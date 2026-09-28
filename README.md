@@ -1,9 +1,15 @@
 # Shopping-App-Frontend
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://shopping-app-frontend-rho.vercel.app/)
+[![Backend API](https://img.shields.io/badge/Backend_API-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://shopping-app-backend-bwbb.onrender.com/api)
+
+> **Live Website:** [https://shopping-app-frontend-rho.vercel.app/](https://shopping-app-frontend-rho.vercel.app/)  
+> **Backend API:** [https://shopping-app-backend-bwbb.onrender.com/api](https://shopping-app-backend-bwbb.onrender.com/api)
+
 ÉLANE Luxury Fashion Atelier — Editorial e-commerce client built with React 19, Vite, Tailwind CSS v4, Framer Motion, and Lucide React.
 
 ## Live Deployments
-- **Frontend Client (Vercel):** [https://shopping-app-frontend-rho.vercel.app](https://shopping-app-frontend-rho.vercel.app)
+- **Frontend Client (Vercel):** [https://shopping-app-frontend-rho.vercel.app/](https://shopping-app-frontend-rho.vercel.app/)
 - **REST API (Render):** [https://shopping-app-backend-bwbb.onrender.com/api](https://shopping-app-backend-bwbb.onrender.com/api)
 
 ## Features
