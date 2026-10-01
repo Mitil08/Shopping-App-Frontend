@@ -1,109 +1,351 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
-import { mockCategories } from '../data/mockProducts';
+import { 
+  ArrowRight, 
+  Smartphone, 
+  Watch, 
+  Sparkles, 
+  Home, 
+  Footprints, 
+  ShoppingBag, 
+  Layers, 
+  SlidersHorizontal,
+  Compass
+} from 'lucide-react';
+import { expandedProducts, expandedCategories } from '../data/expandedCatalog';
+import { mockCategories, initialFashionProducts } from '../data/mockProducts';
+import ProductCard from '../components/ProductCard';
 
 export default function CollectionsPage() {
-  const collectionShowcase = [
+  const [selectedPavilion, setSelectedPavilion] = useState('all');
+
+  // Multi-department Curated Pavilions / Collections covering ALL product categories
+  const collectionPavilions = [
     {
-      id: 'cat-outerwear',
-      title: 'THE OUTERWEAR VAULT',
-      season: 'Edition 04 / Core',
-      description: 'Architectural trench coats, double-breasted overcoats, and dry-waxed field utility jackets.',
-      image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1200&q=80',
-      count: '4 Silhouettes',
+      id: 'cat-mobiles-tech',
+      slug: 'mobiles-electronics',
+      title: 'QUANTUM TECH & MOBILE SANCTUARY',
+      subtitle: 'Next-Gen Silicon & Optical Wonders',
+      badge: 'Flagship Edition 2026',
+      icon: Smartphone,
+      description: 'Aerospace grade titanium flagship smartphones, dual-stack tandem OLED tablets, and high-performance studio computing systems crafted for digital visionaries.',
+      image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=1200&q=80',
+      stats: 'Ultra AMOLED • 200MP Optical • 100W Fast Charge',
+      highlightTag: 'Silicon Architecture'
     },
     {
-      id: 'cat-tailoring',
-      title: 'RELAXED TAILORING & SUITING',
-      season: 'Permanent Archive',
-      description: 'Single-breasted blazers cut with natural shoulders and fluid wide-leg forward-pleat trousers.',
+      id: 'cat-audio-wearables',
+      slug: 'smartwatches-audio',
+      title: 'ACOUSTIC PURSUIT & HOROLOGY',
+      subtitle: 'Beryllium Drivers & Titanium Timepieces',
+      badge: 'Spatial Acoustics',
+      icon: Watch,
+      description: 'Studio-grade spatial noise cancellation headphones, custom beryllium acoustic drivers, and Swiss sapphire biometric smartwatches engineered with luxury precision.',
+      image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=1200&q=80',
+      stats: 'Lossless Hi-Fi • Sapphire Crystal • ECG Biometrics',
+      highlightTag: 'Master Acoustics'
+    },
+    {
+      id: 'cat-mens-fashion',
+      slug: 'mens-fashion',
+      title: 'MASCULINE TAILORING & NOBLE KNITWEAR',
+      subtitle: 'Modern Proportions & Virgin Cashmere',
+      badge: 'Milan Archive',
+      icon: Layers,
+      description: 'Structured double-breasted virgin wool overcoats, 12-gauge Mongolian cashmere mocknecks, pleated architectural trousers, and bespoke Italian poplin shirting.',
       image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80',
-      count: '3 Silhouettes',
+      stats: 'Grade-A Cashmere • Virgin Wool • Tailored Fit',
+      highlightTag: 'Sartorial Mastery'
     },
     {
-      id: 'cat-knitwear',
-      title: 'FINE NOBLE KNITWEAR',
-      season: 'Mongolian Series',
-      description: 'Two-ply 12-gauge grade-A pure cashmere mocknecks and ultrafine merino wool ribbed cardigans.',
-      image: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1200&q=80',
-      count: '4 Silhouettes',
+      id: 'cat-womens-fashion',
+      slug: 'womens-fashion',
+      title: 'FEMININE SILHOUETTE & COUTURE',
+      subtitle: 'Fluid Silk & Sculptural Outerwear',
+      badge: 'Haute Capsule',
+      icon: Sparkles,
+      description: 'Weightless silk charmeuse evening slip dresses, sculptural double-faced trench coats, and artisanal knitwear capturing contemporary quiet luxury.',
+      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=80',
+      stats: '100% Silk Charmeuse • Structural Drape • Paris Atelier',
+      highlightTag: 'Couture Craft'
     },
     {
-      id: 'cat-shirts',
-      title: 'CRISP SHIRTING & ESSENTIAL TEES',
-      season: 'Daily Wardrobe',
-      description: 'Italian poplin studio shirts, French linen resort collars, and 240gsm heavyweight Supima tees.',
-      image: 'https://images.unsplash.com/photo-1598554747436-c9293d6a588f?auto=format&fit=crop&w=1200&q=80',
-      count: '5 Silhouettes',
+      id: 'cat-footwear',
+      slug: 'footwear-sneakers',
+      title: 'ARTISANAL FOOTWEAR & SNEAKER LAB',
+      subtitle: 'Tuscan Cordwainers & Vibram Soles',
+      badge: 'Handmade in Tuscany',
+      icon: Footprints,
+      description: 'Vegetable-tanned calfskin Chelsea boots with Goodyear welted construction, Italian suede driving loafers, and minimalist luxury court sneakers.',
+      image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=1200&q=80',
+      stats: 'Goodyear Welt • Full-Grain Calfskin • Vibram Soles',
+      highlightTag: 'Cordwainer Guild'
+    },
+    {
+      id: 'cat-beauty-perfumes',
+      slug: 'beauty-fragrances',
+      title: 'OLFACTORY APOTHECARY & BEAUTY',
+      subtitle: 'Rare Botanicals & High-Concentration Extraits',
+      badge: 'Grasse Distillations',
+      icon: Sparkles,
+      description: 'Niche artisan extraits de parfum laced with smoked oud, aged ambergris, and Damascene rose, accompanied by cellular botanical restorative skincare elixirs.',
+      image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=1200&q=80',
+      stats: '30% Extrait de Parfum • 24K Restorative • Pure Botanicals',
+      highlightTag: 'Niche Olfactory'
+    },
+    {
+      id: 'cat-home-living',
+      slug: 'home-luxury-living',
+      title: 'HABITAT, LIGHT & LIVING SANCTUARY',
+      subtitle: 'Architectural Ceramics & Organic Belgian Linens',
+      badge: 'Living Arts',
+      icon: Home,
+      description: 'Brutalist ceramic lamps hand-thrown in Kyoto, stone-washed Belgian flax linen bedding, and precision brass pour-over coffee barware designed for intentional living.',
+      image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80',
+      stats: 'Hand-thrown Ceramic • Pure Belgian Linen • Solid Brass',
+      highlightTag: 'Interior Sanctuary'
     },
     {
       id: 'cat-accessories',
-      title: 'TUSCAN LEATHER GOODS',
-      season: 'Florence Handcraft',
-      description: 'Vegetable-tanned full grain carryalls, minimalist cardholders, and beveled solid brass belts.',
+      slug: 'leather-accessories',
+      title: 'TUSCAN LEATHER GOODS & TRAVEL',
+      subtitle: 'Full-Grain Florentine Vegetable-Tanned Hides',
+      badge: 'Heritage Carry',
+      icon: ShoppingBag,
+      description: 'Hand-stitched weekenders, minimal RFID cardholders, solid brass hardware belts, and lifetime-grade leather carryalls designed to patinate beautifully with age.',
       image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1200&q=80',
-      count: '4 Silhouettes',
+      stats: 'Full-Grain Tuscan • Solid Brass • Lifetime Guarantee',
+      highlightTag: 'Florentine Tannery'
     },
   ];
 
+  // Combined product pool
+  const allProducts = useMemo(() => {
+    return [...expandedProducts, ...initialFashionProducts];
+  }, []);
+
+  // Filter showcased pavilion
+  const activePavilions = useMemo(() => {
+    if (selectedPavilion === 'all') return collectionPavilions;
+    return collectionPavilions.filter(p => p.id === selectedPavilion || p.slug === selectedPavilion);
+  }, [selectedPavilion]);
+
+  // Representative items preview for each pavilion
+  const getProductsForPavilion = (pavilionId, slug) => {
+    return allProducts.filter(p => {
+      const pCat = (p.category_id || '').toLowerCase();
+      const pName = (p.name || '').toLowerCase();
+      if (pavilionId === 'cat-mobiles-tech') return pCat === 'cat-mobiles-tech' || pName.includes('smartphone') || pName.includes('tablet');
+      if (pavilionId === 'cat-audio-wearables') return pCat === 'cat-audio-wearables' || pName.includes('headphone') || pName.includes('smartwatch');
+      if (pavilionId === 'cat-footwear') return pCat === 'cat-footwear' || pName.includes('boot') || pName.includes('sneaker') || pName.includes('loafer');
+      if (pavilionId === 'cat-beauty-perfumes') return pCat === 'cat-beauty-perfumes' || pName.includes('parfum') || pName.includes('serum') || pName.includes('fragrance');
+      if (pavilionId === 'cat-home-living') return pCat === 'cat-home-living' || pName.includes('lamp') || pName.includes('linen') || pName.includes('pour-over');
+      if (pavilionId === 'cat-accessories') return pCat === 'cat-accessories' || pName.includes('leather') || pName.includes('cardholder') || pName.includes('carryall') || pName.includes('tote');
+      if (pavilionId === 'cat-mens-fashion') return ['cat-tailoring', 'cat-shirts', 'cat-outerwear', 'cat-trousers', 'cat-knitwear', 'cat-mens-fashion'].includes(pCat);
+      if (pavilionId === 'cat-womens-fashion') return pCat === 'cat-womens-fashion' || pName.includes('silk') || pName.includes('dress') || pName.includes('trench');
+      return pCat === pavilionId || pCat === slug;
+    }).slice(0, 4);
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-      <div className="text-center max-w-2xl mx-auto mb-16">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-[#787570] font-semibold">
-          Curated Portfolios
-        </span>
-        <h1 className="font-serif text-3xl sm:text-5xl text-[#141414] font-normal uppercase mt-1">
-          Seasonal Collections
-        </h1>
-        <p className="text-xs sm:text-sm text-[#787570] mt-2 font-light">
-          Each capsule represents a study in materials, silhouette architecture, and tactile refinement.
-        </p>
-      </div>
-
-      <div className="space-y-16">
-        {collectionShowcase.map((col, idx) => (
-          <div
-            key={col.id}
-            className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center ${
-              idx % 2 === 1 ? 'lg:flex-row-reverse' : ''
-            }`}
-          >
-            <div className={`lg:col-span-7 ${idx % 2 === 1 ? 'lg:order-2' : ''}`}>
-              <Link to={`/shop?category=${col.id}`} className="block overflow-hidden bg-[#F3F1EC] group">
-                <div className="aspect-[16/9] sm:aspect-[21/10] overflow-hidden">
-                  <img
-                    src={col.image}
-                    alt={col.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                </div>
-              </Link>
-            </div>
-
-            <div className={`lg:col-span-5 space-y-4 ${idx % 2 === 1 ? 'lg:order-1' : ''}`}>
-              <span className="text-[10px] uppercase tracking-[0.25em] text-[#C2A676] font-semibold">
-                {col.season} • {col.count}
-              </span>
-              <h2 className="font-serif text-2xl sm:text-3xl text-[#141414] font-normal">
-                {col.title}
-              </h2>
-              <p className="text-xs sm:text-sm text-[#63605A] font-light leading-relaxed">
-                {col.description}
-              </p>
-              <div className="pt-2">
-                <Link
-                  to={`/shop?category=${col.id}`}
-                  className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] font-semibold text-[#141414] hover:text-[#C2A676] transition-colors group"
-                >
-                  <span>Explore Capsule</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </div>
+    <div className="relative min-h-screen text-[#141414] dark:text-[#FAF9F5] transition-colors duration-300">
+      {/* Hero Header */}
+      <section className="relative pt-12 pb-16 lg:pt-20 lg:pb-24 border-b border-[#E8E6E1] dark:border-[#24222E]/80 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#C2A676]/5 via-transparent to-transparent pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C2A676]/10 border border-[#C2A676]/20 text-[#C2A676] text-[11px] uppercase tracking-[0.25em] font-semibold mb-6">
+            <Compass className="w-3.5 h-3.5" />
+            Curated Global Pavilions • Omnichannel Index
           </div>
-        ))}
-      </div>
+          
+          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-light tracking-tight uppercase max-w-4xl mx-auto leading-[1.05]">
+            The Master <span className="italic font-normal text-[#C2A676]">Collections</span>
+          </h1>
+          
+          <p className="mt-5 max-w-2xl mx-auto text-sm sm:text-base text-[#73706B] dark:text-[#9A968F] font-light leading-relaxed">
+            From precision 3nm smartphones and spatial beryllium acoustics to sartorial virgin wools, 
+            Florentine leathercraft, and Grasse perfume extraits. Explore every department of the modern ÉLANE sanctuary.
+          </p>
+
+          {/* Department Quick Filter Pills */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto">
+            <button
+              onClick={() => setSelectedPavilion('all')}
+              className={`px-4 py-2 rounded-full text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
+                selectedPavilion === 'all'
+                  ? 'bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] shadow-sm'
+                  : 'bg-[#F3F1EC] dark:bg-[#181622] text-[#73706B] dark:text-[#9A968F] hover:text-[#141414] dark:hover:text-white border border-[#E8E6E1] dark:border-[#24222E]'
+              }`}
+            >
+              All Pavilions ({collectionPavilions.length})
+            </button>
+            {collectionPavilions.map((p) => {
+              const Icon = p.icon;
+              const isActive = selectedPavilion === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedPavilion(p.id)}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
+                    isActive
+                      ? 'bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] shadow-sm'
+                      : 'bg-[#F3F1EC] dark:bg-[#181622] text-[#73706B] dark:text-[#9A968F] hover:text-[#141414] dark:hover:text-white border border-[#E8E6E1] dark:border-[#24222E]'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{p.title.split(' ')[0]}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Main Collections Pavilions Display */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 space-y-24 lg:space-y-32">
+        {activePavilions.map((col, idx) => {
+          const Icon = col.icon;
+          const pavilionProducts = getProductsForPavilion(col.id, col.slug);
+          const isReversed = idx % 2 === 1;
+
+          return (
+            <div key={col.id} className="relative group/pavilion scroll-mt-28" id={col.slug}>
+              {/* Top Banner Feature Grid */}
+              <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center ${
+                isReversed ? 'lg:flex-row-reverse' : ''
+              }`}>
+                {/* Visual Imagery Side */}
+                <div className={`lg:col-span-7 ${isReversed ? 'lg:order-2' : ''}`}>
+                  <Link 
+                    to={`/shop?category=${col.slug}`} 
+                    className="block relative overflow-hidden rounded-2xl bg-[#F3F1EC] dark:bg-[#181622] border border-[#E8E6E1] dark:border-[#24222E] shadow-xl group aspect-[16/10] sm:aspect-[16/9]"
+                  >
+                    <img
+                      src={col.image}
+                      alt={col.title}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    
+                    {/* Floating Overlay Details */}
+                    <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+                      <div>
+                        <span className="text-[10px] tracking-[0.25em] uppercase font-semibold text-[#C2A676] bg-black/50 backdrop-blur-md px-3 py-1 rounded-full border border-[#C2A676]/30 inline-block mb-2">
+                          {col.highlightTag}
+                        </span>
+                        <p className="text-white font-serif text-xl sm:text-2xl font-light">
+                          {col.subtitle}
+                        </p>
+                      </div>
+                      <div className="hidden sm:flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white text-xs uppercase tracking-widest px-4 py-2.5 rounded-full border border-white/20 transition-all">
+                        <span>Browse Catalog</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+
+                {/* Editorial Description Side */}
+                <div className={`lg:col-span-5 space-y-6 ${isReversed ? 'lg:order-1' : ''}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-[#C2A676]/10 text-[#C2A676] border border-[#C2A676]/20">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase tracking-[0.25em] text-[#C2A676] font-bold block">
+                        {col.badge}
+                      </span>
+                      <span className="text-xs text-[#73706B] dark:text-[#9A968F] font-light">
+                        {col.stats}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h2 className="font-serif text-3xl sm:text-4xl text-[#141414] dark:text-white font-normal uppercase leading-tight">
+                      {col.title}
+                    </h2>
+                    <p className="text-sm text-[#5C5A55] dark:text-[#B3AFAB] font-light leading-relaxed mt-4">
+                      {col.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-2 flex flex-wrap items-center gap-4">
+                    <Link
+                      to={`/shop?category=${col.slug}`}
+                      className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-xs uppercase tracking-[0.2em] font-semibold bg-[#141414] text-white hover:bg-[#C2A676] dark:bg-[#FAF9F5] dark:text-[#0B0A0E] dark:hover:bg-[#C2A676] transition-all duration-300 shadow-md group"
+                    >
+                      <span>Explore {col.title.split(' ')[0]} Sanctuary</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+
+                    <Link
+                      to={`/shop?category=all`}
+                      className="text-xs uppercase tracking-[0.18em] text-[#73706B] dark:text-[#9A968F] hover:text-[#141414] dark:hover:text-white transition-colors"
+                    >
+                      View All Catalog &rarr;
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* Showcase Product Silhouettes in this Department */}
+              {pavilionProducts.length > 0 && (
+                <div className="mt-10 pt-8 border-t border-[#E8E6E1]/60 dark:border-[#24222E]/60">
+                  <div className="flex items-center justify-between mb-6">
+                    <span className="text-[11px] uppercase tracking-[0.25em] text-[#73706B] dark:text-[#9A968F] font-semibold flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C2A676]" />
+                      Featured Pieces from this Pavilion
+                    </span>
+                    <Link
+                      to={`/shop?category=${col.slug}`}
+                      className="text-xs uppercase tracking-wider text-[#C2A676] hover:underline font-semibold flex items-center gap-1"
+                    >
+                      See All ({pavilionProducts.length}+) <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                    {pavilionProducts.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </section>
+
+      {/* Bespoke Concierge Banner */}
+      <section className="bg-[#F3F1EC] dark:bg-[#13111C] border-y border-[#E8E6E1] dark:border-[#24222E] py-16 lg:py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-6">
+          <span className="text-[10px] uppercase tracking-[0.3em] text-[#C2A676] font-semibold block">
+            Custom Procurement & Private Viewing
+          </span>
+          <h3 className="font-serif text-3xl sm:text-4xl font-light text-[#141414] dark:text-white uppercase">
+            Seeking a specific timepiece, custom device, or archive piece?
+          </h3>
+          <p className="text-sm text-[#73706B] dark:text-[#9A968F] font-light max-w-xl mx-auto">
+            Our atelier concierge procures rare horology, limited edition flagship technology, and bespoke couture across all continents.
+          </p>
+          <div className="pt-2 flex flex-wrap justify-center gap-4">
+            <Link
+              to="/about"
+              className="px-6 py-3 rounded-full text-xs uppercase tracking-widest font-semibold bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] hover:opacity-90 transition-opacity"
+            >
+              Atelier Heritage & Services
+            </Link>
+            <Link
+              to="/shop"
+              className="px-6 py-3 rounded-full text-xs uppercase tracking-widest font-semibold border border-[#141414] dark:border-white/30 text-[#141414] dark:text-white hover:bg-[#141414]/5 dark:hover:bg-white/5 transition-all"
+            >
+              Browse Complete Inventory
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
