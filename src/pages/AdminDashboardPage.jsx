@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { DollarSign, ShoppingBag, Users, AlertTriangle, ArrowUpRight, ChevronRight, Package, TrendingUp } from 'lucide-react';
 import { mockProducts } from '../data/mockProducts';
+import { formatPrice } from '../utils/currency';
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -62,7 +63,7 @@ export default function AdminDashboardPage() {
             <DollarSign className="w-4 h-4 text-[#C2A676]" />
           </div>
           <div className="font-serif text-3xl font-medium text-[#141414]">
-            ${stats.totalSales.toLocaleString()}
+            {formatPrice(stats.totalSales)}
           </div>
           <p className="text-[11px] text-emerald-700 font-medium flex items-center gap-1 mt-2">
             <TrendingUp className="w-3.5 h-3.5" />
@@ -116,13 +117,13 @@ export default function AdminDashboardPage() {
 
         <div className="grid grid-cols-7 gap-2 sm:gap-4 items-end h-44 pt-6 pb-2 border-b border-[#E8E6E1]">
           {[
-            { day: 'Mon', val: 65, amount: '$6,420' },
-            { day: 'Tue', val: 78, amount: '$7,890' },
-            { day: 'Wed', val: 55, amount: '$5,200' },
-            { day: 'Thu', val: 92, amount: '$9,340' },
-            { day: 'Fri', val: 84, amount: '$8,120' },
-            { day: 'Sat', val: 100, amount: '$11,400' },
-            { day: 'Sun', val: 72, amount: '$7,150' },
+            { day: 'Mon', val: 65, amount: '₹6,420' },
+            { day: 'Tue', val: 78, amount: '₹7,890' },
+            { day: 'Wed', val: 55, amount: '₹5,200' },
+            { day: 'Thu', val: 92, amount: '₹9,340' },
+            { day: 'Fri', val: 84, amount: '₹8,120' },
+            { day: 'Sat', val: 100, amount: '₹11,400' },
+            { day: 'Sun', val: 72, amount: '₹7,150' },
           ].map((bar) => (
             <div key={bar.day} className="flex flex-col items-center gap-2 h-full justify-end group">
               <span className="text-[9px] text-[#787570] opacity-0 group-hover:opacity-100 transition-opacity font-mono">
@@ -176,7 +177,7 @@ export default function AdminDashboardPage() {
                       {ord.customer || ord.shippingAddress?.name || 'Clientele'}
                     </td>
                     <td className="py-3 font-semibold text-[#141414]">
-                      ${typeof ord.total === 'number' ? ord.total.toFixed(2) : ord.total}
+                      {formatPrice(ord.total, true)}
                     </td>
                     <td className="py-3">
                       <span className="px-2 py-0.5 bg-[#F3F1EC] text-[10px] uppercase font-bold tracking-wider text-[#141414]">

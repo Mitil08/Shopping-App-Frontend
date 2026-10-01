@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, ChevronRight, ArrowLeft } from 'lucide-react';
+import { formatPrice } from '../utils/currency';
 import { orderApi } from '../services/orderApi';
 
 export default function OrderHistoryPage() {
@@ -84,7 +85,7 @@ export default function OrderHistoryPage() {
                   Placed on {new Date(order.createdAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                 </p>
                 <p className="text-xs text-[#141414]">
-                  {order.items?.length || 1} {order.items?.length === 1 ? 'item' : 'items'} • Total: <span className="font-semibold">${order.total?.toFixed(2)}</span>
+                  {order.items?.length || 1} {order.items?.length === 1 ? 'item' : 'items'} • Total: <span className="font-semibold">{formatPrice(order.total, true)}</span>
                 </p>
               </div>
 

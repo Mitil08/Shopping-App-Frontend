@@ -4,6 +4,7 @@ import { Heart, Plus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useLanguage } from '../context/LanguageContext';
+import { formatPrice } from '../utils/currency';
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
@@ -119,13 +120,13 @@ export default function ProductCard({ product }) {
         <div className="mt-2 flex items-baseline gap-2">
           {hasDiscount ? (
             <>
-              <span className="text-sm font-semibold text-[#141414]">${product.sale_price}</span>
+              <span className="text-sm font-semibold text-[#141414]">{formatPrice(product.sale_price)}</span>
               <span className="text-xs text-[#787570] line-through font-normal">
-                ${product.base_price}
+                {formatPrice(product.base_price)}
               </span>
             </>
           ) : (
-            <span className="text-sm font-semibold text-[#141414]">${product.base_price}</span>
+            <span className="text-sm font-semibold text-[#141414]">{formatPrice(product.base_price)}</span>
           )}
         </div>
 

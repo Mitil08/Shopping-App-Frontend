@@ -5,9 +5,9 @@ const LanguageContext = createContext(null);
 export const translations = {
   en: {
     // Brand & Header
-    announcement: 'Complimentary express shipping on orders over $100 • Use code',
+    announcement: 'Complimentary express shipping on orders over ₹10,000 • Use code',
     languageName: 'English (US)',
-    currency: 'USD ($)',
+    currency: 'INR (₹)',
     home: 'HOME',
     shopAll: 'SHOP ALL',
     collections: 'COLLECTIONS',
@@ -33,7 +33,7 @@ export const translations = {
     
     // Marquee
     marquee1: 'LUXURY DESIGNER COLLECTION',
-    marquee2: 'COMPLIMENTARY EXPRESS DELIVERY OVER $100',
+    marquee2: 'COMPLIMENTARY EXPRESS DELIVERY OVER ₹10,000',
     marquee3: '100% GRADE-A MONGOLIAN CASHMERE',
     marquee4: 'OKAYAMA RAW SELVEDGE DENIM',
     marquee5: 'TUSCAN VEGETABLE-TANNED LEATHER',
@@ -57,7 +57,7 @@ export const translations = {
     curatedFavorites: 'Curated Favorites',
     trendingNow: 'TRENDING NOW',
     ethicallySourcedFibers: 'Ethically Sourced Natural Fibers',
-    complimentaryExpressShipping: 'Complimentary Express Shipping over $100',
+    complimentaryExpressShipping: 'Complimentary Express Shipping over ₹10,000',
     complimentary30DayReturns: 'Complimentary 30-Day Atelier Returns',
     outerwearVaultTitle: 'THE OUTERWEAR VAULT',
     outerwearVaultSubtitle: 'Sculptural trench coats & virgin wool overcoats',
@@ -121,9 +121,9 @@ export const translations = {
     thankYou: 'Thank you for your purchase. We are preparing your order for shipment.',
   },
   es: {
-    announcement: 'Envío exprés gratuito en pedidos superiores a $100 • Código',
+    announcement: 'Envío exprés gratuito en pedidos superiores a ₹10,000 • Código',
     languageName: 'Español',
-    currency: 'USD ($)',
+    currency: 'INR (₹)',
     home: 'INICIO',
     shopAll: 'TIENDA',
     collections: 'COLECCIONES',
@@ -158,7 +158,7 @@ export const translations = {
     curatedFavorites: 'Favoritos Seleccionados',
     trendingNow: 'TENDENCIAS',
     ethicallySourcedFibers: 'Fibras Naturales de Origen Ético',
-    complimentaryExpressShipping: 'Envío Exprés Gratuito en pedidos superiores a $100',
+    complimentaryExpressShipping: 'Envío Exprés Gratuito en pedidos superiores a ₹10,000',
     complimentary30DayReturns: 'Devoluciones Gratuitas en 30 Días',
     outerwearVaultTitle: 'ABRIGOS Y PARKAS',
     outerwearVaultSubtitle: 'Trenchs esculturales y abrigos de pura lana',
@@ -216,9 +216,9 @@ export const translations = {
     thankYou: 'Gracias por tu compra. Estamos preparando tu envío.',
   },
   fr: {
-    announcement: 'Livraison express offerte dès $100 d’achats • Code',
+    announcement: 'Livraison express offerte dès ₹10,000 d’achats • Code',
     languageName: 'Français',
-    currency: 'USD ($)',
+    currency: 'INR (₹)',
     home: 'ACCUEIL',
     shopAll: 'BOUTIQUE',
     collections: 'COLLECTIONS',
@@ -253,7 +253,7 @@ export const translations = {
     curatedFavorites: 'Coups de Cœur',
     trendingNow: 'TENDANCES DU MOMENT',
     ethicallySourcedFibers: 'Fibres Naturelles Éco-responsables',
-    complimentaryExpressShipping: 'Livraison Express Offerte dès $100',
+    complimentaryExpressShipping: 'Livraison Express Offerte dès ₹10,000',
     complimentary30DayReturns: 'Retours Offerts sous 30 Jours',
     outerwearVaultTitle: 'MANTEAUX & PIÈCES D’EXTÉRIEUR',
     outerwearVaultSubtitle: 'Trenchs sculpturaux et pardessus en pure laine',

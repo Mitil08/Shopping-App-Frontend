@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Search, Edit2, Trash2, Check, Star } from 'lucide-react';
 import { mockProducts } from '../data/mockProducts';
 import { useToast } from '../context/ToastContext';
+import { formatPrice } from '../utils/currency';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState(() => {
@@ -106,11 +107,11 @@ export default function AdminProductsPage() {
                   <td className="p-4 font-medium text-[#141414]">
                     {prod.sale_price ? (
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-red-700">${prod.sale_price}</span>
-                        <span className="text-[#A3A099] line-through">${prod.base_price}</span>
+                        <span className="font-bold text-red-700">{formatPrice(prod.sale_price)}</span>
+                        <span className="text-[#A3A099] line-through">{formatPrice(prod.base_price)}</span>
                       </div>
                     ) : (
-                      <span>${prod.base_price}</span>
+                      <span>{formatPrice(prod.base_price)}</span>
                     )}
                   </td>
                   <td className="p-4">

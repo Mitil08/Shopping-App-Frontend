@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { orderApi } from '../services/orderApi';
+import { formatPrice } from '../utils/currency';
 
 export default function CheckoutPage() {
   const { items, subtotal, discountAmount, shippingCost, total, clearCart } = useCart();
@@ -396,7 +397,7 @@ export default function CheckoutPage() {
                       {item.size} • {item.color}
                     </p>
                     <p className="text-xs font-semibold text-[#141414] mt-0.5">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      {formatPrice(item.price * item.quantity, true)}
                     </p>
                   </div>
                 </div>
@@ -407,21 +408,21 @@ export default function CheckoutPage() {
             <div className="space-y-2 text-xs text-[#787570] pt-4 border-t border-[#E8E6E1]">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="text-[#141414] font-medium">${subtotal.toFixed(2)}</span>
+                <span className="text-[#141414] font-medium">{formatPrice(subtotal, true)}</span>
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between text-[#C2A676]">
                   <span>Privilege Discount</span>
-                  <span>-${discountAmount.toFixed(2)}</span>
+                  <span>-{formatPrice(discountAmount, true)}</span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span>Express Courier Shipping</span>
-                <span>{shippingCost === 0 ? 'COMPLIMENTARY' : `$${shippingCost.toFixed(2)}`}</span>
+                <span>{shippingCost === 0 ? 'COMPLIMENTARY' : formatPrice(shippingCost, true)}</span>
               </div>
               <div className="flex justify-between text-base font-semibold text-[#141414] pt-3 border-t border-[#E8E6E1]">
                 <span>Total Due</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{formatPrice(total, true)}</span>
               </div>
             </div>
 
@@ -434,7 +435,7 @@ export default function CheckoutPage() {
               {placingOrder ? (
                 <span>Transmitting Order...</span>
               ) : (
-                <span>Confirm & Authorize ${total.toFixed(2)}</span>
+                <span>Confirm & Authorize {formatPrice(total, true)}</span>
               )}
             </button>
 

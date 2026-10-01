@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { CheckCircle2, Package, ArrowRight, ShieldCheck, Mail, MapPin } from 'lucide-react';
+import { formatPrice } from '../utils/currency';
 
 export default function OrderSuccessPage() {
   const { orderId } = useParams();
@@ -90,7 +91,7 @@ export default function OrderSuccessPage() {
                     </div>
                   </div>
                   <span className="font-semibold text-[#141414]">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatPrice(item.price * item.quantity, true)}
                   </span>
                 </div>
               ))}
@@ -98,7 +99,7 @@ export default function OrderSuccessPage() {
 
             <div className="border-t border-[#E8E6E1] mt-4 pt-3 flex justify-between items-center text-xs font-semibold text-[#141414]">
               <span>Total Paid</span>
-              <span className="text-base">${order.total?.toFixed(2)}</span>
+              <span className="text-base">{formatPrice(order.total, true)}</span>
             </div>
           </div>
         )}

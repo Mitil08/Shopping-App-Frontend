@@ -447,7 +447,7 @@ export default function HomePage() {
         >
           <span>{t.marquee1 || 'LUXURY DESIGNER COLLECTION'}</span>
           <span className="text-amber-400 animate-pulse">◆</span>
-          <span>{t.marquee2 || 'COMPLIMENTARY EXPRESS DELIVERY OVER $100'}</span>
+          <span>{t.marquee2 || 'COMPLIMENTARY EXPRESS DELIVERY OVER ₹10,000'}</span>
           <span className="text-rose-400 animate-pulse">◆</span>
           <span>{t.marquee3 || '100% GRADE-A MONGOLIAN CASHMERE'}</span>
           <span className="text-violet-400 animate-pulse">◆</span>
@@ -460,7 +460,7 @@ export default function HomePage() {
           {/* Loop repeat */}
           <span>{t.marquee1 || 'LUXURY DESIGNER COLLECTION'}</span>
           <span className="text-amber-400 animate-pulse">◆</span>
-          <span>{t.marquee2 || 'COMPLIMENTARY EXPRESS DELIVERY OVER $100'}</span>
+          <span>{t.marquee2 || 'COMPLIMENTARY EXPRESS DELIVERY OVER ₹10,000'}</span>
           <span className="text-rose-400 animate-pulse">◆</span>
           <span>{t.marquee3 || '100% GRADE-A MONGOLIAN CASHMERE'}</span>
           <span className="text-violet-400 animate-pulse">◆</span>
@@ -516,7 +516,7 @@ export default function HomePage() {
                   {t.complimentaryExpressShipping || 'Complimentary Express Shipping'}
                 </span>
                 <span className="text-[11px] text-[#73706B] font-light">
-                  Free on all orders over $100
+                  Free on all orders over ₹10,000
                 </span>
               </div>
             </motion.div>

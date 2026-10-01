@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import ProductCard from '../components/ProductCard';
 import { mockProducts } from '../data/mockProducts';
+import { formatPrice } from '../utils/currency';
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -180,11 +181,11 @@ export default function ProductDetailPage() {
             <div className="mt-3 flex items-baseline gap-3">
               {product.sale_price ? (
                 <>
-                  <span className="text-2xl font-serif text-[#141414]">${product.sale_price}</span>
-                  <span className="text-base text-[#787570] line-through">${product.base_price}</span>
+                  <span className="text-2xl font-serif text-[#141414]">{formatPrice(product.sale_price)}</span>
+                  <span className="text-base text-[#787570] line-through">{formatPrice(product.base_price)}</span>
                 </>
               ) : (
-                <span className="text-2xl font-serif text-[#141414]">${product.base_price}</span>
+                <span className="text-2xl font-serif text-[#141414]">{formatPrice(product.base_price)}</span>
               )}
               <span className="text-[11px] text-[#787570] uppercase tracking-wider ml-1">
                 Taxes included
@@ -378,7 +379,7 @@ export default function ProductDetailPage() {
               {activeTab === 'shipping' && (
                 <div className="space-y-2.5">
                   <p>
-                    We offer complimentary express courier shipping on all orders over $100. Dispatched from our central logistics atelier within 24 business hours.
+                    We offer complimentary express courier shipping on all orders over ₹10,000. Dispatched from our central logistics atelier within 24 business hours.
                   </p>
                   <p>
                     Returns are accepted within 30 days of receipt in original condition with unclipped security tags.
@@ -414,7 +415,7 @@ export default function ProductDetailPage() {
         <div>
           <p className="font-serif text-sm font-semibold text-[#141414] line-clamp-1">{product.name}</p>
           <p className="text-xs text-[#787570]">
-            ${product.sale_price || product.base_price} • Size: {selectedVariant?.size || 'M'}
+            {formatPrice(product.sale_price || product.base_price)} • Size: {selectedVariant?.size || 'M'}
           </p>
         </div>
         <button

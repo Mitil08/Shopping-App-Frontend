@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, Plus, Minus, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { formatPrice } from '../utils/currency';
 
 export default function CartDrawer() {
   const { t } = useLanguage();
@@ -92,7 +93,7 @@ export default function CartDrawer() {
               <div className="flex justify-between items-center text-xs tracking-wider uppercase mb-1.5 font-medium">
                 {amountToFreeShipping > 0 ? (
                   <span>
-                    Add <span className="font-semibold text-[#141414]">${amountToFreeShipping.toFixed(2)}</span> more for Free Shipping
+                    Add <span className="font-semibold text-[#141414]">{formatPrice(amountToFreeShipping, true)}</span> more for Free Shipping
                   </span>
                 ) : (
                   <span className="text-[#141414] font-semibold flex items-center gap-1.5">
@@ -173,7 +174,7 @@ export default function CartDrawer() {
                         </div>
 
                         <div className="text-xs font-semibold text-[#141414] mt-1.5">
-                          ${item.price}
+                          {formatPrice(item.price)}
                         </div>
                       </div>
 
@@ -200,7 +201,7 @@ export default function CartDrawer() {
                         </div>
 
                         <span className="text-xs font-medium text-[#787570]">
-                          Subtotal: ${(item.price * item.quantity).toFixed(2)}
+                          Subtotal: {formatPrice(item.price * item.quantity, true)}
                         </span>
                       </div>
                     </div>
@@ -239,21 +240,21 @@ export default function CartDrawer() {
                 <div className="space-y-1.5 text-xs text-[#787570]">
                   <div className="flex justify-between">
                     <span>{t.subtotal || 'Subtotal'}</span>
-                    <span className="text-[#141414] font-medium">${subtotal.toFixed(2)}</span>
+                    <span className="text-[#141414] font-medium">{formatPrice(subtotal, true)}</span>
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-[#C2A676]">
                       <span>{t.discount || 'Discount'}</span>
-                      <span>-${discountAmount.toFixed(2)}</span>
+                      <span>-{formatPrice(discountAmount, true)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span>{t.shipping || 'Shipping'}</span>
-                    <span>{shippingCost === 0 ? (t.complimentary || 'COMPLIMENTARY') : `$${shippingCost.toFixed(2)}`}</span>
+                    <span>{shippingCost === 0 ? (t.complimentary || 'COMPLIMENTARY') : formatPrice(shippingCost, true)}</span>
                   </div>
                   <div className="flex justify-between text-sm font-semibold text-[#141414] pt-2 border-t border-[#E8E6E1]">
                     <span>{t.totalDue || 'Total'}</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>{formatPrice(total, true)}</span>
                   </div>
                 </div>
 

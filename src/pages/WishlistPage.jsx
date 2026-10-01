@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
+import { formatPrice } from '../utils/currency';
 
 export default function WishlistPage() {
   const { wishlist, removeFromWishlist, moveToCart } = useWishlist();
@@ -76,7 +77,7 @@ export default function WishlistPage() {
                 {product.name}
               </Link>
               <div className="mt-1 text-xs font-semibold text-[#141414]">
-                ${product.sale_price || product.base_price}
+                {formatPrice(product.sale_price || product.base_price)}
               </div>
 
               <div className="pt-3 mt-auto">

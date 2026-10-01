@@ -217,7 +217,7 @@ export default function ShopPage() {
         <div className="flex items-center gap-2">
           <input
             type="number"
-            placeholder="Min $"
+            placeholder="Min ₹"
             value={minPriceParam}
             onChange={(e) => updateParam('minPrice', e.target.value)}
             className="w-1/2 bg-white border border-[#E8E6E1] px-3 py-1.5 text-xs text-[#141414] focus:outline-none focus:border-[#141414]"
@@ -225,7 +225,7 @@ export default function ShopPage() {
           <span className="text-[#A3A099]">-</span>
           <input
             type="number"
-            placeholder="Max $"
+            placeholder="Max ₹"
             value={maxPriceParam}
             onChange={(e) => updateParam('maxPrice', e.target.value)}
             className="w-1/2 bg-white border border-[#E8E6E1] px-3 py-1.5 text-xs text-[#141414] focus:outline-none focus:border-[#141414]"

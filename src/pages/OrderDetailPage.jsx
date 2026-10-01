@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { ArrowLeft, MapPin, Truck, CheckCircle2 } from 'lucide-react';
 import { orderApi } from '../services/orderApi';
+import { formatPrice } from '../utils/currency';
 
 export default function OrderDetailPage() {
   const { orderId } = useParams();
@@ -127,7 +128,7 @@ export default function OrderDetailPage() {
                   </div>
                 </div>
                 <span className="font-semibold text-[#141414]">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  {formatPrice(item.price * item.quantity, true)}
                 </span>
               </div>
             ))}
@@ -156,21 +157,21 @@ export default function OrderDetailPage() {
             </p>
             <div className="flex justify-between">
               <span>Subtotal:</span>
-              <span className="text-[#141414]">${order.subtotal?.toFixed(2)}</span>
+              <span className="text-[#141414]">{formatPrice(order.subtotal, true)}</span>
             </div>
             {order.discount > 0 && (
               <div className="flex justify-between text-[#C2A676]">
                 <span>Discount:</span>
-                <span>-${order.discount?.toFixed(2)}</span>
+                <span>-{formatPrice(order.discount, true)}</span>
               </div>
             )}
             <div className="flex justify-between">
               <span>Shipping:</span>
-              <span>{order.shippingCost === 0 ? 'COMPLIMENTARY' : `$${order.shippingCost?.toFixed(2)}`}</span>
+              <span>{order.shippingCost === 0 ? 'COMPLIMENTARY' : formatPrice(order.shippingCost, true)}</span>
             </div>
             <div className="flex justify-between text-sm font-semibold text-[#141414] pt-2 border-t border-[#E8E6E1]">
               <span>Total Paid:</span>
-              <span>${order.total?.toFixed(2)}</span>
+              <span>{formatPrice(order.total, true)}</span>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, ArrowRight } from 'lucide-react';
 import { mockProducts } from '../data/mockProducts';
+import { formatPrice } from '../utils/currency';
 
 export default function SearchBar({ isOpen, onClose }) {
   const [query, setQuery] = useState('');
@@ -139,7 +140,7 @@ export default function SearchBar({ isOpen, onClose }) {
                       {product.name}
                     </h4>
                     <span className="text-xs font-semibold text-[#141414] mt-1">
-                      ${product.sale_price || product.base_price}
+                      {formatPrice(product.sale_price || product.base_price)}
                     </span>
                   </div>
                 </div>

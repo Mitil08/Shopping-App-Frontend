@@ -98,13 +98,13 @@ export default function Navbar({ onOpenSearch }) {
 
         {/* Center Offer */}
         <div className="hidden md:block text-center flex-1">
-          {t.announcement || 'Complimentary express shipping on orders over $100 • Use code'}{' '}
+          {t.announcement || 'Complimentary express shipping on orders over ₹10,000 • Use code'}{' '}
           <span className="text-[#C2A676] font-semibold">ELANE10</span>
         </div>
 
         {/* Currency Display */}
         <div className="text-[10px] text-[#A3A099] tracking-widest font-mono">
-          USD ($)
+          INR (₹)
         </div>
       </div>
 

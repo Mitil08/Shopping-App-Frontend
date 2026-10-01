@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Search, ChevronDown, Check } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { formatPrice } from '../utils/currency';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -120,7 +121,7 @@ export default function AdminOrdersPage() {
                     {ord.items?.length || ord.itemsCount || 1} items
                   </td>
                   <td className="p-4 font-semibold text-[#141414]">
-                    ${typeof ord.total === 'number' ? ord.total.toFixed(2) : ord.total}
+                    {formatPrice(ord.total, true)}
                   </td>
                   <td className="p-4 text-[#787570]">
                     {new Date(ord.createdAt || ord.date || Date.now()).toLocaleDateString()}

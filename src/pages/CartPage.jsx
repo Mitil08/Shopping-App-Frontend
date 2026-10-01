@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trash2, Plus, Minus, ArrowRight, ShieldCheck, ArrowLeft, Tag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { formatPrice } from '../utils/currency';
 
 export default function CartPage() {
   const {
@@ -48,7 +49,7 @@ export default function CartPage() {
           Your Shopping Bag Is Empty
         </h1>
         <p className="text-xs sm:text-sm text-[#787570] max-w-md mx-auto mb-8 font-light">
-          Pieces selected from our seasonal curations will appear here. Enjoy complimentary delivery on orders over $100.
+          Pieces selected from our seasonal curations will appear here. Enjoy complimentary delivery on orders over ₹10,000.
         </p>
         <Link
           to="/shop"
@@ -88,7 +89,7 @@ export default function CartPage() {
             <div className="flex justify-between items-center text-xs tracking-wider uppercase font-medium mb-2">
               {amountToFreeShipping > 0 ? (
                 <span>
-                  Add <span className="font-bold text-[#141414]">${amountToFreeShipping.toFixed(2)}</span> more to receive Free Express Shipping
+                  Add <span className="font-bold text-[#141414]">{formatPrice(amountToFreeShipping, true)}</span> more to receive Free Express Shipping
                 </span>
               ) : (
                 <span className="text-[#141414] font-semibold flex items-center gap-1.5">
@@ -127,7 +128,7 @@ export default function CartPage() {
                       <span>Color: {item.color}</span>
                     </div>
                     <div className="text-xs font-semibold text-[#141414] pt-1">
-                      ${item.price}
+                      {formatPrice(item.price)}
                     </div>
                   </div>
                 </div>
@@ -151,7 +152,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="text-sm font-semibold text-[#141414] min-w-[70px] text-right">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatPrice(item.price * item.quantity, true)}
                   </div>
 
                   <button
@@ -213,17 +214,17 @@ export default function CartPage() {
             <div className="space-y-3 text-xs text-[#787570] pt-2 border-t border-[#E8E6E1]">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="text-[#141414] font-medium">${subtotal.toFixed(2)}</span>
+                <span className="text-[#141414] font-medium">{formatPrice(subtotal, true)}</span>
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between text-[#C2A676]">
                   <span>Privilege Discount</span>
-                  <span>-${discountAmount.toFixed(2)}</span>
+                  <span>-{formatPrice(discountAmount, true)}</span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>{shippingCost === 0 ? 'COMPLIMENTARY' : `$${shippingCost.toFixed(2)}`}</span>
+                <span>{shippingCost === 0 ? 'COMPLIMENTARY' : formatPrice(shippingCost, true)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Estimated Sales Tax</span>
@@ -231,7 +232,7 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between text-base font-semibold text-[#141414] pt-4 border-t border-[#E8E6E1]">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{formatPrice(total, true)}</span>
               </div>
             </div>
 
