@@ -19,7 +19,7 @@ export default function WhatsAppOrderShare({ order, awbNumber }) {
   const shareText = `*ÉLANE LUXURY ATELIER — DISPATCH ADVISORY* 🏛️✨
 ━━━━━━━━━━━━━━━━━━━━
 *Acquisition Reference:* #${order.id}
-*Garments:* ${firstItemName}${remainingCount}
+*Items:* ${firstItemName}${remainingCount}
 *Total Value:* ${orderTotalFormatted}
 *Status:* ${currentStatus} (Atelier Quality Inspected)
 

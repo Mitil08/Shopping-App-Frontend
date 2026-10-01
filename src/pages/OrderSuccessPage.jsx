@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { CheckCircle2, Package, ArrowRight, ShieldCheck, Mail, MapPin, Truck, Clock, FileText } from 'lucide-react';
+import { CheckCircle2, Package, ArrowRight, ShieldCheck, Mail, MapPin, Truck, Clock, FileText, Sparkles } from 'lucide-react';
 import { formatPrice } from '../utils/currency';
 import InvoiceModal from '../components/InvoiceModal';
 import WhatsAppOrderShare from '../components/WhatsAppOrderShare';
+import UnboxingSimulator from '../components/UnboxingSimulator';
 
 export default function OrderSuccessPage() {
   const { orderId } = useParams();
   const location = useLocation();
   const order = location.state?.order;
   const [showInvoice, setShowInvoice] = useState(false);
+  const [showUnboxing, setShowUnboxing] = useState(false);
 
   // Generate deterministic mock AWB and courier tracking number
   const awbNumber = orderId
@@ -50,7 +52,7 @@ export default function OrderSuccessPage() {
         ORDER CONFIRMED
       </h1>
       <p className="text-xs sm:text-sm text-[#787570] font-light max-w-md mx-auto mb-8 leading-relaxed">
-        Thank you for your purchase. We are preparing your garments for shipment with our signature protective packaging.
+        Thank you for your purchase. We are preparing your pieces for shipment with our signature protective packaging.
       </p>
 
       {/* Amazon-style Live Fulfillment Tracker Card */}
@@ -190,7 +192,7 @@ export default function OrderSuccessPage() {
         {order?.items && order.items.length > 0 && (
           <div className="border-t border-[#E8E6E1] pt-4">
             <span className="text-[10px] uppercase tracking-wider text-[#787570] block mb-3">
-              Allocated Garments ({order.items.length})
+              Allocated Items ({order.items.length})
             </span>
             <div className="space-y-3">
               {order.items.map((item, idx) => (
@@ -232,6 +234,14 @@ export default function OrderSuccessPage() {
       {/* Action buttons */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <button
+          onClick={() => setShowUnboxing(true)}
+          className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#181622] via-[#0E0D14] to-[#181622] border border-[#C2A676] text-[#C2A676] hover:bg-[#C2A676] hover:text-[#0B0A0E] text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2 transition-all shadow-md group"
+        >
+          <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <span>Experience 3D Unboxing Ceremony</span>
+        </button>
+
+        <button
           onClick={() => setShowInvoice(true)}
           className="w-full sm:w-auto px-6 py-3.5 border border-[#141414] bg-white hover:bg-[#FAF9F5] text-[#141414] text-xs uppercase tracking-[0.2em] font-semibold flex items-center justify-center gap-2 transition-colors shadow-2xs"
         >
@@ -251,6 +261,14 @@ export default function OrderSuccessPage() {
           Continue Browsing
         </Link>
       </div>
+
+      {/* Interactive 3D Unboxing Ceremony Simulator */}
+      {showUnboxing && (
+        <UnboxingSimulator
+          order={order || { id: orderId, total: 42500, items: [] }}
+          onClose={() => setShowUnboxing(false)}
+        />
+      )}
 
       {/* Official Tax Invoice Modal */}
       <InvoiceModal

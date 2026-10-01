@@ -263,7 +263,7 @@ export default function SearchBar({ isOpen, onClose }) {
               ) : (
                 <div className="py-10 text-center space-y-2">
                   <p className="font-serif text-base text-[#141414]">
-                    No garments matching "{query}"
+                    No products matching "{query}"
                   </p>
                   <p className="text-xs text-[#787570]">
                     Try checking spelling or exploring trending pieces below.

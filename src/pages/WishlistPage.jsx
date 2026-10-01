@@ -17,7 +17,7 @@ export default function WishlistPage() {
           Your Wishlist is Empty
         </h1>
         <p className="text-xs sm:text-sm text-[#787570] font-light max-w-sm mx-auto mb-8">
-          Save your favorite garments, outerwear, and accessories to revisit later or add directly to your bag.
+          Save your favorite products, flagship electronics, and curated pieces to revisit later or add directly to your bag.
         </p>
         <Link
           to="/shop"

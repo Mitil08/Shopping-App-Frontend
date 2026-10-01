@@ -148,7 +148,7 @@ export default function ReturnModal({ isOpen, onClose, order, onReturnSuccess })
             {/* Trajectory Card */}
             <div className="p-4 bg-[#FAF9F5] dark:bg-[#1A1822] border border-[#E8E6E1] dark:border-[#2C2938] rounded-xl text-left text-xs space-y-2">
               <div className="flex justify-between items-center pb-2 border-b border-[#E8E6E1] dark:border-[#2C2938]">
-                <span className="text-[#787570]">Garment for Return:</span>
+                <span className="text-[#787570]">Item for Return:</span>
                 <span className="font-semibold text-[#141414] dark:text-[#FAF9F5]">{submittedData.item?.name}</span>
               </div>
               <div className="flex justify-between items-center pb-2 border-b border-[#E8E6E1] dark:border-[#2C2938]">

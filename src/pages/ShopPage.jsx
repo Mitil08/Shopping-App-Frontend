@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, X, RotateCcw, Search, ChevronDown, Check, Zap } from 'lucide-react';
+import { SlidersHorizontal, X, RotateCcw, Search, ChevronDown, Check, Zap, Sparkles } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { ProductGridSkeleton } from '../components/Skeleton';
 import { productApi } from '../services/productApi';
 import { mockCategories } from '../data/mockProducts';
 import { useLanguage } from '../context/LanguageContext';
+import AICapsuleBuilder from '../components/AICapsuleBuilder';
 
 export default function ShopPage() {
   const { t } = useLanguage();
@@ -26,6 +27,7 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(true);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [searchInput, setSearchInput] = useState(searchParam);
+  const [showAICapsule, setShowAICapsule] = useState(false);
 
   // Multi-department sizes & capacities: apparel, tech storage, horology, footwear, flacons
   const availableSizes = [
@@ -320,17 +322,27 @@ export default function ShopPage() {
           <span>{t.refineCatalog || 'Filters'} {hasActiveFilters && '• Active'}</span>
         </button>
 
-        {/* Total Results Count */}
-        <div className="text-xs uppercase tracking-widest text-[#787570]">
-          {t.showing || 'Showing'} <span className="font-semibold text-[#141414]">{products.length}</span> {t.pieces || 'Pieces'}
-          {hasActiveFilters && (
-            <button
-              onClick={resetAllFilters}
-              className="ml-3 text-[#C2A676] underline hover:text-[#141414] font-medium"
-            >
-              Clear filters
-            </button>
-          )}
+        {/* Total Results Count & AI Capsule Curator Action */}
+        <div className="flex items-center gap-3">
+          <div className="text-xs uppercase tracking-widest text-[#787570]">
+            {t.showing || 'Showing'} <span className="font-semibold text-[#141414] dark:text-white">{products.length}</span> {t.pieces || 'Pieces'}
+            {hasActiveFilters && (
+              <button
+                onClick={resetAllFilters}
+                className="ml-3 text-[#C2A676] underline hover:text-[#141414] dark:hover:text-white font-medium"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+
+          <button
+            onClick={() => setShowAICapsule(!showAICapsule)}
+            className="px-3.5 py-1.5 rounded-full bg-[#141414] dark:bg-[#C2A676] text-[#C2A676] dark:text-[#0B0A0E] text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 hover:opacity-90 shadow-xs transition-opacity"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{showAICapsule ? 'Hide AI Curator' : 'AI Life Capsule Curator'}</span>
+          </button>
         </div>
 
         {/* Sort Dropdown */}
@@ -364,7 +376,14 @@ export default function ShopPage() {
         </aside>
 
         {/* Products Grid Area */}
-        <div className="lg:col-span-9">
+        <div className="lg:col-span-9 space-y-8">
+          {/* Expandable AI Lifestyle Capsule Curator */}
+          {showAICapsule && (
+            <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+              <AICapsuleBuilder onComplete={() => setShowAICapsule(false)} />
+            </div>
+          )}
+
           {loading ? (
             <ProductGridSkeleton count={8} />
           ) : products.length === 0 ? (

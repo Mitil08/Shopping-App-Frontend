@@ -34,14 +34,14 @@ import { useAuth } from '../context/AuthContext';
 
 // Quick Starter Suggestions
 const QUICK_QUESTIONS = [
+  "How do I view products in 3D 360°?",
+  "Where can I find my Digital Authenticity Passes?",
+  "How does the AI Life Capsule Curator work?",
+  "Can I split the bill or group gift an item?",
+  "What is the 15-minute Vault Hold?",
   "Chat with Stylist on WhatsApp",
   "How do I track my order?",
-  "What is the return & exchange policy?",
   "Where are the lightning deals?",
-  "What promo codes can I use?",
-  "Do you have cash on delivery (COD)?",
-  "Recommend a luxury winter coat",
-  "How does pincode delivery check work?"
 ];
 
 export default function AssistantWidget() {
@@ -209,8 +209,53 @@ export default function AssistantWidget() {
     // 1. GREETINGS & INTRO
     if (['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'help'].includes(q)) {
       return {
-        text: "✨ Welcome to **ÉLANE Flagship Superstore**! I am your 24/7 AI Concierge.\n\nI can assist you with:\n• 📱 **Tech & Audio**: Smartphone hardware specs, titanium watches, ANC headphones\n• 👟 **Footwear & Fragrances**: Italian sizing, niche extraits, skincare\n• 🏷️ **Promos & Flash Deals**: Instant discounts, coupons, lightning offers\n• 🚚 **Deliveries & PIN Code Checker**: Live ETA, Cash on Delivery, order dispatch\n• 🛡️ **Guarantees**: Official 1-year brand warranty, 30-day doorstep returns",
-        suggestions: ["Where are the lightning deals?", "Show me smartphones", "What promo codes are active?", "How fast is shipping?"]
+        text: "✨ Welcome to **ÉLANE Flagship Superstore**! I am your 24/7 AI Concierge.\n\nI can assist you with:\n• 🌐 **3D WebGL Product Inspector**: 360° rotation and wireframe materials inspection\n• 🔒 **Cryptographic Authenticity Vault**: Blockchain ledger passes & transferable digital ownership in your profile\n• 🪄 **AI Life Capsule Builder**: Generate synchronized 4-piece bundles across Tech, Perfume, Fashion & Living\n• 🎁 **Group Gifting & Split Bill**: Crowdfund flagship pieces with friends\n• ⏱️ **15-Min Vault Hold**: Lock limited stock items exclusively",
+        suggestions: ["How do I view products in 3D 360°?", "Where can I find my Digital Authenticity Passes?", "How does the AI Life Capsule Curator work?", "Where are the lightning deals?"]
+      };
+    }
+
+    // 1B. 3D WEBGL PRODUCT INSPECTION
+    if (q.includes('3d') || q.includes('360') || q.includes('rotate') || q.includes('inspect')) {
+      return {
+        text: "🌐 **Interactive 3D WebGL Studio Inspector**:\n\n• On any product detail page, tap **'Inspect in 3D (360°)'** on the image display.\n• Drag with your mouse or finger to rotate the piece 360 degrees.\n• Scroll to zoom into the titanium bezels, sapphire crystals, or leather stitching.\n• Tap **'CAD Mesh'** to view the underlying wireframe geometry, or toggle the auto-rotation spin.",
+        actionLink: { label: "Try 3D on Flagship Smartphone", url: "/product/aether-pro-16-flagship-smartphone-512gb" },
+        suggestions: ["Where can I find my Digital Authenticity Passes?", "How does the AI Life Capsule Curator work?", "Where are the lightning deals?"]
+      };
+    }
+
+    // 1C. AUTHENTICITY VAULT & DIGITAL PASSES
+    if (q.includes('vault') || q.includes('authenticity') || q.includes('certificate') || q.includes('provenance') || q.includes('pass') || q.includes('serial')) {
+      return {
+        text: "🔒 **ÉLANE Authenticity Vault & Digital Passes**:\n\n• Every product you acquire carries an immutable cryptographic serial number and provenance record.\n• Visit your [Account Profile](/profile) and click on the **Authenticity Vault** tab.\n• View materials provenance, master artisan guild details, and scan the unique transferable QR code to verify or transfer ownership.",
+        actionLink: { label: "Open Authenticity Vault", url: "/profile" },
+        suggestions: ["How does the AI Life Capsule Curator work?", "How do I view products in 3D 360°?", "What is the 15-minute Vault Hold?"]
+      };
+    }
+
+    // 1D. AI LIFE CAPSULE CURATOR
+    if (q.includes('capsule') || q.includes('curator') || q.includes('bundle') || q.includes('harmonize')) {
+      return {
+        text: "🪄 **AI Lifestyle Capsule Curator**:\n\n• Head over to the [All Departments Catalog](/shop) and tap **'AI Life Capsule Curator'** at the top.\n• Select your aesthetic archetype (*The Silicon Architect*, *The Sartorial Luminary*, or *The Mindful Connoisseur*).\n• The AI synthesizes a tailored 4-piece ensemble spanning Tech, Fragrance, Fashion, and Sanctuary living with an instant **15% privilege discount**.",
+        actionLink: { label: "Launch AI Capsule Curator", url: "/shop" },
+        suggestions: ["Can I split the bill or group gift an item?", "What is the 15-minute Vault Hold?", "Where are the lightning deals?"]
+      };
+    }
+
+    // 1E. GROUP GIFTING & SPLIT BILL
+    if (q.includes('split') || q.includes('gift') || q.includes('pool') || q.includes('crowdfund') || q.includes('friends')) {
+      return {
+        text: "🎁 **Group Gifting & Collective Split-the-Bill**:\n\n• Found an extraordinary watch, titanium smartphone, or overcoat you'd like to gift together?\n• On the product page, click **'🎁 Split The Bill / Group Gifting Collective'**.\n• Share the generated link with friends or colleagues so everyone can contribute their portion seamlessly.",
+        actionLink: { label: "Explore Giftable Flagships", url: "/shop" },
+        suggestions: ["What is the 15-minute Vault Hold?", "Where can I find my Digital Authenticity Passes?", "Where are the lightning deals?"]
+      };
+    }
+
+    // 1F. VAULT HOLD RESERVATION
+    if (q.includes('hold') || q.includes('reserve') || q.includes('lock') || q.includes('15 min')) {
+      return {
+        text: "⏱️ **15-Minute VIP Vault Hold**:\n\n• For rare, high-demand items with limited inventory, you can click **'Lock 15 Min Hold'** on the product page.\n• This reserves 1 unit exclusively in your cart with a live countdown timer, preventing other shoppers from purchasing the last available piece while you finalize your details.",
+        actionLink: { label: "Browse Catalog", url: "/shop" },
+        suggestions: ["How do I view products in 3D 360°?", "Can I split the bill or group gift an item?", "Where are the lightning deals?"]
       };
     }
 

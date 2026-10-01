@@ -51,7 +51,7 @@ export default function AdminDashboardPage() {
             to="/admin/products/new"
             className="px-5 py-2.5 bg-[#141414] text-[#FAF9F5] text-xs uppercase tracking-wider font-semibold hover:bg-[#2A2A2A] transition-colors"
           >
-            + Create New Garment
+            + Create New Product
           </Link>
         </div>
       </div>
@@ -94,11 +94,32 @@ export default function AdminDashboardPage() {
 
         <div className="bg-white border border-[#E8E6E1] p-6 shadow-2xs">
           <div className="flex items-center justify-between text-[#787570] mb-3">
-            <span className="text-[11px] uppercase tracking-wider font-semibold">Active Catalog</span>
+            <span className="text-[11px] uppercase tracking-wider font-semibold">Active Superstore Catalog</span>
             <ShoppingBag className="w-4 h-4 text-[#C2A676]" />
           </div>
           <div className="font-serif text-3xl font-medium text-[#141414]">{stats.totalProducts}</div>
-          <p className="text-[11px] text-[#787570] mt-2">Pieces across 6 categories</p>
+          <p className="text-[11px] text-[#787570] mt-2">Flagships across 8 Omnichannel Pavilions</p>
+        </div>
+      </div>
+
+      {/* Department Breakdown Matrix */}
+      <div className="bg-white border border-[#E8E6E1] p-6 shadow-2xs">
+        <h2 className="font-serif text-lg uppercase tracking-wider text-[#141414] mb-4">
+          Omnichannel Department Velocity & Inventory Distribution
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[
+            { dept: 'Tech & Silicon', share: '34%', count: 'Flagship 3nm & Tablets', color: '#2E3033' },
+            { dept: 'Horology & Audio', share: '24%', count: 'Beryllium & Titanium', color: '#C2A676' },
+            { dept: 'Artisanal Footwear', share: '18%', count: 'Tuscan Chelsea & Loafers', color: '#8E4A28' },
+            { dept: 'Niche Perfumes', share: '14%', count: 'Grasse Extraits & Elixirs', color: '#9E743A' },
+          ].map((d) => (
+            <div key={d.dept} className="p-3.5 rounded-xl border border-[#E8E6E1] bg-[#FAF9F5]">
+              <span className="text-[10px] uppercase tracking-wider text-[#787570] block">{d.dept}</span>
+              <p className="font-serif text-2xl font-bold text-[#141414] mt-1">{d.share}</p>
+              <p className="text-[10px] text-[#787570] mt-0.5">{d.count}</p>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -61,7 +61,7 @@ export default function CheckoutPage() {
       <div className="max-w-xl mx-auto px-6 py-24 text-center">
         <h2 className="font-serif text-2xl text-[#141414] mb-3">No items to checkout</h2>
         <p className="text-xs text-[#787570] mb-6">
-          Your shopping bag is currently empty. Please add garments before checking out.
+          Your shopping bag is currently empty. Please add items to your bag before checking out.
         </p>
         <Link
           to="/shop"

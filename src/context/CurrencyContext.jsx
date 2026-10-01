@@ -53,6 +53,36 @@ export const CURRENCIES = {
     minDecimals: 2,
     maxDecimals: 2,
   },
+  JPY: {
+    code: 'JPY',
+    symbol: '¥',
+    name: 'Japanese Yen',
+    rateFromINR: 1.84, // ~1 INR = 1.84 JPY
+    locale: 'ja-JP',
+    flag: '🇯🇵',
+    minDecimals: 0,
+    maxDecimals: 0,
+  },
+  SGD: {
+    code: 'SGD',
+    symbol: 'S$',
+    name: 'Singapore Dollar',
+    rateFromINR: 0.016, // ~1 SGD = 62.5 INR
+    locale: 'en-SG',
+    flag: '🇸🇬',
+    minDecimals: 2,
+    maxDecimals: 2,
+  },
+  CAD: {
+    code: 'CAD',
+    symbol: 'CA$',
+    name: 'Canadian Dollar',
+    rateFromINR: 0.0165,
+    locale: 'en-CA',
+    flag: '🇨🇦',
+    minDecimals: 2,
+    maxDecimals: 2,
+  },
 };
 
 const CurrencyContext = createContext(null);

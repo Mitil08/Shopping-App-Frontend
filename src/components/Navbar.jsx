@@ -51,7 +51,7 @@ export default function Navbar({ onOpenSearch }) {
   const navLinks = [
     { label: t.home || 'HOME', path: '/' },
     { label: t.shopAll || 'ALL DEPARTMENTS', path: '/shop' },
-    { label: 'OUTFIT STUDIO', path: '/wardrobe-builder', badge: 'LAB' },
+    { label: 'CAPSULE STUDIO', path: '/wardrobe-builder', badge: 'LAB' },
     { label: t.collections || 'CURATED PAVILIONS', path: '/collections' },
     { label: t.about || 'ABOUT', path: '/about' },
   ];

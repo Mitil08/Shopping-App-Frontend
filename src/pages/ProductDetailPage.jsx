@@ -7,6 +7,10 @@ import { useWishlist } from '../context/WishlistContext';
 import ProductCard from '../components/ProductCard';
 import VirtualFittingModal from '../components/VirtualFittingModal';
 import MonogramStudioModal from '../components/MonogramStudioModal';
+import Interactive3DProductViewer from '../components/Interactive3DProductViewer';
+import VaultHoldBar from '../components/VaultHoldBar';
+import GroupGiftModal from '../components/GroupGiftModal';
+import SpatialSoundscapePlayer from '../components/SpatialSoundscapePlayer';
 import { mockProducts } from '../data/mockProducts';
 import { formatPrice } from '../utils/currency';
 
@@ -67,6 +71,10 @@ export default function ProductDetailPage() {
   // Bespoke Monogramming & Foil Debossing Studio State
   const [showMonogramModal, setShowMonogramModal] = useState(false);
   const [appliedMonogram, setAppliedMonogram] = useState(null);
+
+  // Luxury 3D WebGL Product Inspector & Group Gifting States
+  const [show3DViewer, setShow3DViewer] = useState(false);
+  const [showGiftModal, setShowGiftModal] = useState(false);
 
   // Amazon-grade Lightning Deal Countdown Timer State
   const [dealTimeLeft, setDealTimeLeft] = useState({ hours: 4, minutes: 28, seconds: 45 });
@@ -137,7 +145,7 @@ export default function ProductDetailPage() {
       <div className="max-w-4xl mx-auto px-6 py-24 text-center">
         <h2 className="font-serif text-3xl text-[#141414] mb-3">Product not found</h2>
         <p className="text-xs text-[#787570] mb-6">
-          The requested garment may have been archived or is no longer available.
+          The requested product may have been archived or is no longer available.
         </p>
         <Link
           to="/shop"
@@ -348,17 +356,31 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          {/* Active Large Image Display with Subtle Zoom Effect */}
-          <div className="flex-1 relative aspect-[3/4] bg-[#F3F1EC] overflow-hidden group">
-            <img
-              src={currentImage}
-              alt={product.name}
-              className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-            />
-            {product.sale_price && (
-              <div className="absolute top-4 left-4 bg-[#141414] text-[#FAF9F5] text-xs uppercase font-bold tracking-widest px-3 py-1">
-                SALE
-              </div>
+          {/* Active Large Image Display with Subtle Zoom Effect or 3D WebGL Inspector */}
+          <div className="flex-1 relative aspect-[3/4] bg-[#F3F1EC] dark:bg-[#13111C] overflow-hidden group rounded-xl">
+            {show3DViewer ? (
+              <Interactive3DProductViewer product={product} onClose={() => setShow3DViewer(false)} />
+            ) : (
+              <>
+                <img
+                  src={currentImage}
+                  alt={product.name}
+                  className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+                {product.sale_price && (
+                  <div className="absolute top-4 left-4 bg-[#141414] text-[#FAF9F5] text-xs uppercase font-bold tracking-widest px-3 py-1">
+                    SALE
+                  </div>
+                )}
+                {/* 3D Model Launcher Pill */}
+                <button
+                  onClick={() => setShow3DViewer(true)}
+                  className="absolute bottom-4 right-4 px-3.5 py-2 rounded-full bg-black/70 hover:bg-black text-[#C2A676] text-[11px] uppercase tracking-widest font-semibold backdrop-blur-md border border-[#C2A676]/40 shadow-lg flex items-center gap-1.5 transition-all hover:scale-105"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Inspect in 3D (360°)</span>
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -547,6 +569,19 @@ export default function ProductDetailPage() {
 
           {/* Quantity and Actions */}
           <div className="space-y-4 pt-2">
+            {/* Spatial Soundscape Audio Player for Audio/Wearables/Sanctuary Products */}
+            {(product?.category_id === 'cat-audio-wearables' || product?.name?.toLowerCase().includes('headphone') || product?.name?.toLowerCase().includes('sound') || product?.name?.toLowerCase().includes('acoustic')) && (
+              <div className="mb-4">
+                <SpatialSoundscapePlayer productName={product.name} />
+              </div>
+            )}
+
+            {/* 15-Minute Vault Hold & Exclusive Reservation */}
+            <div className="mb-4">
+              <VaultHoldBar product={product} variant={selectedVariant} />
+            </div>
+
+            {/* Quantity and Actions */}
             <div className="flex gap-4">
               {/* Stepper */}
               <div className="flex items-center border border-[#E8E6E1] bg-white w-32 justify-between px-2">
@@ -603,6 +638,17 @@ export default function ProductDetailPage() {
                     isLiked ? 'fill-[#141414] text-[#141414]' : 'text-[#141414]'
                   }`}
                 />
+              </button>
+            </div>
+
+            {/* Split Bill & Group Gifting Option */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setShowGiftModal(true)}
+                className="w-full py-2.5 rounded-lg border border-[#C2A676]/60 bg-[#C2A676]/10 hover:bg-[#C2A676]/20 text-[#A37B30] dark:text-[#E6CA65] text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-colors"
+              >
+                <span>🎁 Split The Bill / Group Gifting Collective</span>
               </button>
             </div>
 
@@ -1072,11 +1118,11 @@ export default function ProductDetailPage() {
                 {/* Material / Composition */}
                 <tr>
                   <td className="p-4 font-semibold text-[#787570] uppercase text-[10px] tracking-wider bg-[#FAF9F5]/40">
-                    Noble Fiber
+                    Materials & Build
                   </td>
                   {compareGarments.map((g) => (
                     <td key={g.id} className="p-4 text-center text-[#141414] font-medium leading-relaxed">
-                      {g.material || '100% Virgin Natural Fiber'}
+                      {g.material || 'Premium Aerospace & Atelier Craft'}
                     </td>
                   ))}
                 </tr>
@@ -1115,7 +1161,7 @@ export default function ProductDetailPage() {
                   </td>
                   {compareGarments.map((g) => (
                     <td key={g.id} className="p-4 text-center text-[11px] text-[#787570]">
-                      {g.care || 'Specialist Dry Clean Only'}
+                      {g.care || 'Specialist Care & Protection'}
                     </td>
                   ))}
                 </tr>
@@ -1136,7 +1182,7 @@ export default function ProductDetailPage() {
                           to={`/product/${g.slug || g.id}`}
                           className="inline-block px-4 py-2 bg-[#141414] hover:bg-[#2A2A2A] text-[#FAF9F5] text-[10px] uppercase tracking-widest font-semibold transition-colors"
                         >
-                          View Garment
+                          View Product
                         </Link>
                       )}
                     </td>
@@ -1275,7 +1321,7 @@ export default function ProductDetailPage() {
               {/* Sizing & Fit Rating (Amazon style) */}
               <div>
                 <label className="block text-[10px] uppercase tracking-wider text-[#787570] mb-1.5">
-                  How Did The Garment Fit?
+                  Sizing & Dimension / Fit
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {['Runs small', 'True to size', 'Runs large'].map((fit) => (
@@ -1462,6 +1508,14 @@ export default function ProductDetailPage() {
           setAppliedMonogram(config);
         }}
       />
+
+      {/* Split Bill & Group Gifting Modal */}
+      {showGiftModal && (
+        <GroupGiftModal
+          product={product}
+          onClose={() => setShowGiftModal(false)}
+        />
+      )}
     </div>
   );
 }

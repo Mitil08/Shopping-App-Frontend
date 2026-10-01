@@ -37,9 +37,9 @@ export default function WhatsAppNotificationSimulator({ orders }) {
 
     switch (eventType) {
       case 'confirmed':
-        return `*ÉLANE LUXURY ATELIER — ORDER CONFIRMED* 🏛️\n\nDear Clientele, your order ${orderRef} for ${totalVal} has been authorized. Our master tailors have begun inspecting your garments.\n\nEstimated dispatch: within 24 hours.`;
+        return `*ÉLANE LUXURY ATELIER — ORDER CONFIRMED* 🏛️\n\nDear Clientele, your order ${orderRef} for ${totalVal} has been authorized. Our master curators have begun preparing your acquisitions.\n\nEstimated dispatch: within 24 hours.`;
       case 'packed':
-        return `*ÉLANE ATELIER — PACKED & SEALED* 📦✨\n\nYour garments in order ${orderRef} have passed luxury quality inspection and are sealed in signature obsidian keepsake packaging with our tamper-proof wax seal.`;
+        return `*ÉLANE ATELIER — PACKED & SEALED* 📦✨\n\nYour items in order ${orderRef} have passed luxury quality inspection and are sealed in signature obsidian keepsake packaging with our tamper-proof wax seal.`;
       case 'dispatch':
         return `*ÉLANE DISPATCH ADVISORY — IN TRANSIT* ✈️🚚\n\nOrder ${orderRef} is airborne with ${customCourier}.\n\n*AWB Tracking #:* ${awbCode}\n*Status:* Next-Day Priority Delivery.`;
       case 'out_for_delivery':

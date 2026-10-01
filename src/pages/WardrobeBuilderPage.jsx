@@ -12,316 +12,301 @@ import {
   Tag,
   Shuffle,
   ShieldCheck,
+  Smartphone,
+  Watch,
+  Footprints,
+  Home,
+  Music,
   Heart
 } from 'lucide-react';
+import { expandedProducts } from '../data/expandedCatalog';
 import { mockProducts } from '../data/mockProducts';
 import { formatPrice } from '../utils/currency';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import SpatialSoundscapePlayer from '../components/SpatialSoundscapePlayer';
 
-// Garment categories categorized for outfit mixing
-const CATEGORIES = [
-  { id: 'cat-outerwear', title: '1. Outerwear & Coats', defaultIndex: 0 },
-  { id: 'cat-shirts', title: '2. Inner Tops & Shirts', defaultIndex: 0 },
-  { id: 'cat-trousers', title: '3. Trousers & Denim', defaultIndex: 0 },
-  { id: 'cat-accessories', title: '4. Leather Goods & Accent', defaultIndex: 0 },
-];
-
+/**
+ * Total Life Capsule Studio (Omnichannel Atelier Lab)
+ * Allows clients to curate complete, cross-department luxury lifestyle setups:
+ * Tech & Mobile, Horology & Acoustics, Sartorial Apparel, Footwear, Fragrances, and Sanctuary Living.
+ */
 export default function WardrobeBuilderPage() {
   const { addToCart } = useCart();
   const { success } = useToast();
 
-  // Category products
-  const outers = mockProducts.filter((p) => p.category_id === 'cat-outerwear' || p.category_id === 'cat-knitwear');
-  const tops = mockProducts.filter((p) => p.category_id === 'cat-shirts');
-  const bottoms = mockProducts.filter((p) => p.category_id === 'cat-trousers');
-  const accessories = mockProducts.filter((p) => p.category_id === 'cat-accessories');
+  const allItems = [...expandedProducts, ...mockProducts];
 
-  // Outfit Selection States
-  const [selectedOuter, setSelectedOuter] = useState(outers[0] || null);
-  const [selectedTop, setSelectedTop] = useState(tops[0] || null);
-  const [selectedBottom, setSelectedBottom] = useState(bottoms[0] || null);
-  const [selectedAccessory, setSelectedAccessory] = useState(accessories[0] || null);
-  const [addingLook, setAddingLook] = useState(false);
+  // Multi-department Curated Pools
+  const techPool = allItems.filter(p => (p.category_id || '').includes('tech') || (p.name || '').toLowerCase().includes('phone') || (p.name || '').toLowerCase().includes('tablet'));
+  const audioPool = allItems.filter(p => (p.category_id || '').includes('audio') || (p.name || '').toLowerCase().includes('headphone') || (p.name || '').toLowerCase().includes('watch'));
+  const apparelPool = allItems.filter(p => ['cat-outerwear', 'cat-knitwear', 'cat-tailoring', 'cat-shirts'].includes(p.category_id));
+  const footwearPool = allItems.filter(p => (p.category_id || '').includes('foot') || (p.name || '').toLowerCase().includes('boot') || (p.name || '').toLowerCase().includes('sneaker') || (p.name || '').toLowerCase().includes('loafer'));
+  const beautyPool = allItems.filter(p => (p.category_id || '').includes('beauty') || (p.name || '').toLowerCase().includes('parfum') || (p.name || '').toLowerCase().includes('serum') || (p.name || '').toLowerCase().includes('fragrance'));
+  const homePool = allItems.filter(p => (p.category_id || '').includes('home') || (p.name || '').toLowerCase().includes('lamp') || (p.name || '').toLowerCase().includes('linen') || (p.name || '').toLowerCase().includes('coffee'));
 
-  // Price calculations
-  const selectedItems = [selectedOuter, selectedTop, selectedBottom, selectedAccessory].filter(Boolean);
-  const subtotal = selectedItems.reduce((acc, item) => acc + Number(item.sale_price || item.base_price), 0);
-  const lookDiscountRate = selectedItems.length >= 3 ? 0.15 : 0; // 15% discount for complete looks
-  const discountAmount = Math.round(subtotal * lookDiscountRate);
-  const finalLookTotal = subtotal - discountAmount;
+  // Selected State for each Dimension
+  const [selectedTech, setSelectedTech] = useState(techPool[0] || null);
+  const [selectedAudio, setSelectedAudio] = useState(audioPool[0] || null);
+  const [selectedApparel, setSelectedApparel] = useState(apparelPool[0] || null);
+  const [selectedFootwear, setSelectedFootwear] = useState(footwearPool[0] || null);
+  const [selectedBeauty, setSelectedBeauty] = useState(beautyPool[0] || null);
+  const [selectedHome, setSelectedHome] = useState(homePool[0] || null);
 
-  // Shuffle / Curate Random Look
-  const handleRandomizeLook = () => {
-    setSelectedOuter(outers[Math.floor(Math.random() * outers.length)] || null);
-    setSelectedTop(tops[Math.floor(Math.random() * tops.length)] || null);
-    setSelectedBottom(bottoms[Math.floor(Math.random() * bottoms.length)] || null);
-    setSelectedAccessory(accessories[Math.floor(Math.random() * accessories.length)] || null);
+  const [activeDimension, setActiveDimension] = useState('tech'); // 'tech' | 'audio' | 'apparel' | 'footwear' | 'beauty' | 'home'
+  const [addingCapsule, setAddingCapsule] = useState(false);
+
+  // Capsule Selection Pool
+  const selectedCapsuleItems = [
+    selectedTech,
+    selectedAudio,
+    selectedApparel,
+    selectedFootwear,
+    selectedBeauty,
+    selectedHome,
+  ].filter(Boolean);
+
+  const subtotal = selectedCapsuleItems.reduce((acc, item) => acc + Number(item.sale_price || item.base_price), 0);
+  const discountRate = selectedCapsuleItems.length >= 4 ? 0.20 : selectedCapsuleItems.length >= 2 ? 0.10 : 0;
+  const discountAmount = Math.round(subtotal * discountRate);
+  const finalTotal = subtotal - discountAmount;
+
+  // Randomize Stylist Setup
+  const handleRandomizeSetup = () => {
+    if (techPool.length) setSelectedTech(techPool[Math.floor(Math.random() * techPool.length)]);
+    if (audioPool.length) setSelectedAudio(audioPool[Math.floor(Math.random() * audioPool.length)]);
+    if (apparelPool.length) setSelectedApparel(apparelPool[Math.floor(Math.random() * apparelPool.length)]);
+    if (footwearPool.length) setSelectedFootwear(footwearPool[Math.floor(Math.random() * footwearPool.length)]);
+    if (beautyPool.length) setSelectedBeauty(beautyPool[Math.floor(Math.random() * beautyPool.length)]);
+    if (homePool.length) setSelectedHome(homePool[Math.floor(Math.random() * homePool.length)]);
   };
 
-  // Add Entire Look to Cart with 1 Click
-  const handleAddLookToCart = async () => {
-    setAddingLook(true);
-    for (let i = 0; i < selectedItems.length; i++) {
-      const item = selectedItems[i];
-      const defaultVariant = item.variants?.[0] || { size: 'M', color: 'Default' };
-      // Only open drawer on the last added item
-      const isLast = i === selectedItems.length - 1;
+  // 1-Click Add Full Capsule to Bag
+  const handleAddCapsuleToCart = async () => {
+    setAddingCapsule(true);
+    for (let i = 0; i < selectedCapsuleItems.length; i++) {
+      const item = selectedCapsuleItems[i];
+      const defaultVariant = item.variants?.[0] || { size: 'Standard', color: 'Default' };
+      const isLast = i === selectedCapsuleItems.length - 1;
       await addToCart(item, defaultVariant, 1, isLast);
     }
-    setAddingLook(false);
-    success(`Complete atelier look (${selectedItems.length} items) added with 15% bundle discount!`);
+    setAddingCapsule(false);
+    success(`Total Life Capsule (${selectedCapsuleItems.length} items) added to your bag with ${(discountRate * 100)}% privilege savings!`);
   };
 
+  const DIMENSIONS = [
+    { id: 'tech', label: 'Tech & Silicon', icon: Smartphone, pool: techPool, selected: selectedTech, setter: setSelectedTech },
+    { id: 'audio', label: 'Horology & Acoustics', icon: Watch, pool: audioPool, selected: selectedAudio, setter: setSelectedAudio },
+    { id: 'apparel', label: 'Sartorial Couture', icon: Layers, pool: apparelPool, selected: selectedApparel, setter: setSelectedApparel },
+    { id: 'footwear', label: 'Footwear & Sneaker Lab', icon: Footprints, pool: footwearPool, selected: selectedFootwear, setter: setSelectedFootwear },
+    { id: 'beauty', label: 'Olfactory & Botanical', icon: Sparkles, pool: beautyPool, selected: selectedBeauty, setter: setSelectedBeauty },
+    { id: 'home', label: 'Habitat & Sanctuary', icon: Home, pool: homePool, selected: selectedHome, setter: setSelectedHome },
+  ];
+
+  const currentDim = DIMENSIONS.find(d => d.id === activeDimension) || DIMENSIONS[0];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16 text-[#141414] dark:text-[#FAF9F5] transition-colors duration-300">
       {/* Header */}
       <div className="mb-10 text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#141414] dark:bg-[#C2A676] text-[#C2A676] dark:text-[#141414] text-[10px] uppercase font-mono font-bold tracking-[0.25em]">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Atelier Stylist Lab</span>
+          <span>Omnichannel Life Studio</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-5xl uppercase tracking-wider text-[#141414] dark:text-[#FAF9F5]">
-          Curated Wardrobe Builder
+          Total Life Capsule Studio
         </h1>
         <p className="text-xs sm:text-sm text-[#787570] dark:text-[#A3A099] font-light leading-relaxed">
-          Assemble your bespoke look by mixing noble fabrics, structured silhouettes, and Italian accessories. Build a full outfit to unlock an automatic <strong className="text-[#141414] dark:text-[#FAF9F5]">15% Atelier Look Savings</strong>.
+          Curate a synchronized lifestyle sanctuary across Silicon Devices, Master Acoustics, Sartorial Wool, 
+          Cordwainer Boots, Grasse Perfumes, and Interior Ceramics. Assemble 4+ departments to unlock an automatic <strong className="text-[#141414] dark:text-[#FAF9F5]">20% Capsule Privilege</strong>.
         </p>
 
         {/* Quick Shuffle button */}
-        <div className="pt-2">
+        <div className="pt-2 flex justify-center gap-3">
           <button
-            onClick={handleRandomizeLook}
+            onClick={handleRandomizeSetup}
             className="inline-flex items-center gap-2 px-4 py-2 border border-[#E8E6E1] dark:border-[#2C2938] bg-white dark:bg-[#1A1822] hover:border-[#C2A676] text-xs font-semibold uppercase tracking-wider text-[#141414] dark:text-[#FAF9F5] rounded-full shadow-xs hover:scale-105 active:scale-95 transition-all"
           >
             <Shuffle className="w-3.5 h-3.5 text-[#C2A676]" />
-            <span>Randomize Stylist Curation</span>
+            <span>Randomize Omnichannel Harmony</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-        {/* LEFT CANVAS: Interactive Look Visualizer (Col 5) */}
-        <div className="lg:col-span-5 bg-white dark:bg-[#14131A] border border-[#E8E6E1] dark:border-[#2C2938] rounded-3xl p-6 lg:p-8 shadow-xl sticky top-28 space-y-6">
-          <div className="flex items-center justify-between border-b border-[#E8E6E1] dark:border-[#2C2938] pb-4">
-            <div>
-              <span className="text-[10px] uppercase font-mono tracking-widest text-[#787570] dark:text-[#A3A099]">
-                Live Look Canvas
-              </span>
-              <h3 className="font-serif text-xl text-[#141414] dark:text-[#FAF9F5] mt-0.5">
-                The Ensemble ({selectedItems.length} Pieces)
-              </h3>
-            </div>
-            {lookDiscountRate > 0 && (
-              <span className="px-2.5 py-1 bg-[#141414] dark:bg-[#C2A676] text-[#FAF9F5] dark:text-[#141414] text-[10px] uppercase font-bold tracking-wider rounded-full flex items-center gap-1">
-                <Zap className="w-3 h-3 fill-[#C2A676] dark:fill-[#141414]" />
-                15% Bundle Save
-              </span>
-            )}
-          </div>
-
-          {/* Layered Visualizer Grid */}
-          <div className="grid grid-cols-2 gap-3 aspect-square sm:aspect-[4/3] lg:aspect-square bg-[#FAF9F5] dark:bg-[#0E0D13] p-3 rounded-2xl border border-[#E8E6E1] dark:border-[#2C2938] overflow-hidden">
-            {selectedItems.map((item, idx) => (
-              <div key={idx} className="relative rounded-xl overflow-hidden bg-white dark:bg-[#1A1822] border border-[#E8E6E1] dark:border-[#2C2938] group">
-                <img
-                  src={item.images?.[0]}
-                  alt={item.name}
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2.5 text-white">
-                  <p className="text-[10px] font-serif font-bold truncate">{item.name}</p>
-                  <p className="text-[9px] text-[#C2A676]">{formatPrice(item.sale_price || item.base_price)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Pricing & Checkout Summary Box */}
-          <div className="p-4 bg-[#FAF9F5] dark:bg-[#1A1822] border border-[#E8E6E1] dark:border-[#2C2938] rounded-2xl space-y-2 text-xs">
-            <div className="flex justify-between text-[#787570] dark:text-[#A3A099]">
-              <span>Curated Subtotal:</span>
-              <span className="font-semibold text-[#141414] dark:text-[#FAF9F5]">{formatPrice(subtotal)}</span>
-            </div>
-
-            {lookDiscountRate > 0 && (
-              <div className="flex justify-between text-[#B45309] dark:text-[#C2A676] font-semibold">
-                <span className="flex items-center gap-1">
-                  <Tag className="w-3 h-3" />
-                  Complete Look 15% Savings:
+      {/* Main Studio Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* LEFT: Capsule Preview & Pricing Board (Col 5) */}
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-28">
+          <div className="bg-white dark:bg-[#15141E] border border-[#E8E6E1] dark:border-[#24222E] rounded-2xl p-6 shadow-xl space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-[#E8E6E1] dark:border-[#24222E]">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#C2A676] font-bold">
+                  ACTIVE LIFE HARMONY
                 </span>
-                <span>-{formatPrice(discountAmount)}</span>
+                <h3 className="font-serif text-xl font-light uppercase mt-0.5">
+                  Your Bespoke Capsule
+                </h3>
               </div>
-            )}
-
-            <div className="pt-2 border-t border-[#E8E6E1] dark:border-[#2C2938] flex justify-between items-baseline">
-              <span className="font-bold text-sm text-[#141414] dark:text-[#FAF9F5]">Ensemble Total:</span>
-              <span className="font-serif text-2xl font-bold text-[#141414] dark:text-[#C2A676]">
-                {formatPrice(finalLookTotal)}
+              <span className="px-2.5 py-1 rounded-full bg-[#C2A676]/10 text-[#C2A676] text-[10px] uppercase font-mono font-bold">
+                {selectedCapsuleItems.length} Dimensions
               </span>
             </div>
 
-            <button
-              onClick={handleAddLookToCart}
-              disabled={addingLook || selectedItems.length === 0}
-              className="w-full mt-3 py-3.5 bg-[#141414] dark:bg-[#C2A676] text-[#FAF9F5] dark:text-[#141414] text-xs uppercase tracking-[0.2em] font-bold rounded-xl hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              <span>{addingLook ? 'Adding Look...' : `Add Complete Look (${selectedItems.length} Items)`}</span>
-            </button>
-            <p className="text-[10px] text-[#787570] dark:text-[#A3A099] text-center pt-1">
-              Includes free express air delivery & 30-day atelier exchanges.
-            </p>
+            {/* Selected Dimensions Mini Grid */}
+            <div className="grid grid-cols-3 gap-2.5">
+              {DIMENSIONS.map((dim) => {
+                const item = dim.selected;
+                const Icon = dim.icon;
+                const isActive = activeDimension === dim.id;
+
+                return (
+                  <button
+                    key={dim.id}
+                    onClick={() => setActiveDimension(dim.id)}
+                    className={`p-2 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                      isActive
+                        ? 'border-[#141414] dark:border-[#C2A676] ring-2 ring-[#C2A676]/50 bg-[#FAF9F5] dark:bg-[#1C1A28]'
+                        : 'border-[#E8E6E1] dark:border-[#24222E] bg-white dark:bg-[#12111A] hover:border-black/30'
+                    }`}
+                  >
+                    <div className="aspect-square rounded-lg overflow-hidden mb-1.5 bg-[#F3F1EC] dark:bg-[#181622] relative">
+                      {item ? (
+                        <img src={item.images?.[0]} alt={item.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-[#787570]">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                      )}
+                      <div className="absolute top-1 left-1 p-1 rounded-md bg-black/60 text-white backdrop-blur-xs">
+                        <Icon className="w-2.5 h-2.5" />
+                      </div>
+                    </div>
+                    <span className="text-[9px] uppercase tracking-wider text-[#787570] dark:text-[#9A968F] block truncate">
+                      {dim.label.split(' ')[0]}
+                    </span>
+                    <span className="text-[10px] font-semibold text-[#141414] dark:text-white truncate block">
+                      {item ? item.name : 'Choose...'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Spatial Soundscape Audio Player if an audio item is in capsule */}
+            {selectedAudio && (
+              <div className="pt-2">
+                <SpatialSoundscapePlayer productName={selectedAudio.name} />
+              </div>
+            )}
+
+            {/* Financial Summary */}
+            <div className="pt-4 border-t border-[#E8E6E1] dark:border-[#24222E] space-y-2 text-xs">
+              <div className="flex justify-between text-[#787570] dark:text-[#9A968F]">
+                <span>Combined Catalog Price:</span>
+                <span>{formatPrice(subtotal)}</span>
+              </div>
+
+              {discountAmount > 0 && (
+                <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
+                  <span className="flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5" />
+                    Capsule Privilege Savings ({(discountRate * 100)}%):
+                  </span>
+                  <span>-{formatPrice(discountAmount)}</span>
+                </div>
+              )}
+
+              <div className="pt-2 border-t border-[#E8E6E1] dark:border-[#24222E] flex justify-between items-baseline">
+                <span className="font-bold text-sm text-[#141414] dark:text-white uppercase">Capsule Total:</span>
+                <span className="font-serif text-2xl font-bold text-[#141414] dark:text-[#C2A676]">
+                  {formatPrice(finalTotal)}
+                </span>
+              </div>
+
+              <button
+                onClick={handleAddCapsuleToCart}
+                disabled={addingCapsule || selectedCapsuleItems.length === 0}
+                className="w-full mt-3 py-3.5 bg-[#141414] dark:bg-[#C2A676] text-white dark:text-[#0B0A0E] text-xs uppercase tracking-[0.2em] font-bold rounded-xl hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                <span>{addingCapsule ? 'Adding Capsule...' : `Acquire Total Capsule (${selectedCapsuleItems.length} Items)`}</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* RIGHT: Wardrobe Category Pickers (Col 7) */}
-        <div className="lg:col-span-7 space-y-10">
-          {/* Layer 1: Outerwear */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-baseline border-b border-[#E8E6E1] dark:border-[#2C2938] pb-2">
-              <h2 className="text-xs uppercase font-bold tracking-[0.2em] text-[#141414] dark:text-[#FAF9F5] flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-[#141414] dark:bg-[#C2A676] text-white dark:text-[#141414] flex items-center justify-center text-[10px]">1</span>
-                Layer 1: Outerwear & Coats
-              </h2>
-              <span className="text-[11px] text-[#787570] dark:text-[#A3A099]">
-                Selected: <strong className="text-[#141414] dark:text-[#FAF9F5]">{selectedOuter?.name}</strong>
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {outers.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => setSelectedOuter(item)}
-                  className={`relative p-2.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
-                    selectedOuter?.id === item.id
-                      ? 'border-[#141414] dark:border-[#C2A676] ring-2 ring-[#C2A676] bg-white dark:bg-[#1A1822]'
-                      : 'border-[#E8E6E1] dark:border-[#2C2938] bg-[#FAF9F5] dark:bg-[#14131A] hover:border-black/30'
+        {/* RIGHT: Dimension Selectors & Item Grid (Col 7) */}
+        <div className="lg:col-span-7 space-y-8">
+          {/* Department Dimension Tabs */}
+          <div className="flex flex-wrap gap-2 pb-2 border-b border-[#E8E6E1] dark:border-[#24222E]">
+            {DIMENSIONS.map((dim) => {
+              const Icon = dim.icon;
+              const isActive = activeDimension === dim.id;
+              return (
+                <button
+                  key={dim.id}
+                  onClick={() => setActiveDimension(dim.id)}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-semibold transition-all ${
+                    isActive
+                      ? 'bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] shadow-sm'
+                      : 'bg-[#F3F1EC] dark:bg-[#181622] text-[#787570] dark:text-[#9A968F] hover:text-[#141414] dark:hover:text-white border border-[#E8E6E1] dark:border-[#24222E]'
                   }`}
                 >
-                  <div className="aspect-[3/4] rounded-xl overflow-hidden mb-2 bg-[#F3F1EC]">
-                    <img src={item.images?.[0]} alt={item.name} className="w-full h-full object-cover" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-serif font-bold text-[#141414] dark:text-[#FAF9F5] truncate">{item.name}</h4>
-                    <p className="text-[11px] font-semibold text-[#141414] dark:text-[#C2A676] mt-0.5">
-                      {formatPrice(item.sale_price || item.base_price)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{dim.label}</span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Layer 2: Shirts & Tops */}
+          {/* Active Dimension Items */}
           <div className="space-y-4">
-            <div className="flex justify-between items-baseline border-b border-[#E8E6E1] dark:border-[#2C2938] pb-2">
-              <h2 className="text-xs uppercase font-bold tracking-[0.2em] text-[#141414] dark:text-[#FAF9F5] flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-[#141414] dark:bg-[#C2A676] text-white dark:text-[#141414] flex items-center justify-center text-[10px]">2</span>
-                Layer 2: Inner Tops & Poplin Shirts
+            <div className="flex justify-between items-baseline">
+              <h2 className="text-xs uppercase font-bold tracking-[0.2em] text-[#141414] dark:text-white flex items-center gap-2">
+                <currentDim.icon className="w-4 h-4 text-[#C2A676]" />
+                Select {currentDim.label}
               </h2>
-              <span className="text-[11px] text-[#787570] dark:text-[#A3A099]">
-                Selected: <strong className="text-[#141414] dark:text-[#FAF9F5]">{selectedTop?.name}</strong>
+              <span className="text-[11px] text-[#787570] dark:text-[#9A968F]">
+                Selected: <strong className="text-[#141414] dark:text-white">{currentDim.selected?.name || 'None'}</strong>
               </span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {tops.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => setSelectedTop(item)}
-                  className={`relative p-2.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
-                    selectedTop?.id === item.id
-                      ? 'border-[#141414] dark:border-[#C2A676] ring-2 ring-[#C2A676] bg-white dark:bg-[#1A1822]'
-                      : 'border-[#E8E6E1] dark:border-[#2C2938] bg-[#FAF9F5] dark:bg-[#14131A] hover:border-black/30'
-                  }`}
-                >
-                  <div className="aspect-[3/4] rounded-xl overflow-hidden mb-2 bg-[#F3F1EC]">
-                    <img src={item.images?.[0]} alt={item.name} className="w-full h-full object-cover" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-serif font-bold text-[#141414] dark:text-[#FAF9F5] truncate">{item.name}</h4>
-                    <p className="text-[11px] font-semibold text-[#141414] dark:text-[#C2A676] mt-0.5">
-                      {formatPrice(item.sale_price || item.base_price)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+              {currentDim.pool.map((item) => {
+                const isSelected = currentDim.selected?.id === item.id;
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => currentDim.setter(item)}
+                    className={`relative p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between group ${
+                      isSelected
+                        ? 'border-[#141414] dark:border-[#C2A676] ring-2 ring-[#C2A676] bg-white dark:bg-[#1A1822] shadow-md'
+                        : 'border-[#E8E6E1] dark:border-[#24222E] bg-[#FAF9F5] dark:bg-[#13111C] hover:border-black/30 dark:hover:border-white/30'
+                    }`}
+                  >
+                    <div className="aspect-[4/5] rounded-xl overflow-hidden mb-2 bg-[#F3F1EC] dark:bg-[#181622]">
+                      <img src={item.images?.[0]} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    </div>
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-[#787570] dark:text-[#9A968F] block truncate">
+                        {item.brand || item.categoryName}
+                      </span>
+                      <h4 className="text-xs font-serif font-bold text-[#141414] dark:text-white truncate mt-0.5">
+                        {item.name}
+                      </h4>
+                      <p className="text-[11px] font-semibold text-[#141414] dark:text-[#C2A676] mt-1 font-mono">
+                        {formatPrice(item.sale_price || item.base_price)}
+                      </p>
+                    </div>
 
-          {/* Layer 3: Trousers & Denim */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-baseline border-b border-[#E8E6E1] dark:border-[#2C2938] pb-2">
-              <h2 className="text-xs uppercase font-bold tracking-[0.2em] text-[#141414] dark:text-[#FAF9F5] flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-[#141414] dark:bg-[#C2A676] text-white dark:text-[#141414] flex items-center justify-center text-[10px]">3</span>
-                Layer 3: Tailored Trousers & Denim
-              </h2>
-              <span className="text-[11px] text-[#787570] dark:text-[#A3A099]">
-                Selected: <strong className="text-[#141414] dark:text-[#FAF9F5]">{selectedBottom?.name}</strong>
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {bottoms.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => setSelectedBottom(item)}
-                  className={`relative p-2.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
-                    selectedBottom?.id === item.id
-                      ? 'border-[#141414] dark:border-[#C2A676] ring-2 ring-[#C2A676] bg-white dark:bg-[#1A1822]'
-                      : 'border-[#E8E6E1] dark:border-[#2C2938] bg-[#FAF9F5] dark:bg-[#14131A] hover:border-black/30'
-                  }`}
-                >
-                  <div className="aspect-[3/4] rounded-xl overflow-hidden mb-2 bg-[#F3F1EC]">
-                    <img src={item.images?.[0]} alt={item.name} className="w-full h-full object-cover" />
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#141414] dark:bg-[#C2A676] text-white dark:text-[#0B0A0E] flex items-center justify-center text-[10px] shadow-sm">
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <h4 className="text-xs font-serif font-bold text-[#141414] dark:text-[#FAF9F5] truncate">{item.name}</h4>
-                    <p className="text-[11px] font-semibold text-[#141414] dark:text-[#C2A676] mt-0.5">
-                      {formatPrice(item.sale_price || item.base_price)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Layer 4: Leather Accessories */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-baseline border-b border-[#E8E6E1] dark:border-[#2C2938] pb-2">
-              <h2 className="text-xs uppercase font-bold tracking-[0.2em] text-[#141414] dark:text-[#FAF9F5] flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-[#141414] dark:bg-[#C2A676] text-white dark:text-[#141414] flex items-center justify-center text-[10px]">4</span>
-                Layer 4: Tuscan Leather & Accents
-              </h2>
-              <span className="text-[11px] text-[#787570] dark:text-[#A3A099]">
-                Selected: <strong className="text-[#141414] dark:text-[#FAF9F5]">{selectedAccessory?.name}</strong>
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {accessories.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => setSelectedAccessory(item)}
-                  className={`relative p-2.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
-                    selectedAccessory?.id === item.id
-                      ? 'border-[#141414] dark:border-[#C2A676] ring-2 ring-[#C2A676] bg-white dark:bg-[#1A1822]'
-                      : 'border-[#E8E6E1] dark:border-[#2C2938] bg-[#FAF9F5] dark:bg-[#14131A] hover:border-black/30'
-                  }`}
-                >
-                  <div className="aspect-[3/4] rounded-xl overflow-hidden mb-2 bg-[#F3F1EC]">
-                    <img src={item.images?.[0]} alt={item.name} className="w-full h-full object-cover" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-serif font-bold text-[#141414] dark:text-[#FAF9F5] truncate">{item.name}</h4>
-                    <p className="text-[11px] font-semibold text-[#141414] dark:text-[#C2A676] mt-0.5">
-                      {formatPrice(item.sale_price || item.base_price)}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

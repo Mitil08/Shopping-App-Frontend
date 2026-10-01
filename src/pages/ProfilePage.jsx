@@ -4,6 +4,7 @@ import { User, Package, Heart, ShieldCheck, LogOut, Check, Crown, Sparkles, Awar
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useLoyalty } from '../context/LoyaltyContext';
+import AuthenticityVault from '../components/AuthenticityVault';
 import { formatPrice } from '../utils/currency';
 
 export default function ProfilePage() {
@@ -11,7 +12,7 @@ export default function ProfilePage() {
   const { success, error } = useToast();
   const { loyaltyData, currentTier, nextTier, progressToNextTier, spendNeededForNextTier, redeemPoints, TIERS } = useLoyalty();
 
-  const [activeTab, setActiveTab] = useState('privilege'); // 'privilege' | 'details'
+  const [activeTab, setActiveTab] = useState('vault'); // 'vault' | 'privilege' | 'details'
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [saving, setSaving] = useState(false);
@@ -59,6 +60,23 @@ export default function ProfilePage() {
         {/* Navigation Sidebar */}
         {/* Navigation Sidebar */}
         <div className="space-y-1">
+          <button
+            onClick={() => setActiveTab('vault')}
+            className={`w-full text-left flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider font-semibold transition-all ${
+              activeTab === 'vault'
+                ? 'bg-[#141414] text-[#C2A676] dark:bg-[#C2A676] dark:text-[#141414] shadow-xs'
+                : 'bg-white dark:bg-[#181722] hover:bg-[#F3F1EC] dark:hover:bg-neutral-800 text-[#141414] dark:text-white border border-[#E8E6E1] dark:border-[#2A2834]'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <ShieldCheck className="w-4 h-4 text-[#C2A676]" />
+              <span>Authenticity Vault</span>
+            </div>
+            <span className="text-[9px] font-mono px-1.5 py-0.5 uppercase bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">
+              VERIFIED
+            </span>
+          </button>
+
           <button
             onClick={() => setActiveTab('privilege')}
             className={`w-full text-left flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider font-semibold transition-all ${
@@ -110,6 +128,13 @@ export default function ProfilePage() {
             <span>Sign Out</span>
           </button>
         </div>
+
+        {/* Tab 0: Authenticity Vault & Digital Ownership Passes */}
+        {activeTab === 'vault' && (
+          <div className="md:col-span-3">
+            <AuthenticityVault />
+          </div>
+        )}
 
         {/* Tab 1: ÉLANE Privilège VIP Club Dashboard */}
         {activeTab === 'privilege' && (
