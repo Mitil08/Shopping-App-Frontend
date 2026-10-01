@@ -33,17 +33,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleDemoFill = (role) => {
-    if (role === 'admin') {
-      setEmail('admin@elane-studio.com');
-      setPassword('AdminPass123!');
-    } else {
-      setEmail('client@elane-studio.com');
-      setPassword('ClientPass123!');
-    }
-    setFormError('');
-  };
-
   return (
     <div className="max-w-md w-full mx-auto px-6 py-16 lg:py-24">
       <div className="text-center mb-8">
@@ -64,29 +53,6 @@ export default function LoginPage() {
           <span>{formError}</span>
         </div>
       )}
-
-      {/* Demo Credentials Quick-Fill Banner */}
-      <div className="mb-6 p-4 bg-[#F3F1EC] border border-[#E8E6E1] text-xs">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-[#141414] mb-2">
-          Demo Test Accounts (Click to autofill):
-        </p>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => handleDemoFill('customer')}
-            className="flex-1 py-1.5 px-2 bg-white border border-[#E8E6E1] text-[11px] uppercase tracking-wider hover:border-[#141414] transition-colors"
-          >
-            Customer Account
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDemoFill('admin')}
-            className="flex-1 py-1.5 px-2 bg-[#141414] text-[#FAF9F5] text-[11px] uppercase tracking-wider hover:bg-[#2A2A2A] transition-colors"
-          >
-            Admin Account
-          </button>
-        </div>
-      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
