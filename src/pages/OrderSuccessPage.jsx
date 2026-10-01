@@ -1,12 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { CheckCircle2, Package, ArrowRight, ShieldCheck, Mail, MapPin } from 'lucide-react';
+import { CheckCircle2, Package, ArrowRight, ShieldCheck, Mail, MapPin, Truck, Clock, FileText } from 'lucide-react';
 import { formatPrice } from '../utils/currency';
+import InvoiceModal from '../components/InvoiceModal';
+import WhatsAppOrderShare from '../components/WhatsAppOrderShare';
 
 export default function OrderSuccessPage() {
   const { orderId } = useParams();
   const location = useLocation();
   const order = location.state?.order;
+  const [showInvoice, setShowInvoice] = useState(false);
+
+  // Generate deterministic mock AWB and courier tracking number
+  const awbNumber = orderId
+    ? `BLU-${orderId.replace(/[^a-zA-Z0-9]/g, '').slice(-8).toUpperCase()}IN`
+    : 'BLU-94821039IN';
+
+  const orderStatus = order?.status || 'Confirmed';
+  const statusMap = {
+    Pending: 0,
+    Confirmed: 1,
+    Processing: 1,
+    Packed: 1,
+    Shipped: 2,
+    OutForDelivery: 3,
+    Delivered: 4,
+  };
+  const activeStepIndex = statusMap[orderStatus] ?? 1;
+
+  const trackingSteps = [
+    { key: 'Ordered', label: 'Ordered', desc: 'Payment Approved' },
+    { key: 'Packed', label: 'Packed', desc: 'Atelier Inspection' },
+    { key: 'Shipped', label: 'Shipped', desc: 'Express Hub' },
+    { key: 'OutForDelivery', label: 'Out for Delivery', desc: 'Courier Assigned' },
+    { key: 'Delivered', label: 'Delivered', desc: 'Handed to Clientele' },
+  ];
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 lg:py-24 text-center">
@@ -24,6 +52,94 @@ export default function OrderSuccessPage() {
       <p className="text-xs sm:text-sm text-[#787570] font-light max-w-md mx-auto mb-8 leading-relaxed">
         Thank you for your purchase. We are preparing your garments for shipment with our signature protective packaging.
       </p>
+
+      {/* Amazon-style Live Fulfillment Tracker Card */}
+      <div className="bg-[#FAF9F5] border border-[#141414] p-6 lg:p-8 text-left mb-8 space-y-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#E8E6E1] pb-4 gap-3">
+          <div>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#C2A676] font-bold">
+              Live Fulfillment Status
+            </span>
+            <h3 className="font-serif text-lg font-semibold text-[#141414] mt-0.5">
+              Order Dispatched to Courier Hub
+            </h3>
+          </div>
+          <div className="bg-white border border-[#E8E6E1] px-3 py-1.5 text-right">
+            <span className="text-[9px] uppercase tracking-wider text-[#787570] block">
+              Carrier & AWB Tracker
+            </span>
+            <p className="font-mono text-xs font-bold text-[#141414]">
+              BlueDart • {awbNumber}
+            </p>
+          </div>
+        </div>
+
+        {/* 5-Stage Stepper with Connecting Bar */}
+        <div className="relative pt-2">
+          <div className="grid grid-cols-5 gap-1 text-center">
+            {trackingSteps.map((step, idx) => {
+              const isPassed = idx <= activeStepIndex;
+              const isCurrent = idx === activeStepIndex;
+
+              return (
+                <div key={step.key} className="flex flex-col items-center relative group">
+                  {/* Circle */}
+                  <div
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 z-10 ${
+                      isCurrent
+                        ? 'bg-[#141414] text-[#FAF9F5] ring-4 ring-[#C2A676]/30'
+                        : isPassed
+                        ? 'bg-emerald-700 text-white'
+                        : 'bg-[#E8E6E1] text-[#A3A099]'
+                    }`}
+                  >
+                    {isPassed && !isCurrent ? (
+                      <CheckCircle2 className="w-4 h-4" />
+                    ) : (
+                      <span>{idx + 1}</span>
+                    )}
+                  </div>
+
+                  {/* Step Label */}
+                  <span
+                    className={`text-[9px] sm:text-[10px] uppercase tracking-wider mt-2 font-semibold ${
+                      isPassed ? 'text-[#141414]' : 'text-[#A3A099]'
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+
+                  {/* Sub description */}
+                  <span className="text-[8px] text-[#787570] hidden sm:block mt-0.5 max-w-[85px] leading-tight">
+                    {step.desc}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Progress Connector */}
+          <div className="absolute top-5 sm:top-6 left-6 right-6 h-0.5 bg-[#E8E6E1] -z-0">
+            <div
+              className="h-full bg-emerald-700 transition-all duration-500"
+              style={{
+                width: `${(activeStepIndex / (trackingSteps.length - 1)) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Estimated Courier Delivery Bar */}
+        <div className="bg-white border border-[#E8E6E1] p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs gap-2">
+          <span className="text-[#787570] flex items-center gap-1.5">
+            <Truck className="w-4 h-4 text-[#C2A676]" />
+            <span>Guaranteed Express Delivery: <strong className="text-[#141414]">Within 24–48 Hours</strong></span>
+          </span>
+          <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+            OTP-Protected Delivery
+          </span>
+        </div>
+      </div>
 
       {/* Order Details Card */}
       <div className="bg-white border border-[#E8E6E1] p-6 lg:p-8 text-left space-y-6 shadow-xs mb-10">
@@ -105,21 +221,43 @@ export default function OrderSuccessPage() {
         )}
       </div>
 
+      {/* 1-Click WhatsApp Order Sharing & Dispatch Tracker */}
+      <div className="mb-8">
+        <WhatsAppOrderShare
+          order={order || { id: orderId, total: 0, items: [] }}
+          awbNumber={awbNumber}
+        />
+      </div>
+
       {/* Action buttons */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <button
+          onClick={() => setShowInvoice(true)}
+          className="w-full sm:w-auto px-6 py-3.5 border border-[#141414] bg-white hover:bg-[#FAF9F5] text-[#141414] text-xs uppercase tracking-[0.2em] font-semibold flex items-center justify-center gap-2 transition-colors shadow-2xs"
+        >
+          <FileText className="w-4 h-4 text-[#C2A676]" />
+          <span>Download Tax Invoice</span>
+        </button>
         <Link
           to="/profile/orders"
-          className="w-full sm:w-auto px-8 py-3.5 border border-[#141414] text-[#141414] text-xs uppercase tracking-[0.2em] font-medium hover:bg-[#F3F1EC] transition-colors"
+          className="w-full sm:w-auto px-6 py-3.5 border border-[#E8E6E1] text-[#787570] hover:text-[#141414] hover:border-[#141414] text-xs uppercase tracking-[0.2em] font-medium transition-colors"
         >
-          View Order History
+          Order Archive
         </Link>
         <Link
           to="/shop"
-          className="w-full sm:w-auto px-8 py-3.5 bg-[#141414] text-[#FAF9F5] text-xs uppercase tracking-[0.2em] font-semibold hover:bg-[#2A2A2A] transition-colors shadow-md"
+          className="w-full sm:w-auto px-6 py-3.5 bg-[#141414] text-[#FAF9F5] text-xs uppercase tracking-[0.2em] font-semibold hover:bg-[#2A2A2A] transition-colors shadow-md"
         >
           Continue Browsing
         </Link>
       </div>
+
+      {/* Official Tax Invoice Modal */}
+      <InvoiceModal
+        order={order || { id: orderId, total: 0, items: [] }}
+        isOpen={showInvoice}
+        onClose={() => setShowInvoice(false)}
+      />
     </div>
   );
 }

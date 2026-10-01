@@ -173,6 +173,12 @@ export default function CartDrawer() {
                           <span>Color: {item.color}</span>
                         </div>
 
+                        {item.monogram && (
+                          <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#FAF8F5] border border-[#C2A676]/40 text-[10px] font-mono text-[#8C6D2D]">
+                            <span>✨ Monogram: <strong>{item.monogram.text}</strong> ({item.monogram.foilName})</span>
+                          </div>
+                        )}
+
                         <div className="text-xs font-semibold text-[#141414] mt-1.5">
                           {formatPrice(item.price)}
                         </div>

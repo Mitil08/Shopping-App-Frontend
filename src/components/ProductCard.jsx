@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Plus } from 'lucide-react';
+import { Heart, Plus, Zap } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -70,10 +70,16 @@ export default function ProductCard({ product }) {
           />
         )}
 
-        {/* Discount Badge */}
+        {/* Discount Badge & Lightning Deal Tag */}
         {hasDiscount && (
-          <div className="absolute top-3 left-3 bg-[#141414] text-[#FAF9F5] text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 z-10">
-            -{discountPercent}%
+          <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
+            <span className="bg-[#141414] text-[#FAF9F5] text-[10px] uppercase font-bold tracking-widest px-2 py-0.5">
+              -{discountPercent}%
+            </span>
+            <span className="bg-[#C2A676] text-[#141414] text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 flex items-center gap-1 shadow-xs">
+              <Zap className="w-2.5 h-2.5 fill-[#141414]" />
+              <span>Deal</span>
+            </span>
           </div>
         )}
 
@@ -111,7 +117,7 @@ export default function ProductCard({ product }) {
 
         <Link
           to={`/product/${product.slug || product.id}`}
-          className="font-serif text-base font-normal text-[#141414] hover:text-[#C2A676] transition-colors leading-snug line-clamp-1"
+          className="font-serif text-base font-normal text-[#141414] dark:text-[#FAF9F5] hover:text-[#C2A676] dark:hover:text-[#C2A676] transition-colors leading-snug line-clamp-1"
         >
           {product.name}
         </Link>
@@ -120,15 +126,26 @@ export default function ProductCard({ product }) {
         <div className="mt-2 flex items-baseline gap-2">
           {hasDiscount ? (
             <>
-              <span className="text-sm font-semibold text-[#141414]">{formatPrice(product.sale_price)}</span>
-              <span className="text-xs text-[#787570] line-through font-normal">
+              <span className="text-sm font-semibold text-[#141414] dark:text-[#FAF9F5]">{formatPrice(product.sale_price)}</span>
+              <span className="text-xs text-[#787570] dark:text-[#A3A099] line-through font-normal">
                 {formatPrice(product.base_price)}
               </span>
             </>
           ) : (
-            <span className="text-sm font-semibold text-[#141414]">{formatPrice(product.base_price)}</span>
+            <span className="text-sm font-semibold text-[#141414] dark:text-[#FAF9F5]">{formatPrice(product.base_price)}</span>
           )}
         </div>
+
+        {/* ÉLANE Privilege Next-Day Delivery Badge (Amazon Prime style) */}
+        {(product.is_featured || product.id === 'prod-1' || product.id === 'prod-2' || product.id === 'prod-3' || product.id === 'prod-5' || product.id === 'prod-7') && (
+          <div className="mt-1.5 flex items-center gap-1 text-[10px] font-semibold text-[#141414] dark:text-[#FAF9F5]">
+            <span className="bg-[#141414] dark:bg-[#252230] border border-transparent dark:border-[#C2A676]/40 text-[#C2A676] px-1.5 py-0.5 uppercase tracking-wider flex items-center gap-1 font-mono text-[9px]">
+              <Zap className="w-2.5 h-2.5 fill-[#C2A676]" />
+              <span>Privilege</span>
+            </span>
+            <span className="text-[10px] text-[#787570] dark:text-[#A3A099] font-light">Next-Day Air</span>
+          </div>
+        )}
 
         {/* Color variants preview dots */}
         {product.variants && (

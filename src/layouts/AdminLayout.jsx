@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, ShoppingBag, Package, Users, ArrowLeft, ShieldCheck, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, ArrowLeft, ShieldCheck, LogOut, Headphones } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function AdminLayout() {
@@ -37,6 +37,7 @@ export default function AdminLayout() {
     { label: 'Overview', path: '/admin', icon: LayoutDashboard, end: true },
     { label: 'Products & Inventory', path: '/admin/products', icon: ShoppingBag },
     { label: 'Orders & Fulfillment', path: '/admin/orders', icon: Package },
+    { label: 'Client Support Desk', path: '/admin/support', icon: Headphones, badge: '3' },
     { label: 'Users & Clientele', path: '/admin/users', icon: Users },
   ];
 
@@ -66,15 +67,22 @@ export default function AdminLayout() {
                   to={item.path}
                   end={item.end}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 text-xs tracking-wider uppercase font-medium transition-colors ${
+                    `flex items-center justify-between px-4 py-3 text-xs tracking-wider uppercase font-medium transition-colors ${
                       isActive
                         ? 'bg-[#FAF9F5] text-[#141414] font-semibold'
                         : 'text-[#A3A099] hover:bg-[#222222] hover:text-[#FAF9F5]'
                     }`
                   }
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{item.label}</span>
+                  <div className="flex items-center gap-3">
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.badge && (
+                    <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-[#C2A676] text-[#141414] rounded-full">
+                      {item.badge}
+                    </span>
+                  )}
                 </NavLink>
               );
             })}

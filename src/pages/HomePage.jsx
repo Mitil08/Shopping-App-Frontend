@@ -16,8 +16,11 @@ import {
   Heart,
   Mail,
   Flame,
+  Clock,
+  Timer,
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import Hero3DScene from '../components/Hero3DScene';
 import { mockProducts } from '../data/mockProducts';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -63,6 +66,28 @@ export default function HomePage() {
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
   const [isCursorActive, setIsCursorActive] = useState(false);
 
+  // Amazon-grade Lightning Deals Countdown Timer State for Homepage
+  const [dealTimeLeft, setDealTimeLeft] = useState({ hours: 4, minutes: 28, seconds: 45 });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDealTimeLeft((prev) => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 };
+        } else if (prev.minutes > 0) {
+          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        } else if (prev.hours > 0) {
+          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        }
+        return prev;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Filter deal products with sale_price
+  const dealProducts = mockProducts.filter((p) => p.sale_price && p.sale_price < p.base_price);
+
   // Smooth Spring-driven Cursor Following Physics
   const mouseX = useMotionValue(-600);
   const mouseY = useMotionValue(-600);
@@ -101,47 +126,60 @@ export default function HomePage() {
 
   const collections = [
     {
-      title: t.outerwearVaultTitle || 'THE OUTERWEAR VAULT',
-      subtitle: t.outerwearVaultSubtitle || 'Sculptural trench coats & virgin wool overcoats',
-      tag: 'COLLECTION 04',
-      tagColor: 'from-violet-500 to-indigo-600',
-      badgeBg: 'bg-violet-500/20 text-violet-200 border-violet-400/30',
-      image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80',
-      link: '/shop?category=cat-outerwear',
+      title: 'THE QUANTUM TECH PAVILION',
+      subtitle: 'Grade 5 Titanium smartphones, 3nm processors & tandem OLED tablets',
+      tag: 'TECH PAVILION',
+      tagColor: 'from-blue-500 to-indigo-600',
+      badgeBg: 'bg-blue-500/20 text-blue-200 border-blue-400/30',
+      image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=800&q=80',
+      link: '/shop?category=mobiles-electronics',
     },
     {
-      title: t.fineCashmereTitle || 'FINE CASHMERE KNITWEAR',
-      subtitle: t.fineCashmereSubtitle || 'Grade-A 2-ply Mongolian cashmere mocknecks & cardigans',
-      tag: 'MONGOLIAN SERIES',
+      title: 'ACOUSTICS & HOROLOGY CHAMBER',
+      subtitle: 'Beryllium ANC spatial headphones & titanium dive smartwatches',
+      tag: 'AUDIO & WATCHES',
       tagColor: 'from-amber-400 to-rose-500',
       badgeBg: 'bg-rose-500/20 text-rose-200 border-rose-400/30',
-      image: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=800&q=80',
-      link: '/shop?category=cat-knitwear',
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+      link: '/shop?category=smartwatches-audio',
     },
     {
-      title: t.relaxedTailoringTitle || 'RELAXED TAILORING',
-      subtitle: t.relaxedTailoringSubtitle || 'High-twist tropical wool blazers & pleated trousers',
-      tag: 'SARTORIAL LINE',
+      title: 'FOOTWEAR & SNEAKER LAB',
+      subtitle: 'Civitanova Italian calfskin low-tops & Goodyear-welted Chelsea boots',
+      tag: 'SNEAKER LAB',
       tagColor: 'from-emerald-400 to-teal-600',
       badgeBg: 'bg-emerald-500/20 text-emerald-200 border-emerald-400/30',
-      image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
-      link: '/shop?category=cat-tailoring',
+      image: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=800&q=80',
+      link: '/shop?category=footwear-sneakers',
     },
   ];
 
   const categoryTabs = [
-    { id: 'all', label: 'All Releases', icon: Sparkles },
-    { id: 'cat-outerwear', label: 'Outerwear', icon: Layers },
-    { id: 'cat-knitwear', label: 'Cashmere & Knits', icon: Heart },
-    { id: 'cat-tailoring', label: 'Tailoring', icon: Award },
+    { id: 'all', label: 'All Departments', icon: Sparkles },
+    { id: 'cat-mobiles-tech', label: 'Mobiles & Tech', icon: Zap },
+    { id: 'cat-audio-wearables', label: 'Audio & Watches', icon: Award },
+    { id: 'cat-footwear', label: 'Footwear & Sneakers', icon: Compass },
+    { id: 'cat-beauty-perfumes', label: 'Fragrances & Beauty', icon: Heart },
+    { id: 'cat-home-living', label: 'Home & Living', icon: Layers },
+    { id: 'cat-mens-fashion', label: 'Men’s Fashion', icon: Award },
+    { id: 'cat-womens-fashion', label: 'Women’s Fashion', icon: Heart },
   ];
 
   const filteredProducts =
     selectedCategory === 'all'
-      ? mockProducts.slice(0, 4)
-      : mockProducts.filter((p) => p.category_id === selectedCategory).slice(0, 4);
+      ? mockProducts.slice(0, 8)
+      : mockProducts.filter((p) => {
+          if (p.category_id === selectedCategory) return true;
+          if (selectedCategory === 'cat-mens-fashion') {
+            return ['cat-tailoring', 'cat-shirts', 'cat-outerwear', 'cat-trousers', 'cat-knitwear', 'cat-footwear'].includes(p.category_id);
+          }
+          if (selectedCategory === 'cat-womens-fashion') {
+            return ['cat-outerwear', 'cat-knitwear', 'cat-tailoring', 'cat-shirts', 'cat-beauty-perfumes'].includes(p.category_id) || p.name.includes('Dress') || p.name.includes('Skirt');
+          }
+          return false;
+        }).slice(0, 8);
 
-  const trendingProducts = mockProducts.slice(4, 12);
+  const trendingProducts = mockProducts.slice(0, 12);
 
   const scrollTrending = (direction) => {
     if (trendingScrollRef.current) {
@@ -163,89 +201,13 @@ export default function HomePage() {
 
   return (
     <div className="relative flex flex-col overflow-hidden bg-[#FAF9F5] text-[#141414]">
-      {/* ========================================================================= */}
-      {/* DYNAMIC CURSOR-FOLLOWING BACKGROUND ANIMATION SYSTEM */}
-      {/* ========================================================================= */}
-      <div
-        className={`fixed inset-0 pointer-events-none z-30 overflow-hidden transition-opacity duration-700 ${
-          isCursorActive ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        {/* Layer 1: Deep Atmospheric Trailing Aurora */}
-        <motion.div
-          style={{
-            x: deepTrailX,
-            y: deepTrailY,
-            translateX: '-50%',
-            translateY: '-50%',
-          }}
-          className="absolute w-[620px] h-[620px] rounded-full bg-gradient-to-tr from-purple-600/22 via-pink-600/20 to-amber-400/16 blur-[125px] mix-blend-screen pointer-events-none"
-        />
 
-        {/* Layer 2: Secondary Fluid Liquid Light Orb */}
-        <motion.div
-          style={{
-            x: trailX,
-            y: trailY,
-            translateX: '-50%',
-            translateY: '-50%',
-          }}
-          className="absolute w-[400px] h-[400px] rounded-full bg-gradient-to-r from-rose-500/26 via-violet-500/28 to-cyan-400/22 blur-[85px] mix-blend-screen pointer-events-none"
-        />
 
-        {/* Layer 3: Primary Energetic Spotlight Core */}
-        <motion.div
-          style={{
-            x: cursorX,
-            y: cursorY,
-            translateX: '-50%',
-            translateY: '-50%',
-          }}
-          className="absolute w-[240px] h-[240px] rounded-full bg-gradient-to-br from-amber-300/35 via-rose-500/38 to-purple-600/32 blur-[55px] mix-blend-screen pointer-events-none"
-        />
+      {/* 1. Full-Width Editorial Hero Section with Dynamic 3D WebGL Scene & Ambient Glows */}
+      <section className="relative min-h-[90vh] lg:min-h-[96vh] flex items-center justify-center overflow-hidden bg-[#0B0A0E]">
+        {/* Real 3D Interactive WebGL Three.js Scene (Gyroscopic Core, Quantum Torus Rings & Product Geometry) */}
+        <Hero3DScene />
 
-        {/* Layer 4: Luxury Floating Micro-Beacon / Follower Spark */}
-        <motion.div
-          style={{
-            x: cursorX,
-            y: cursorY,
-            translateX: '-50%',
-            translateY: '-50%',
-          }}
-          className="absolute w-8 h-8 rounded-full border border-amber-300/80 bg-gradient-to-tr from-amber-400/20 via-rose-500/25 to-purple-600/25 backdrop-blur-xs hidden sm:flex items-center justify-center shadow-lg shadow-purple-500/30 pointer-events-none"
-        >
-          <div className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-ping" />
-        </motion.div>
-
-        {/* Layer 5: Orbiting Stardust Sparkle 1 */}
-        <motion.div
-          style={{
-            x: trailX,
-            y: trailY,
-            translateX: '38px',
-            translateY: '-32px',
-          }}
-          animate={{ rotate: 360, scale: [0.75, 1.25, 0.75] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-2.5 h-2.5 rounded-full bg-gradient-to-r from-amber-300 to-rose-400 blur-[0.6px] shadow-sm pointer-events-none"
-        />
-
-        {/* Layer 6: Orbiting Stardust Sparkle 2 */}
-        <motion.div
-          style={{
-            x: deepTrailX,
-            y: deepTrailY,
-            translateX: '-42px',
-            translateY: '28px',
-          }}
-          animate={{ rotate: -360, scale: [1.2, 0.7, 1.2] }}
-          transition={{ duration: 5.5, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-cyan-300 to-purple-400 blur-[0.6px] shadow-sm pointer-events-none"
-        />
-      </div>
-
-      {/* 1. Full-Width Editorial Hero Section with Dynamic Colourful Ambient Glows */}
-      <section className="relative min-h-[90vh] lg:min-h-[96vh] flex items-center justify-center overflow-hidden bg-[#0C0B10]">
         {/* Dynamic Pulsing Ambient Gradient Orbs */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
@@ -276,24 +238,24 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Background Editorial Imagery with Slow Ambient Zoom */}
+        {/* Background Multi-Category Flagship Editorial Imagery with Slow Ambient Zoom */}
         <motion.div
-          animate={{ scale: [1, 1.05, 1] }}
+          animate={{ scale: [1, 1.04, 1] }}
           transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute inset-0"
         >
           <img
-            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=2200&q=85"
-            alt="ÉLANE Autumn Winter Editorial"
-            className="w-full h-full object-cover object-top opacity-55 mix-blend-luminosity filter brightness-[0.9] contrast-[1.1]"
+            src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=2200&q=85"
+            alt="ÉLANE Flagship Superstore Editorial"
+            className="w-full h-full object-cover object-center opacity-30 mix-blend-luminosity filter brightness-[0.8] contrast-[1.2]"
           />
         </motion.div>
 
         {/* Ambient Dark Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0C0B10] via-[#0C0B10]/60 to-black/30 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0A0E] via-[#0B0A0E]/75 to-black/50 pointer-events-none" />
 
         {/* Hero Content with Staggered Entrance Animation */}
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center text-[#FAF9F5] py-24 sm:py-32">
+        <div className="relative z-20 max-w-5xl mx-auto px-6 text-center text-[#FAF9F5] py-24 sm:py-32">
           <motion.div
             initial="hidden"
             animate="visible"
@@ -304,7 +266,7 @@ export default function HomePage() {
             <motion.div variants={fadeUpVariants} custom={0} className="inline-block">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 rounded-full border border-white/20 bg-gradient-to-r from-rose-500/20 via-purple-500/20 to-amber-500/20 backdrop-blur-md text-[10px] sm:text-[11px] uppercase tracking-[0.3em] font-semibold text-[#FAF9F5] shadow-xl shadow-purple-500/10"
+                className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 rounded-full border border-white/20 bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-blue-500/20 backdrop-blur-md text-[10px] sm:text-[11px] uppercase tracking-[0.3em] font-semibold text-[#FAF9F5] shadow-xl shadow-purple-500/10"
               >
                 <motion.div
                   animate={{ rotate: 360 }}
@@ -313,9 +275,9 @@ export default function HomePage() {
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 </motion.div>
                 <span className="bg-gradient-to-r from-amber-200 via-rose-200 to-purple-200 bg-clip-text text-transparent font-bold">
-                  {t.heroTag || 'COLLECTION N° 04 / 2026 EDITION'}
+                  {t.heroTag || 'FLAGSHIP INNOVATION & TIMELESS CRAFT / 2026 EDITION'}
                 </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
               </motion.div>
             </motion.div>
 
@@ -340,10 +302,10 @@ export default function HomePage() {
             <motion.p
               variants={fadeUpVariants}
               custom={2}
-              className="max-w-xl mx-auto text-sm sm:text-base font-light text-[#E2DFD8] tracking-wider leading-relaxed"
+              className="max-w-2xl mx-auto text-sm sm:text-base font-light text-[#E2DFD8] tracking-wider leading-relaxed"
             >
               {t.heroSubtitle ||
-                'Contemporary essentials designed for everyday expression. Tactile natural noble fibers, architectural tailoring, and enduring silhouettes.'}
+                'From titanium flagship smartphones and spatial acoustics to Tuscan footwear, rare extract perfumes, and architectural home living.'}
             </motion.p>
 
             {/* Action Buttons with Colorful Animations & Micro-Interactions */}
@@ -364,7 +326,7 @@ export default function HomePage() {
                   className="group relative w-full sm:w-auto px-9 py-4 rounded-full overflow-hidden bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white text-xs uppercase tracking-[0.25em] font-bold shadow-2xl shadow-rose-500/35 hover:shadow-rose-500/60 transition-all duration-300 flex items-center justify-center gap-3"
                 >
                   <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-                  <span className="relative z-10">{t.shopCollection || 'Shop Collection'}</span>
+                  <span className="relative z-10">{t.shopCollection || 'Explore All Departments'}</span>
                   <ArrowRight className="w-4 h-4 text-amber-200 relative z-10 group-hover:translate-x-1.5 transition-transform duration-200" />
                 </Link>
               </motion.div>
@@ -382,7 +344,7 @@ export default function HomePage() {
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-45 transition-transform duration-300" />
                   <span className="group-hover:text-amber-200 transition-colors">
-                    {t.exploreArrivals || 'Explore New Arrivals'}
+                    {t.exploreArrivals || 'Discover Flagships'}
                   </span>
                 </Link>
               </motion.div>
@@ -395,25 +357,37 @@ export default function HomePage() {
               className="pt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-3"
             >
               <span className="text-[10px] uppercase tracking-widest text-stone-400 mr-1 hidden sm:inline">
-                Curations:
+                Flagships:
               </span>
               <Link
-                to="/shop?category=cat-outerwear"
-                className="px-3.5 py-1 rounded-full text-[10px] uppercase tracking-wider text-violet-300 hover:text-white bg-violet-500/15 hover:bg-violet-500/30 border border-violet-500/30 transition-all duration-200"
+                to="/shop?category=mobiles-electronics"
+                className="px-3.5 py-1 rounded-full text-[10px] uppercase tracking-wider text-cyan-300 hover:text-white bg-cyan-500/15 hover:bg-cyan-500/30 border border-cyan-500/30 transition-all duration-200"
               >
-                Outerwear Vault
+                📱 Titanium Flagships
               </Link>
               <Link
-                to="/shop?category=cat-knitwear"
-                className="px-3.5 py-1 rounded-full text-[10px] uppercase tracking-wider text-rose-300 hover:text-white bg-rose-500/15 hover:bg-rose-500/30 border border-rose-500/30 transition-all duration-200"
+                to="/shop?category=smartwatches-audio"
+                className="px-3.5 py-1 rounded-full text-[10px] uppercase tracking-wider text-amber-300 hover:text-white bg-amber-500/15 hover:bg-amber-500/30 border border-amber-500/30 transition-all duration-200"
               >
-                Cashmere Knits
+                🎧 Spatial Acoustics
               </Link>
               <Link
-                to="/shop?category=cat-tailoring"
+                to="/shop?category=footwear-sneakers"
                 className="px-3.5 py-1 rounded-full text-[10px] uppercase tracking-wider text-emerald-300 hover:text-white bg-emerald-500/15 hover:bg-emerald-500/30 border border-emerald-500/30 transition-all duration-200"
               >
-                Artisanal Suiting
+                👟 Sneaker Lab
+              </Link>
+              <Link
+                to="/shop?category=beauty-fragrances"
+                className="px-3.5 py-1 rounded-full text-[10px] uppercase tracking-wider text-rose-300 hover:text-white bg-rose-500/15 hover:bg-rose-500/30 border border-rose-500/30 transition-all duration-200"
+              >
+                ✨ Rare Extraits
+              </Link>
+              <Link
+                to="/shop?category=home-luxury-living"
+                className="px-3.5 py-1 rounded-full text-[10px] uppercase tracking-wider text-violet-300 hover:text-white bg-violet-500/15 hover:bg-violet-500/30 border border-violet-500/30 transition-all duration-200"
+              >
+                🏛️ Luxury Living
               </Link>
             </motion.div>
           </motion.div>
@@ -635,6 +609,84 @@ export default function HomePage() {
         </motion.div>
       </section>
 
+      {/* 4.5 Amazon-Style Lightning Deals & Flash Countdown Section */}
+      <section id="flash-deals" className="py-16 bg-[#141318] text-[#FAF9F5] border-y border-[#26242E] relative overflow-hidden">
+        {/* Ambient Glow */}
+        <div className="absolute -top-32 right-10 w-96 h-96 bg-amber-500/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -bottom-32 left-10 w-96 h-96 bg-rose-500/10 rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Header Bar: Deal Tag + Live Ticking Countdown Timer */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-[#2C2A36] mb-10">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EA580C]/20 border border-[#EA580C]/40 text-[#FB923C] text-[10px] uppercase tracking-[0.25em] font-bold mb-2">
+                <Zap className="w-3.5 h-3.5 fill-[#FB923C]" />
+                <span>Amazon-Style Lightning Deals</span>
+              </div>
+              <h2 className="font-serif text-2xl sm:text-4xl uppercase tracking-wider text-white">
+                Flash Atelier Deals • Limited Time
+              </h2>
+            </div>
+
+            {/* Live Ticking Countdown Clock Box */}
+            <div className="flex items-center gap-3 bg-[#1C1A24] border border-[#3E3A4D] px-5 py-3 rounded-2xl shadow-xl">
+              <div className="flex items-center gap-2 text-rose-400">
+                <Clock className="w-4 h-4 animate-pulse" />
+                <span className="text-xs uppercase tracking-wider font-semibold text-white/70">Deals End In:</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-mono text-base sm:text-lg font-bold">
+                <span className="bg-[#2A2736] px-2.5 py-1 rounded-md text-amber-300 border border-white/10">
+                  {String(dealTimeLeft.hours).padStart(2, '0')}h
+                </span>
+                <span className="text-white/40">:</span>
+                <span className="bg-[#2A2736] px-2.5 py-1 rounded-md text-amber-300 border border-white/10">
+                  {String(dealTimeLeft.minutes).padStart(2, '0')}m
+                </span>
+                <span className="text-white/40">:</span>
+                <span className="bg-[#2A2736] px-2.5 py-1 rounded-md text-rose-400 border border-white/10">
+                  {String(dealTimeLeft.seconds).padStart(2, '0')}s
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Deal Products Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {dealProducts.slice(0, 4).map((product) => {
+              const savingsPercent = Math.round(((product.base_price - product.sale_price) / product.base_price) * 100);
+              return (
+                <div key={product.id} className="bg-[#1C1A24] rounded-2xl p-3 border border-[#2D2A3B] hover:border-[#EA580C]/50 transition-all duration-300 flex flex-col group">
+                  <div className="relative rounded-xl overflow-hidden mb-3">
+                    <ProductCard product={product} />
+                  </div>
+                  {/* Progress Claimed Bar */}
+                  <div className="mt-auto pt-2">
+                    <div className="w-full bg-[#2E2B3D] h-2 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-amber-500 to-[#EA580C] h-full rounded-full transition-all duration-500" style={{ width: '84%' }} />
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-white/60 mt-1.5 font-sans">
+                      <span className="text-amber-400 font-semibold">84% Claimed</span>
+                      <span className="text-rose-400 font-medium">Save {savingsPercent}%</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom All Deals CTA */}
+          <div className="mt-10 text-center">
+            <Link
+              to="/shop?deal=true"
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] font-bold text-amber-400 hover:text-amber-300 transition-colors"
+            >
+              <span>Explore All Atelier Flash Deals</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* 5. New Season Releases with Interactive Category Filter Pills */}
       <section className="py-24 bg-gradient-to-b from-[#F3F1EC]/60 via-[#F9F7F2] to-[#FAF9F5] border-y border-[#E8E6E1]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -739,7 +791,7 @@ export default function HomePage() {
             {/* Dynamic Glass Tag */}
             <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 text-white shadow-xl">
               <span className="text-[10px] uppercase tracking-[0.25em] font-semibold bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-transparent">
-                {t.editionFabricFocus || 'Edition 04 • Fabric Focus'}
+                {t.editionFabricFocus || 'Master Flagship Pavilion'}
               </span>
             </div>
 
@@ -747,9 +799,9 @@ export default function HomePage() {
             <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-white/90 backdrop-blur-md border border-white/50 text-[#141414] shadow-xl flex items-center justify-between">
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-[#73706B] font-bold">
-                  Generational Standard
+                  Flagship Standards
                 </p>
-                <p className="font-serif text-lg font-bold">Porto & Biella Guild</p>
+                <p className="font-serif text-lg font-bold">Aerospace Titanium • Pure Extracts • Tuscan Guild</p>
               </div>
               <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-700 border border-rose-200">
                 100% Certified
@@ -767,11 +819,11 @@ export default function HomePage() {
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-700 text-[10px] uppercase tracking-[0.25em] font-bold">
               <Award className="w-3 h-3 text-violet-600" />
-              {t.atelierStandard || 'The Atelier Standard'}
+              {t.atelierStandard || 'The Master Standard'}
             </div>
 
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-[#141414] font-normal leading-[1.12]">
-              {t.editorialTitle || 'THE ART OF RESTRAINT & LONGEVITY'}
+              {t.editorialTitle || 'EXCELLENCE IN EVERY DISCIPLINE'}
             </h2>
 
             <motion.div
@@ -784,11 +836,11 @@ export default function HomePage() {
 
             <p className="text-sm text-[#63605A] font-light leading-relaxed">
               {t.atelierParagraph1 ||
-                'We reject transient trend cycles in favor of architectural purity and tactile luxury. Every garment begins with raw fiber selection—whether GOTS-certified Italian poplin, Grade-A Mongolian cashmere, or dry-waxed British canvas.'}
+                'We bridge futuristic engineering with artisanal luxury. Every product is selected for extraordinary permanence—from 3nm titanium smartphones and beryllium acoustic drivers to pure Sandalwood extraits and Roman travertine marble.'}
             </p>
             <p className="text-sm text-[#63605A] font-light leading-relaxed">
               {t.atelierParagraph2 ||
-                'Our silhouettes are rigorously engineered to move seamlessly with the human body, providing unconstrained elegance from early morning deliberations into the evening salon.'}
+                'Designed for discerning tastemakers who demand absolute perfection in technology, lifestyle, home ambiance, and sartorial expression.'}
             </p>
 
             {/* Feature Bullets */}
@@ -797,19 +849,19 @@ export default function HomePage() {
                 <div className="w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-r from-rose-500 to-purple-600 text-white shrink-0">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                 </div>
-                <span className="font-medium tracking-wide">Pure Corozo Nut & Natural Horn Buttons</span>
+                <span className="font-medium tracking-wide">Aerospace-Grade Grade 5 Titanium & Tandem OLEDs</span>
               </div>
               <div className="flex items-center gap-3 text-xs text-[#262626]">
                 <div className="w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-r from-amber-400 to-rose-500 text-white shrink-0">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                 </div>
-                <span className="font-medium tracking-wide">Solid Forged Brass Hardware</span>
+                <span className="font-medium tracking-wide">Handcrafted Margom Soles & Italian Vegetable Tanning</span>
               </div>
               <div className="flex items-center gap-3 text-xs text-[#262626]">
                 <div className="w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-r from-emerald-500 to-teal-600 text-white shrink-0">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                 </div>
-                <span className="font-medium tracking-wide">Strict Limited-Edition Small Batches</span>
+                <span className="font-medium tracking-wide">Official Comprehensive Brand Warranty & Doorstep White-Glove Support</span>
               </div>
             </div>
 

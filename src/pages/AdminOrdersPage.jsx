@@ -59,7 +59,7 @@ export default function AdminOrdersPage() {
       <div className="bg-white border border-[#E8E6E1] p-4 flex flex-col sm:flex-row justify-between gap-4">
         {/* Status Tabs */}
         <div className="flex flex-wrap gap-1">
-          {['all', 'Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered'].map((st) => (
+          {['all', 'Ordered', 'Confirmed', 'Packed', 'Shipped', 'OutForDelivery', 'Delivered', 'Cancelled'].map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
@@ -69,7 +69,7 @@ export default function AdminOrdersPage() {
                   : 'text-[#787570] hover:bg-[#F3F1EC] hover:text-[#141414]'
               }`}
             >
-              {st}
+              {st === 'OutForDelivery' ? 'Out for Delivery' : st}
             </button>
           ))}
         </div>
@@ -133,11 +133,12 @@ export default function AdminOrdersPage() {
                         onChange={(e) => handleStatusChange(ord.id, e.target.value)}
                         className="appearance-none bg-[#FAF9F5] border border-[#E8E6E1] px-3 py-1.5 pr-8 text-[11px] uppercase tracking-wider font-semibold text-[#141414] cursor-pointer focus:outline-none"
                       >
-                        <option value="Pending">Pending</option>
-                        <option value="Confirmed">Confirmed</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
+                        <option value="Ordered">1. Ordered</option>
+                        <option value="Confirmed">1. Confirmed</option>
+                        <option value="Packed">2. Packed (Atelier)</option>
+                        <option value="Shipped">3. Shipped (In Transit)</option>
+                        <option value="OutForDelivery">4. Out for Delivery</option>
+                        <option value="Delivered">5. Delivered</option>
                         <option value="Cancelled">Cancelled</option>
                       </select>
                       <ChevronDown className="w-3 h-3 text-[#787570] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />

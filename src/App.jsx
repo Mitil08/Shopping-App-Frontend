@@ -5,6 +5,10 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { LoyaltyProvider } from './context/LoyaltyContext';
+
+import { CurrencyProvider } from './context/CurrencyContext';
 
 import RootLayout from './layouts/RootLayout';
 import AdminLayout from './layouts/AdminLayout';
@@ -24,6 +28,7 @@ import WishlistPage from './pages/WishlistPage';
 import ProfilePage from './pages/ProfilePage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import OrderDetailPage from './pages/OrderDetailPage';
+import WardrobeBuilderPage from './pages/WardrobeBuilderPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 import AdminDashboardPage from './pages/AdminDashboardPage';
@@ -31,15 +36,19 @@ import AdminProductsPage from './pages/AdminProductsPage';
 import AdminProductEditPage from './pages/AdminProductEditPage';
 import AdminOrdersPage from './pages/AdminOrdersPage';
 import AdminUsersPage from './pages/AdminUsersPage';
+import AdminSupportQueuePage from './pages/AdminSupportQueuePage';
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <ToastProvider>
-        <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <BrowserRouter>
+    <ThemeProvider>
+      <LanguageProvider>
+        <CurrencyProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <CartProvider>
+                <WishlistProvider>
+                  <LoyaltyProvider>
+                <BrowserRouter>
                 <Routes>
                   {/* Public & Customer Routes */}
                   <Route path="/" element={<RootLayout />}>
@@ -57,6 +66,7 @@ export default function App() {
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="profile/orders" element={<OrderHistoryPage />} />
                     <Route path="profile/orders/:orderId" element={<OrderDetailPage />} />
+                    <Route path="wardrobe-builder" element={<WardrobeBuilderPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                   </Route>
 
@@ -67,15 +77,19 @@ export default function App() {
                     <Route path="products/new" element={<AdminProductEditPage />} />
                     <Route path="products/:id/edit" element={<AdminProductEditPage />} />
                     <Route path="orders" element={<AdminOrdersPage />} />
+                    <Route path="support" element={<AdminSupportQueuePage />} />
                     <Route path="users" element={<AdminUsersPage />} />
                   </Route>
                 </Routes>
               </BrowserRouter>
+              </LoyaltyProvider>
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>
       </ToastProvider>
+        </CurrencyProvider>
     </LanguageProvider>
+    </ThemeProvider>
   );
 }
 

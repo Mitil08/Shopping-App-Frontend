@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { DollarSign, ShoppingBag, Users, AlertTriangle, ArrowUpRight, ChevronRight, Package, TrendingUp } from 'lucide-react';
 import { mockProducts } from '../data/mockProducts';
 import { formatPrice } from '../utils/currency';
+import WhatsAppNotificationSimulator from '../components/WhatsAppNotificationSimulator';
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -239,6 +240,9 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Automated WhatsApp Webhook & Dispatch Simulator */}
+      <WhatsAppNotificationSimulator orders={orders} />
     </div>
   );
 }

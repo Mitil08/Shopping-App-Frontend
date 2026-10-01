@@ -67,8 +67,9 @@ export const CartProvider = ({ children }) => {
   }, [items, isAuthenticated]);
 
   const addToCart = useCallback(
-    async (product, variant, quantity = 1) => {
-      const cartItemId = `${product.id}-${variant?.id || 'standard'}`;
+    async (product, variant, quantity = 1, openDrawerOnAdd = true, monogramConfig = null) => {
+      const monogramSuffix = monogramConfig?.text ? `-mono-${monogramConfig.text}` : '';
+      const cartItemId = `${product.id}-${variant?.id || 'standard'}${monogramSuffix}`;
       const unitPrice = product.sale_price || product.base_price;
 
       setItems((prevItems) => {
@@ -94,6 +95,7 @@ export const CartProvider = ({ children }) => {
             colorHex: variant?.colorHex,
             variantId: variant?.id,
             quantity,
+            monogram: monogramConfig,
           };
           return [...prevItems, newItem];
         }
@@ -112,7 +114,9 @@ export const CartProvider = ({ children }) => {
       }
 
       success(`Added "${product.name}" to your bag`);
-      setIsDrawerOpen(true);
+      if (openDrawerOnAdd) {
+        setIsDrawerOpen(true);
+      }
     },
     [isAuthenticated, success]
   );
@@ -170,20 +174,43 @@ export const CartProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
+  const [flatDiscountAmount, setFlatDiscountAmount] = useState(0);
+
+  const removePromo = () => {
+    setPromoCode('');
+    setAppliedDiscountRate(0);
+    setFlatDiscountAmount(0);
+    info('Promo coupon removed');
+  };
+
   const applyPromo = (code) => {
     const clean = code.trim().toUpperCase();
-    if (clean === 'ELANE10') {
+    if (clean === 'ELANE10' || clean === 'WELCOME10') {
       setAppliedDiscountRate(0.1);
+      setFlatDiscountAmount(0);
       setPromoCode(clean);
-      success('Promo code ELANE10 applied: 10% off your order');
+      success(`Coupon ${clean} applied: 10% instant discount!`);
       return { success: true, message: '10% discount applied' };
     } else if (clean === 'VIP20') {
       setAppliedDiscountRate(0.2);
+      setFlatDiscountAmount(0);
       setPromoCode(clean);
-      success('VIP Code VIP20 applied: 20% off your order');
+      success('VIP Code VIP20 applied: 20% privilege discount!');
       return { success: true, message: '20% discount applied' };
+    } else if (clean === 'FESTIVE500') {
+      setAppliedDiscountRate(0);
+      setFlatDiscountAmount(500);
+      setPromoCode(clean);
+      success('Festive Code FESTIVE500 applied: ₹500 off your order!');
+      return { success: true, message: '₹500 flat discount applied' };
+    } else if (clean === 'AMAZON15') {
+      setAppliedDiscountRate(0.15);
+      setFlatDiscountAmount(0);
+      setPromoCode(clean);
+      success('Coupon AMAZON15 applied: 15% instant discount!');
+      return { success: true, message: '15% discount applied' };
     } else {
-      return { success: false, message: 'Invalid promo code. Try "ELANE10" or "VIP20"' };
+      return { success: false, message: 'Invalid promo code. Try "WELCOME10", "FESTIVE500", or "VIP20"' };
     }
   };
 
@@ -197,10 +224,13 @@ export const CartProvider = ({ children }) => {
   }, [items]);
 
   const discountAmount = useMemo(() => {
-    return subtotal * appliedDiscountRate;
-  }, [subtotal, appliedDiscountRate]);
+    if (flatDiscountAmount > 0) {
+      return Math.min(subtotal, flatDiscountAmount);
+    }
+    return Math.round(subtotal * appliedDiscountRate);
+  }, [subtotal, appliedDiscountRate, flatDiscountAmount]);
 
-  // Free shipping on orders over $100
+  // Free shipping on orders over ₹100
   const shippingThreshold = 100;
   const shippingCost = subtotal >= shippingThreshold || items.length === 0 ? 0 : 25;
   const amountToFreeShipping = Math.max(0, shippingThreshold - subtotal);
@@ -231,6 +261,7 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         clearCart,
         applyPromo,
+        removePromo,
         loading,
       }}
     >

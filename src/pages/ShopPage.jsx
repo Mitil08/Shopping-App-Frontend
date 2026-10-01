@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, X, RotateCcw, Search, ChevronDown, Check } from 'lucide-react';
+import { SlidersHorizontal, X, RotateCcw, Search, ChevronDown, Check, Zap } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { ProductGridSkeleton } from '../components/Skeleton';
 import { productApi } from '../services/productApi';
@@ -20,20 +20,29 @@ export default function ShopPage() {
   const minPriceParam = searchParams.get('minPrice') || '';
   const maxPriceParam = searchParams.get('maxPrice') || '';
   const inStockParam = searchParams.get('inStock') === 'true';
+  const expressParam = searchParams.get('express') === 'true';
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [searchInput, setSearchInput] = useState(searchParam);
 
-  const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'One Size'];
+  // Multi-department sizes & capacities: apparel, tech storage, horology, footwear, flacons
+  const availableSizes = [
+    '256GB', '512GB', '1TB', '46mm', '42mm',
+    '41 (UK 7)', '42 (UK 8)', '43 (UK 9)',
+    '50ml', '100ml',
+    'S', 'M', 'L', 'One Size'
+  ];
+
   const availableColors = [
-    { label: 'Black / Charcoal', hex: '#1C1C1E', query: 'black' },
-    { label: 'White / Cream', hex: '#FDFBF7', query: 'white' },
-    { label: 'Camel / Tan', hex: '#C39B77', query: 'camel' },
+    { label: 'Titanium / Graphite', hex: '#2E3033', query: 'titanium' },
+    { label: 'Obsidian / Black', hex: '#141414', query: 'black' },
+    { label: 'Ceramic / Chalk White', hex: '#FDFBF7', query: 'white' },
+    { label: 'Saddle Cognac / Tan', hex: '#8E4A28', query: 'saddle' },
+    { label: 'Smoked Amber / Gold', hex: '#9E743A', query: 'amber' },
+    { label: 'Raw Travertine / Living Brass', hex: '#C5B48B', query: 'brass' },
     { label: 'Navy / Indigo', hex: '#1B243B', query: 'indigo' },
-    { label: 'Olive / Khaki', hex: '#3D4233', query: 'olive' },
-    { label: 'Grey / Slate', hex: '#686B6F', query: 'grey' },
   ];
 
   // Fetch products whenever params change
@@ -52,6 +61,7 @@ export default function ShopPage() {
           minPrice: minPriceParam,
           maxPrice: maxPriceParam,
           inStock: inStockParam,
+          express: expressParam,
         });
 
         if (isMounted) {
@@ -68,7 +78,7 @@ export default function ShopPage() {
     return () => {
       isMounted = false;
     };
-  }, [categoryParam, sortParam, searchParam, sizeParam, colorParam, minPriceParam, maxPriceParam, inStockParam]);
+  }, [categoryParam, sortParam, searchParam, sizeParam, colorParam, minPriceParam, maxPriceParam, inStockParam, expressParam]);
 
   const updateParam = (key, value) => {
     const newParams = new URLSearchParams(searchParams);
@@ -97,7 +107,8 @@ export default function ShopPage() {
     colorParam !== '' ||
     minPriceParam !== '' ||
     maxPriceParam !== '' ||
-    inStockParam;
+    inStockParam ||
+    expressParam;
 
   // Filter UI Component
   const FilterContent = () => (
@@ -139,18 +150,25 @@ export default function ShopPage() {
             <span>{t.allSilhouettes || 'All Silhouettes'}</span>
             {categoryParam === 'all' && <Check className="w-3.5 h-3.5 text-[#141414]" />}
           </button>
-          {mockCategories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => updateParam('category', cat.id)}
-              className={`w-full text-left text-xs tracking-wider uppercase py-1 transition-colors flex justify-between ${
-                categoryParam === cat.id ? 'font-bold text-[#141414]' : 'text-[#787570] hover:text-[#141414]'
-              }`}
-            >
-              <span>{cat.name}</span>
-              {categoryParam === cat.id && <Check className="w-3.5 h-3.5 text-[#141414]" />}
-            </button>
-          ))}
+          {mockCategories.map((cat) => {
+            const isCategoryActive =
+              categoryParam === cat.id ||
+              categoryParam === cat.slug ||
+              (cat.slug && categoryParam.toLowerCase() === cat.slug.toLowerCase()) ||
+              (cat.id && categoryParam.toLowerCase() === cat.id.toLowerCase());
+            return (
+              <button
+                key={cat.id}
+                onClick={() => updateParam('category', cat.slug || cat.id)}
+                className={`w-full text-left text-xs tracking-wider uppercase py-1 transition-colors flex justify-between ${
+                  isCategoryActive ? 'font-bold text-[#141414]' : 'text-[#787570] hover:text-[#141414]'
+                }`}
+              >
+                <span>{cat.name}</span>
+                {isCategoryActive && <Check className="w-3.5 h-3.5 text-[#141414]" />}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -234,7 +252,24 @@ export default function ShopPage() {
       </div>
 
       {/* Availability Filter */}
-      <div className="pt-2">
+      <div className="pt-2 space-y-2.5">
+        {/* ÉLANE Privilege Next-Day Air Filter (Amazon Prime equivalent) */}
+        <label className="flex items-center gap-2.5 cursor-pointer text-xs uppercase tracking-wider text-[#141414] p-2 bg-[#FAF9F5] border border-[#E8E6E1] hover:border-[#141414] transition-colors">
+          <input
+            type="checkbox"
+            checked={expressParam}
+            onChange={(e) => updateParam('express', e.target.checked ? 'true' : '')}
+            className="w-4 h-4 accent-[#141414] cursor-pointer"
+          />
+          <div className="flex items-center gap-1.5 font-semibold">
+            <span className="bg-[#141414] text-[#C2A676] px-1.5 py-0.5 font-mono text-[9px] flex items-center gap-1">
+              <Zap className="w-2.5 h-2.5 fill-[#C2A676]" />
+              <span>Privilege</span>
+            </span>
+            <span className="text-[10px] text-[#787570]">Next-Day Air</span>
+          </div>
+        </label>
+
         <label className="flex items-center gap-2.5 cursor-pointer text-xs uppercase tracking-wider text-[#141414]">
           <input
             type="checkbox"
@@ -264,13 +299,13 @@ export default function ShopPage() {
       {/* Header & Page Title */}
       <div className="text-center max-w-2xl mx-auto mb-10">
         <span className="text-[10px] uppercase tracking-[0.3em] text-[#787570] font-semibold">
-          Ready-to-Wear Atelier
+          Flagship Superstore & Curations
         </span>
         <h1 className="font-serif text-3xl sm:text-5xl text-[#141414] font-normal mt-1 uppercase tracking-wide">
-          {t.collectionTitle || 'THE COLLECTION'}
+          {t.collectionTitle || 'THE MASTER CATALOG'}
         </h1>
         <p className="text-xs sm:text-sm text-[#787570] font-light mt-2 max-w-lg mx-auto">
-          Impeccably tailored garments, natural noble fibers, and minimalist proportions designed for enduring permanence.
+          Explore flagship titanium smartphones, spatial acoustics, Tuscan footwear, artisanal perfumery, and designer wardrobe craft.
         </p>
       </div>
 
@@ -334,9 +369,9 @@ export default function ShopPage() {
             <ProductGridSkeleton count={8} />
           ) : products.length === 0 ? (
             <div className="py-24 text-center border border-dashed border-[#E8E6E1] bg-white p-8">
-              <h3 className="font-serif text-2xl text-[#141414] mb-2">No matching silhouettes found</h3>
+              <h3 className="font-serif text-2xl text-[#141414] mb-2">No matching products found</h3>
               <p className="text-xs text-[#787570] max-w-sm mx-auto mb-6">
-                Try widening your price range, clearing specific sizes, or resetting your active filters.
+                Try widening your price range, clearing specific filters, or resetting all options.
               </p>
               <button
                 onClick={resetAllFilters}
