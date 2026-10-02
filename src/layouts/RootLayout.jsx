@@ -12,11 +12,15 @@ import RoyalSplashOpening from '../components/RoyalSplashOpening';
 
 export default function RootLayout() {
   const [searchOpen, setSearchOpen] = useState(false);
-  const [showOpeningSplash, setShowOpeningSplash] = useState(() => {
-    // Show on initial session load
-    return !sessionStorage.getItem('elane_splash_seen');
-  });
+  const [showOpeningSplash, setShowOpeningSplash] = useState(true);
   const location = useLocation();
+
+  // Listen for manual re-trigger event from anywhere in the app
+  useEffect(() => {
+    const handleReplay = () => setShowOpeningSplash(true);
+    window.addEventListener('elane_replay_splash', handleReplay);
+    return () => window.removeEventListener('elane_replay_splash', handleReplay);
+  }, []);
 
   // Scroll to top on every route change
   useEffect(() => {
@@ -24,7 +28,6 @@ export default function RootLayout() {
   }, [location.pathname]);
 
   const handleSplashComplete = () => {
-    sessionStorage.setItem('elane_splash_seen', 'true');
     setShowOpeningSplash(false);
   };
 

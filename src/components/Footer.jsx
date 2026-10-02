@@ -180,9 +180,12 @@ export default function Footer() {
             <Link to="/about" className="hover:text-[#FAF9F5] transition-colors">
               Terms of Service
             </Link>
-            <Link to="/about" className="hover:text-[#FAF9F5] transition-colors">
-              Accessibility
-            </Link>
+            <button
+              onClick={() => window.dispatchEvent(new Event('elane_replay_splash'))}
+              className="text-[#C2A676] hover:text-white transition-colors cursor-pointer flex items-center gap-1 font-semibold"
+            >
+              <span>Replay Opening Ceremony ✨</span>
+            </button>
           </div>
         </div>
       </div>
