@@ -37,7 +37,7 @@ export default function AuthenticityVault() {
         category: 'Milanese Tailoring Archive',
         batchNumber: 'COUTURE-SEASON-04',
         materialProvenance: '90% Virgin Wool (Piedmont), 10% Grade-A Mongolian Cashmere',
-        artisanGuild: 'Atelier ÉLANE Tailoring Guild, Florence',
+        artisanGuild: 'Kashmir Master Guild & Tailoring Atelier, India',
         registrationDate: '04 November 2025',
         warrantyValidUntil: 'Lifetime Craftsmanship Guarantee',
         status: 'AUTHENTIC & REGISTERED',
@@ -48,9 +48,9 @@ export default function AuthenticityVault() {
         serialNumber: 'ELN-AU-2026-11842Q',
         productName: 'Oud Al-Malik Extrait de Parfum (50ml Flacon)',
         category: 'Olfactory Apothecary',
-        batchNumber: 'GRASSE-HARVEST-2025-A',
-        materialProvenance: '15-Year Aged Cambodian Agarwood, Damascene Rose, Ambergris',
-        artisanGuild: 'Maison Parfumerie, Grasse, France',
+        batchNumber: 'KANNAUJ-HARVEST-2025-A',
+        materialProvenance: 'Assam Wild Agarwood, Kannauj Steam-Distilled Damask Rose, Ambergris',
+        artisanGuild: 'Kannauj Royal Perfumery, India (Dispatched Worldwide)',
         registrationDate: '28 February 2026',
         warrantyValidUntil: 'Permanent Olfactory Cellar Seal',
         status: 'AUTHENTIC & REGISTERED',
@@ -132,7 +132,7 @@ export default function AuthenticityVault() {
             <div className="mt-6 pt-4 border-t border-[#E8E6E1] dark:border-[#24222E] flex items-center justify-between">
               <button
                 onClick={() => setSelectedPass(pass)}
-                className="w-full py-2.5 rounded-lg bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] text-xs uppercase tracking-widest font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                className="btn-sheen btn-sapphire-glow w-full py-2.5 rounded-lg bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] text-xs uppercase tracking-widest font-semibold hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-2 active:scale-95 shadow-sm"
               >
                 <QrCode className="w-3.5 h-3.5" />
                 <span>View Full Certificate</span>
@@ -144,12 +144,12 @@ export default function AuthenticityVault() {
 
       {/* Modal Popup for Pass Inspection */}
       {selectedPass && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in">
-          <div className="bg-[#FAF9F5] dark:bg-[#13111C] border border-[#C2A676]/40 rounded-2xl max-w-lg w-full p-6 sm:p-8 text-[#141414] dark:text-[#FAF9F5] shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/75 backdrop-blur-md animate-in fade-in">
+          <div className="bg-[#FAF8F5] dark:bg-[#17213C] border border-[#C2A676]/40 rounded-2xl max-w-lg w-full p-6 sm:p-8 text-[#192238] dark:text-[#F8FAFC] shadow-2xl relative">
             {/* Modal Close */}
             <button
               onClick={() => setSelectedPass(null)}
-              className="absolute top-4 right-4 text-[#787570] hover:text-black dark:hover:text-white p-2"
+              className="absolute top-4 right-4 text-[#64748B] hover:text-[#192238] dark:hover:text-white p-2 rounded-full hover:rotate-90 active:scale-90 transition-all"
             >
               ✕
             </button>
@@ -206,35 +206,35 @@ export default function AuthenticityVault() {
               </div>
 
               {/* QR Verification Box */}
-              <div className="p-4 rounded-xl bg-white dark:bg-[#0B0A0E] border border-[#E8E6E1] dark:border-[#24222E] flex items-center justify-between gap-4">
+              <div className="p-4 rounded-xl bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#2D3A58] flex items-center justify-between gap-4">
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[#141414] dark:text-white block">
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[#192238] dark:text-white block">
                     Transferable Digital Token
                   </span>
-                  <p className="text-[11px] text-[#787570] dark:text-[#9A968F] mt-0.5">
+                  <p className="text-[11px] text-[#64748B] dark:text-[#94A3B8] mt-0.5">
                     Scan via mobile to verify authenticity or transfer ownership to a new client.
                   </p>
                 </div>
-                <div className="p-2 rounded bg-black text-white shrink-0">
+                <div className="p-2 rounded bg-[#1E293B] text-white shrink-0">
                   <QrCode className="w-10 h-10 text-[#C2A676]" />
                 </div>
               </div>
             </div>
 
             {/* Bottom Actions */}
-            <div className="pt-4 border-t border-[#E8E6E1] dark:border-[#24222E] flex gap-3">
+            <div className="pt-4 border-t border-[#E2E8F0] dark:border-[#2D3A58] flex gap-3">
               <button
                 onClick={() => {
                   alert(`Certificate ${selectedPass.serialNumber} downloaded as encrypted PDF pass.`);
                 }}
-                className="flex-1 py-3 rounded-lg border border-[#141414] dark:border-white/30 text-xs uppercase tracking-widest font-semibold hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+                className="btn-sheen flex-1 py-3 rounded-lg border border-[#192238] dark:border-white/30 text-xs uppercase tracking-widest font-semibold hover:bg-[#192238]/5 dark:hover:bg-white/5 transition-all flex items-center justify-center gap-2 active:scale-95 shadow-xs"
               >
                 <FileText className="w-3.5 h-3.5" />
                 <span>Export PDF Pass</span>
               </button>
               <button
                 onClick={() => setSelectedPass(null)}
-                className="flex-1 py-3 rounded-lg bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] text-xs uppercase tracking-widest font-semibold hover:opacity-90 transition-opacity"
+                className="btn-sheen btn-sapphire-glow flex-1 py-3 rounded-lg bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] text-xs uppercase tracking-widest font-semibold hover:bg-[#1D4ED8] transition-all active:scale-95 shadow-sm"
               >
                 Done
               </button>

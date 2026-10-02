@@ -108,7 +108,7 @@ export default function Interactive3DProductViewer({ product, onClose }) {
 
       // OLED Screen
       const screenGeo = new THREE.PlaneGeometry(2.25, 4.6);
-      const screenMat = new THREE.MeshBasicMaterial({ color: 0x050508 });
+      const screenMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
       const screenMesh = new THREE.Mesh(screenGeo, screenMat);
       screenMesh.position.z = 0.125;
       modelGroup.add(screenMesh);
@@ -342,15 +342,15 @@ export default function Interactive3DProductViewer({ product, onClose }) {
   };
 
   return (
-    <div className="relative w-full h-[420px] sm:h-[480px] bg-gradient-to-b from-[#13111C] via-[#0B0A0E] to-[#13111C] rounded-2xl overflow-hidden border border-[#24222E] shadow-2xl flex flex-col">
+    <div className="relative w-full h-[420px] sm:h-[480px] bg-gradient-to-b from-[#1E293B] via-[#111827] to-[#1E293B] rounded-2xl overflow-hidden border border-[#2D3A58] shadow-2xl flex flex-col">
       {/* Top Controls Bar */}
       <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto">
-          <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-[#C2A676]/40 text-[#C2A676] text-[10px] uppercase tracking-[0.2em] font-semibold flex items-center gap-1.5">
+          <span className="px-3 py-1 rounded-full bg-[#1E293B]/80 backdrop-blur-md border border-[#C2A676]/40 text-[#C2A676] text-[10px] uppercase tracking-[0.2em] font-semibold flex items-center gap-1.5">
             <Sparkles className="w-3 h-3" />
             3D Studio Viewer
           </span>
-          <span className="text-[10px] text-white/60 tracking-wider font-mono hidden sm:inline">
+          <span className="text-[10px] text-white/70 tracking-wider font-mono hidden sm:inline">
             Drag to Rotate • Scroll to Zoom
           </span>
         </div>
@@ -361,8 +361,8 @@ export default function Interactive3DProductViewer({ product, onClose }) {
             onClick={() => setAutoRotate(!autoRotate)}
             className={`p-2 rounded-full backdrop-blur-md border text-xs transition-all ${
               autoRotate 
-                ? 'bg-[#C2A676] text-[#0B0A0E] border-[#C2A676]' 
-                : 'bg-black/60 text-white/80 border-white/20 hover:text-white'
+                ? 'bg-[#C2A676] text-[#111827] border-[#C2A676]' 
+                : 'bg-[#1E293B]/80 text-white/80 border-[#2D3A58] hover:text-white'
             }`}
             title={autoRotate ? 'Pause 360° Auto-spin' : 'Enable 360° Auto-spin'}
           >
@@ -373,8 +373,8 @@ export default function Interactive3DProductViewer({ product, onClose }) {
             onClick={toggleMaterialWireframe}
             className={`px-3 py-1.5 rounded-full backdrop-blur-md border text-[10px] uppercase tracking-wider font-semibold transition-all ${
               activeMaterialMode === 'wireframe'
-                ? 'bg-[#C2A676] text-[#0B0A0E] border-[#C2A676]'
-                : 'bg-black/60 text-white/80 border-white/20 hover:text-white'
+                ? 'bg-[#C2A676] text-[#111827] border-[#C2A676]'
+                : 'bg-[#1E293B]/80 text-white/80 border-[#2D3A58] hover:text-white'
             }`}
             title="Inspect CAD Wireframe Architecture"
           >
@@ -384,7 +384,7 @@ export default function Interactive3DProductViewer({ product, onClose }) {
 
           <button
             onClick={resetView}
-            className="p-2 rounded-full bg-black/60 text-white/80 border border-white/20 hover:text-white backdrop-blur-md text-xs"
+            className="p-2 rounded-full bg-[#1E293B]/80 text-white/80 border border-[#2D3A58] hover:text-white backdrop-blur-md text-xs"
             title="Reset Camera"
           >
             <RotateCw className="w-3.5 h-3.5" />
@@ -393,7 +393,7 @@ export default function Interactive3DProductViewer({ product, onClose }) {
           {onClose && (
             <button
               onClick={onClose}
-              className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-[11px] uppercase tracking-wider border border-white/20"
+              className="px-3 py-1.5 rounded-full bg-[#1E293B]/80 hover:bg-[#1E293B] text-white text-[11px] uppercase tracking-wider border border-[#2D3A58]"
             >
               Close 3D
             </button>
@@ -409,7 +409,7 @@ export default function Interactive3DProductViewer({ product, onClose }) {
 
       {/* Bottom Floating Material & Spec Pill */}
       <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
-        <div className="pointer-events-auto bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 text-[11px] text-white/90 flex items-center gap-2">
+        <div className="pointer-events-auto bg-[#1E293B]/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#2D3A58] text-[11px] text-white/90 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#C2A676] animate-pulse" />
           <span className="font-serif italic text-[#C2A676]">Tactile Spec:</span>
           <span>{product?.material || 'Aerospace grade alloy & sapphire finish'}</span>

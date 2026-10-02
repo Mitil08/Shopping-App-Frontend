@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { CheckCircle2, Package, ArrowRight, ShieldCheck, Mail, MapPin, Truck, Clock, FileText, Sparkles } from 'lucide-react';
+import { CheckCircle2, Package, ArrowRight, ShieldCheck, Mail, MapPin, Truck, Clock, FileText, Sparkles, Navigation } from 'lucide-react';
 import { formatPrice } from '../utils/currency';
 import InvoiceModal from '../components/InvoiceModal';
 import WhatsAppOrderShare from '../components/WhatsAppOrderShare';
 import UnboxingSimulator from '../components/UnboxingSimulator';
+import RealtimeCourierMapModal from '../components/RealtimeCourierMapModal';
 
 export default function OrderSuccessPage() {
   const { orderId } = useParams();
@@ -12,6 +13,7 @@ export default function OrderSuccessPage() {
   const order = location.state?.order;
   const [showInvoice, setShowInvoice] = useState(false);
   const [showUnboxing, setShowUnboxing] = useState(false);
+  const [showCourierMap, setShowCourierMap] = useState(false);
 
   // Generate deterministic mock AWB and courier tracking number
   const awbNumber = orderId
@@ -41,36 +43,36 @@ export default function OrderSuccessPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 lg:py-24 text-center">
       {/* Editorial Order Confirmation Badge */}
-      <div className="w-16 h-16 bg-[#141414] text-[#C2A676] rounded-full mx-auto flex items-center justify-center mb-6 shadow-xl">
+      <div className="w-16 h-16 bg-gradient-to-tr from-[#1E40AF] to-[#2563EB] text-[#FCD34D] rounded-full mx-auto flex items-center justify-center mb-6 shadow-xl border border-blue-300/40">
         <CheckCircle2 className="w-8 h-8" />
       </div>
 
-      <span className="text-[10px] uppercase tracking-[0.3em] text-[#C2A676] font-semibold">
+      <span className="text-[10px] uppercase tracking-[0.3em] text-[#D97706] dark:text-[#FCD34D] font-bold">
         Atelier Acquisition Complete
       </span>
-      <h1 className="font-serif text-3xl sm:text-5xl text-[#141414] font-normal uppercase mt-2 mb-3">
+      <h1 className="font-serif text-3xl sm:text-5xl text-[#192238] dark:text-white font-normal uppercase mt-2 mb-3">
         ORDER CONFIRMED
       </h1>
-      <p className="text-xs sm:text-sm text-[#787570] font-light max-w-md mx-auto mb-8 leading-relaxed">
+      <p className="text-xs sm:text-sm text-[#64748B] dark:text-[#94A3B8] font-light max-w-md mx-auto mb-8 leading-relaxed">
         Thank you for your purchase. We are preparing your pieces for shipment with our signature protective packaging.
       </p>
 
       {/* Amazon-style Live Fulfillment Tracker Card */}
-      <div className="bg-[#FAF9F5] border border-[#141414] p-6 lg:p-8 text-left mb-8 space-y-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#E8E6E1] pb-4 gap-3">
+      <div className="bg-white/80 dark:bg-[#162038]/80 backdrop-blur-md border border-[#CBD5E1] dark:border-[#2D4170] rounded-2xl p-6 lg:p-8 text-left mb-8 space-y-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#CBD5E1] dark:border-[#2D4170] pb-4 gap-3">
           <div>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#C2A676] font-bold">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#D97706] dark:text-[#FCD34D] font-bold">
               Live Fulfillment Status
             </span>
-            <h3 className="font-serif text-lg font-semibold text-[#141414] mt-0.5">
+            <h3 className="font-serif text-lg font-semibold text-[#192238] dark:text-white mt-0.5">
               Order Dispatched to Courier Hub
             </h3>
           </div>
-          <div className="bg-white border border-[#E8E6E1] px-3 py-1.5 text-right">
-            <span className="text-[9px] uppercase tracking-wider text-[#787570] block">
+          <div className="bg-[#FAF8F5] dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#334155] px-3.5 py-1.5 rounded-lg text-right">
+            <span className="text-[9px] uppercase tracking-wider text-[#64748B] dark:text-[#94A3B8] block font-semibold">
               Carrier & AWB Tracker
             </span>
-            <p className="font-mono text-xs font-bold text-[#141414]">
+            <p className="font-mono text-xs font-bold text-[#1E3A8A] dark:text-[#60A5FA]">
               BlueDart • {awbNumber}
             </p>
           </div>
@@ -132,14 +134,23 @@ export default function OrderSuccessPage() {
         </div>
 
         {/* Estimated Courier Delivery Bar */}
-        <div className="bg-white border border-[#E8E6E1] p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs gap-2">
-          <span className="text-[#787570] flex items-center gap-1.5">
+        <div className="bg-white dark:bg-[#1E293B] border border-[#E8E6E1] dark:border-[#334155] p-3 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs gap-2 shadow-2xs">
+          <span className="text-[#787570] dark:text-[#94A3B8] flex items-center gap-1.5">
             <Truck className="w-4 h-4 text-[#C2A676]" />
-            <span>Guaranteed Express Delivery: <strong className="text-[#141414]">Within 24–48 Hours</strong></span>
+            <span>Guaranteed Express Delivery: <strong className="text-[#141414] dark:text-white">Within 24–48 Hours</strong></span>
           </span>
-          <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 border border-emerald-200">
-            OTP-Protected Delivery
-          </span>
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 border border-emerald-200 dark:border-emerald-800 rounded-md">
+              OTP-Protected Delivery
+            </span>
+            <button
+              onClick={() => setShowCourierMap(true)}
+              className="btn-sheen btn-sapphire-glow px-3 py-1.5 bg-gradient-to-r from-[#1E40AF] to-[#2563EB] hover:from-[#1D4ED8] hover:to-[#3B82F6] text-white text-[11px] font-semibold rounded-lg shadow-sm transition-all active:scale-95 flex items-center gap-1.5"
+            >
+              <Navigation className="w-3.5 h-3.5 text-[#C2A676] animate-pulse" />
+              <span>Track Live GPS</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -235,7 +246,7 @@ export default function OrderSuccessPage() {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <button
           onClick={() => setShowUnboxing(true)}
-          className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#181622] via-[#0E0D14] to-[#181622] border border-[#C2A676] text-[#C2A676] hover:bg-[#C2A676] hover:text-[#0B0A0E] text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2 transition-all shadow-md group"
+          className="btn-sheen w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#17213C] via-[#212D52] to-[#17213C] border border-[#C2A676] text-[#C2A676] hover:bg-[#C2A676] hover:text-[#111827] text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2 rounded-xl transition-all shadow-md active:scale-95 group"
         >
           <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
           <span>Experience 3D Unboxing Ceremony</span>
@@ -243,20 +254,20 @@ export default function OrderSuccessPage() {
 
         <button
           onClick={() => setShowInvoice(true)}
-          className="w-full sm:w-auto px-6 py-3.5 border border-[#141414] bg-white hover:bg-[#FAF9F5] text-[#141414] text-xs uppercase tracking-[0.2em] font-semibold flex items-center justify-center gap-2 transition-colors shadow-2xs"
+          className="btn-sheen w-full sm:w-auto px-6 py-3.5 border border-[#192238]/30 dark:border-[#334155] bg-white dark:bg-[#1E293B] hover:bg-[#FAF8F5] dark:hover:bg-[#283548] text-[#192238] dark:text-[#F1F5F9] text-xs uppercase tracking-[0.2em] font-semibold flex items-center justify-center gap-2 rounded-xl transition-colors shadow-2xs active:scale-95"
         >
           <FileText className="w-4 h-4 text-[#C2A676]" />
           <span>Download Tax Invoice</span>
         </button>
         <Link
           to="/profile/orders"
-          className="w-full sm:w-auto px-6 py-3.5 border border-[#E8E6E1] text-[#787570] hover:text-[#141414] hover:border-[#141414] text-xs uppercase tracking-[0.2em] font-medium transition-colors"
+          className="w-full sm:w-auto px-6 py-3.5 border border-[#E2E8F0] dark:border-[#334155] text-[#64748B] dark:text-[#94A3B8] hover:text-[#192238] dark:hover:text-white hover:border-[#192238] dark:hover:border-[#60A5FA] text-xs uppercase tracking-[0.2em] font-medium rounded-xl transition-colors text-center active:scale-95"
         >
           Order Archive
         </Link>
         <Link
           to="/shop"
-          className="w-full sm:w-auto px-6 py-3.5 bg-[#141414] text-[#FAF9F5] text-xs uppercase tracking-[0.2em] font-semibold hover:bg-[#2A2A2A] transition-colors shadow-md"
+          className="btn-sheen btn-sapphire-glow w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#1E40AF] to-[#2563EB] hover:from-[#1D4ED8] hover:to-[#3B82F6] text-white text-xs uppercase tracking-[0.2em] font-semibold rounded-xl transition-all shadow-md active:scale-95 text-center"
         >
           Continue Browsing
         </Link>
@@ -275,6 +286,14 @@ export default function OrderSuccessPage() {
         order={order || { id: orderId, total: 0, items: [] }}
         isOpen={showInvoice}
         onClose={() => setShowInvoice(false)}
+      />
+
+      {/* Real-time GPS Courier Tracker Modal */}
+      <RealtimeCourierMapModal
+        isOpen={showCourierMap}
+        onClose={() => setShowCourierMap(false)}
+        awbNumber={awbNumber}
+        destinationAddress={order?.shippingAddress}
       />
     </div>
   );

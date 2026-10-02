@@ -512,14 +512,14 @@ export default function AssistantWidget() {
         {!isOpen ? (
           <button
             onClick={() => setIsOpen(true)}
-            className="group relative flex items-center gap-3 pl-2.5 pr-4 py-2 bg-black/70 dark:bg-[#14121E]/80 backdrop-blur-xl text-[#FAF9F5] border border-white/20 dark:border-[#C2A676]/40 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_40px_rgba(194,166,118,0.35)] hover:border-[#C2A676] hover:scale-105 active:scale-95 transition-all duration-300"
+            className="btn-sheen btn-glow-pulse btn-float group relative flex items-center gap-3 pl-2.5 pr-4 py-2 bg-gradient-to-r from-[#17213C] to-[#1E293B] backdrop-blur-xl text-[#F8FAFC] border border-[#C2A676]/60 rounded-full shadow-[0_8px_32px_rgba(23,33,60,0.5)] hover:shadow-[0_12px_40px_rgba(194,166,118,0.45)] hover:border-[#F59E0B] active:scale-95 transition-all duration-300"
             aria-label="Open AI Concierge"
           >
             {/* Glowing Ambient Halo behind the face */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#C2A676] via-rose-400 to-amber-300 rounded-full opacity-30 group-hover:opacity-75 blur-xs transition-opacity duration-500 -z-10" />
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#C2A676] via-blue-500 to-amber-300 rounded-full opacity-35 group-hover:opacity-85 blur-xs transition-opacity duration-500 -z-10" />
 
             {/* AI Assistant Face Avatar */}
-            <div className="relative w-10 h-10 rounded-full bg-gradient-to-b from-[#22202A] to-[#121118] border border-[#C2A676]/60 flex items-center justify-center shadow-inner overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-300">
+            <div className="relative w-10 h-10 rounded-full bg-gradient-to-b from-[#1E293B] to-[#17213C] border border-[#C2A676]/70 flex items-center justify-center shadow-inner overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-300">
               {/* Cute Digital Eyes with Blink Animation */}
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-2.5 rounded-full bg-gradient-to-b from-[#FFE4A0] to-[#C2A676] shadow-[0_0_8px_#C2A676] animate-pulse" />
@@ -534,7 +534,7 @@ export default function AssistantWidget() {
             {/* Micro Live Status Indicator */}
             <span className="absolute top-1 left-9 flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400 border border-black/40"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400 border border-[#17213C]"></span>
             </span>
 
             {/* Label Microcopy */}
@@ -553,13 +553,13 @@ export default function AssistantWidget() {
 
       {/* Main AI Chat Window Modal: Ultra-Luxury Frosted Glass Design */}
       {isOpen && (
-        <div className="fixed bottom-6 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-w-full h-[620px] max-h-[88vh] bg-white/70 dark:bg-[#12111A]/75 backdrop-blur-2xl border border-white/40 dark:border-white/10 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.4)] z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+        <div className="fixed bottom-6 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-w-full h-[620px] max-h-[88vh] bg-white/90 dark:bg-[#111827]/95 backdrop-blur-2xl border border-[#E2E8F0] dark:border-[#2D3A58] rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.4)] z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-300">
           
           {/* Glass Header */}
-          <div className="px-5 py-4 bg-white/60 dark:bg-black/40 backdrop-blur-md border-b border-black/5 dark:border-white/10 flex items-center justify-between shrink-0">
+          <div className="px-5 py-4 bg-[#F5F1E8] dark:bg-[#17213C] backdrop-blur-md border-b border-[#E2E8F0] dark:border-[#2D3A58] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               {/* Interactive Face in Header */}
-              <div className="relative w-9 h-9 rounded-full bg-gradient-to-b from-[#22202A] to-[#121118] border border-[#C2A676]/60 flex items-center justify-center shadow-md overflow-hidden shrink-0">
+              <div className="relative w-9 h-9 rounded-full bg-gradient-to-b from-[#1E293B] to-[#17213C] border border-[#C2A676]/60 flex items-center justify-center shadow-md overflow-hidden shrink-0">
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-2 rounded-full bg-gradient-to-b from-[#FFE4A0] to-[#C2A676] shadow-[0_0_6px_#C2A676] animate-pulse" />
                   <span className="w-1.5 h-2 rounded-full bg-gradient-to-b from-[#FFE4A0] to-[#C2A676] shadow-[0_0_6px_#C2A676] animate-pulse" />
@@ -768,7 +768,7 @@ export default function AssistantWidget() {
               <button
                 key={i}
                 onClick={() => handleSend(q)}
-                className="whitespace-nowrap px-3 py-1.5 text-[10px] font-medium bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-full border border-black/5 dark:border-white/10 text-[#63605A] dark:text-[#A3A099] hover:border-[#C2A676] hover:text-[#141414] dark:hover:text-white transition-all shadow-2xs"
+                className="whitespace-nowrap px-3 py-1.5 text-[10px] font-medium bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-full border border-black/5 dark:border-white/10 text-[#63605A] dark:text-[#A3A099] hover:border-[#C2A676] hover:text-[#141414] dark:hover:text-white hover:scale-105 active:scale-95 transition-all shadow-2xs"
               >
                 {q}
               </button>
@@ -797,7 +797,7 @@ export default function AssistantWidget() {
             <button
               type="button"
               onClick={toggleListening}
-              className={`p-2.5 rounded-2xl transition-all shadow-sm active:scale-95 flex items-center justify-center shrink-0 ${
+              className={`p-2.5 rounded-2xl transition-all shadow-sm active:scale-90 flex items-center justify-center shrink-0 ${
                 isListening
                   ? 'bg-rose-600 text-white animate-pulse ring-4 ring-rose-500/30'
                   : 'bg-white/80 dark:bg-white/10 text-[#63605A] dark:text-[#A3A099] hover:text-[#141414] dark:hover:text-white border border-black/10 dark:border-white/10 hover:border-[#C2A676]'
@@ -808,17 +808,17 @@ export default function AssistantWidget() {
               {isListening ? (
                 <MicOff className="w-4 h-4 text-white" />
               ) : (
-                <Mic className="w-4 h-4" />
+                <Mic className="w-4 h-4 hover:scale-110 transition-transform" />
               )}
             </button>
 
             <button
               type="submit"
               disabled={!inputValue.trim() || isTyping}
-              className="p-2.5 bg-gradient-to-r from-[#1E1B26] to-[#141414] dark:from-[#C2A676] dark:to-[#E5C287] text-[#FAF9F5] dark:text-[#141414] rounded-2xl hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-95 shrink-0"
+              className="btn-sheen p-2.5 bg-gradient-to-r from-[#1E3A8A] via-[#1D4ED8] to-[#2563EB] text-white rounded-2xl hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-90 group shrink-0"
               aria-label="Send message"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </button>
           </form>
         </div>

@@ -5,7 +5,7 @@ const LanguageContext = createContext(null);
 export const translations = {
   en: {
     // Brand & Header
-    announcement: 'Complimentary express shipping on orders over ₹10,000 • Use code',
+    announcement: '🇮🇳 Crafted in India • ✈️ Express Worldwide Delivery to 190+ Countries • Duties & Taxes Handled • Code',
     languageName: 'English (US)',
     currency: 'INR (₹)',
     home: 'HOME',
@@ -24,20 +24,20 @@ export const translations = {
     adminConsole: 'Admin Console',
 
     // Hero & Home
-    heroTag: 'FLAGSHIP INNOVATION & TIMELESS CRAFT / 2026 EDITION',
+    heroTag: 'INDIA HERITAGE CRAFT • DISPATCHED WORLDWIDE TO 190+ COUNTRIES',
     heroTitle: 'ENGINEERED LUXURY ACROSS EVERY HORIZON',
-    heroSubtitle: 'From titanium flagship smartphones and spatial acoustics to Tuscan footwear, rare extract perfumes, and architectural home living.',
+    heroSubtitle: 'Directly sourced from India\'s master artisan guilds and modern tech laboratories—delivering to discerning clientele worldwide with express air transit.',
     shopCollection: 'Explore All Departments',
     exploreArrivals: 'Discover Flagships',
     scrollPrompt: 'Scroll to Discover',
     
     // Marquee
-    marquee1: 'FLAGSHIP SMARTPHONES & OLED CREATIVE TABLETS',
-    marquee2: 'COMPLIMENTARY EXPRESS AIR DELIVERY OVER ₹10,000',
-    marquee3: 'SPATIAL AUDIO & TITANIUM DIVE SMARTWATCHES',
-    marquee4: 'HANDMADE CIVITANOVA SNEAKERS & CHELSEA BOOTS',
-    marquee5: 'ARTISANAL EXTRACTS & BOTANICAL ELIXIRS',
-    marquee6: 'ARCHITECTURAL HOME & TIMELESS DESIGNER COUTURE',
+    marquee1: 'CRAFTED IN INDIA\'S MASTER ATELIERS',
+    marquee2: 'COMPLIMENTARY WORLDWIDE EXPRESS OVER ₹10,000 / $120',
+    marquee3: 'KASHMIR PASHMINA & VARANASI CHARMEUSE SILK',
+    marquee4: 'DISPATCHING TO 190+ COUNTRIES WORLDWIDE',
+    marquee5: 'KANNAUJ BOTANICAL EXTRAITS & SANDALWOOD ELIXIRS',
+    marquee6: 'PRE-CALCULATED INTERNATIONAL DUTIES & ZERO SURPRISES',
 
     // Pillars
     signaturePillars: 'CURATED DEPARTMENTS',
@@ -56,9 +56,9 @@ export const translations = {
     editionFabricFocus: 'Curated Flagship Pavilion',
     curatedFavorites: 'Curated Favorites',
     trendingNow: 'TRENDING NOW',
-    ethicallySourcedFibers: 'Official Brand Warranty & Authenticity Guaranteed',
-    complimentaryExpressShipping: 'Complimentary Express Air Dispatch over ₹10,000',
-    complimentary30DayReturns: 'Complimentary 14-Day Doorstep Returns',
+    ethicallySourcedFibers: 'Handcrafted in India\'s Heritage Guilds',
+    complimentaryExpressShipping: 'Worldwide Express Air Dispatch (190+ Countries)',
+    complimentary30DayReturns: 'All Global Duties & VAT Pre-Calculated',
     outerwearVaultTitle: 'THE QUANTUM TECH PAVILION',
     outerwearVaultSubtitle: 'Grade 5 Titanium smartphones & tandem OLEDs',
     fineCashmereTitle: 'ACOUSTICS & HOROLOGY CHAMBER',

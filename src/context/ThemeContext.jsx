@@ -5,7 +5,7 @@ const ThemeContext = createContext();
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     try {
-      const saved = localStorage.getItem('elane_theme');
+      const saved = localStorage.getItem('elane_theme_mode');
       return saved === 'dark' ? 'dark' : 'light';
     } catch {
       return 'light';
@@ -14,7 +14,7 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem('elane_theme', theme);
+      localStorage.setItem('elane_theme_mode', theme);
     } catch (e) {
       console.warn('Failed to save theme in localStorage', e);
     }
@@ -23,13 +23,13 @@ export function ThemeProvider({ children }) {
     if (theme === 'dark') {
       root.classList.add('dark');
       root.setAttribute('data-theme', 'dark');
-      document.body.style.backgroundColor = '#0B0A0E';
-      document.body.style.color = '#FAF9F5';
+      document.body.style.backgroundColor = '#172554';
+      document.body.style.color = '#F8FAFC';
     } else {
       root.classList.remove('dark');
       root.setAttribute('data-theme', 'light');
-      document.body.style.backgroundColor = '#FAF9F5';
-      document.body.style.color = '#141414';
+      document.body.style.backgroundColor = '#FAF8F5';
+      document.body.style.color = '#192238';
     }
   }, [theme]);
 

@@ -42,7 +42,7 @@ export default function CollectionsPage() {
       icon: Watch,
       description: 'Studio-grade spatial noise cancellation headphones, custom beryllium acoustic drivers, and Swiss sapphire biometric smartwatches engineered with luxury precision.',
       image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=1200&q=80',
-      stats: 'Lossless Hi-Fi • Sapphire Crystal • ECG Biometrics',
+      stats: 'High-Fidelity Audio • Sapphire Crystal • ECG Biometrics',
       highlightTag: 'Master Acoustics'
     },
     {
@@ -66,15 +66,15 @@ export default function CollectionsPage() {
       icon: Sparkles,
       description: 'Weightless silk charmeuse evening slip dresses, sculptural double-faced trench coats, and artisanal knitwear capturing contemporary quiet luxury.',
       image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=80',
-      stats: '100% Silk Charmeuse • Structural Drape • Paris Atelier',
+      stats: '100% Silk Charmeuse • Structural Drape • Varanasi Master Weave',
       highlightTag: 'Couture Craft'
     },
     {
       id: 'cat-footwear',
       slug: 'footwear-sneakers',
       title: 'ARTISANAL FOOTWEAR & SNEAKER LAB',
-      subtitle: 'Tuscan Cordwainers & Vibram Soles',
-      badge: 'Handmade in Tuscany',
+      subtitle: 'Generational Guilds & Vibram Soles',
+      badge: 'Artisanal Guild • Worldwide Express',
       icon: Footprints,
       description: 'Vegetable-tanned calfskin Chelsea boots with Goodyear welted construction, Italian suede driving loafers, and minimalist luxury court sneakers.',
       image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=1200&q=80',
@@ -172,10 +172,10 @@ export default function CollectionsPage() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto">
             <button
               onClick={() => setSelectedPavilion('all')}
-              className={`px-4 py-2 rounded-full text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
+              className={`btn-sheen px-4 py-2 rounded-full text-xs uppercase tracking-wider font-semibold transition-all duration-200 active:scale-95 ${
                 selectedPavilion === 'all'
-                  ? 'bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] shadow-sm'
-                  : 'bg-[#F3F1EC] dark:bg-[#181622] text-[#73706B] dark:text-[#9A968F] hover:text-[#141414] dark:hover:text-white border border-[#E8E6E1] dark:border-[#24222E]'
+                  ? 'bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] shadow-sm'
+                  : 'bg-[#F3F1EC] dark:bg-[#1E293B] text-[#64748B] dark:text-[#94A3B8] hover:text-[#192238] dark:hover:text-white border border-[#E2E8F0] dark:border-[#2D3A58] hover:scale-105'
               }`}
             >
               All Pavilions ({collectionPavilions.length})
@@ -187,10 +187,10 @@ export default function CollectionsPage() {
                 <button
                   key={p.id}
                   onClick={() => setSelectedPavilion(p.id)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
+                  className={`btn-sheen inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-semibold transition-all duration-200 active:scale-95 ${
                     isActive
-                      ? 'bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] shadow-sm'
-                      : 'bg-[#F3F1EC] dark:bg-[#181622] text-[#73706B] dark:text-[#9A968F] hover:text-[#141414] dark:hover:text-white border border-[#E8E6E1] dark:border-[#24222E]'
+                      ? 'bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] shadow-sm'
+                      : 'bg-[#F3F1EC] dark:bg-[#1E293B] text-[#64748B] dark:text-[#94A3B8] hover:text-[#192238] dark:hover:text-white border border-[#E2E8F0] dark:border-[#2D3A58] hover:scale-105'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -274,15 +274,15 @@ export default function CollectionsPage() {
                   <div className="pt-2 flex flex-wrap items-center gap-4">
                     <Link
                       to={`/shop?category=${col.slug}`}
-                      className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-xs uppercase tracking-[0.2em] font-semibold bg-[#141414] text-white hover:bg-[#C2A676] dark:bg-[#FAF9F5] dark:text-[#0B0A0E] dark:hover:bg-[#C2A676] transition-all duration-300 shadow-md group"
+                      className="btn-sheen btn-sapphire-glow inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-xs uppercase tracking-[0.2em] font-semibold bg-[#192238] text-white hover:bg-[#1D4ED8] dark:bg-[#FAF8F5] dark:text-[#111827] dark:hover:bg-[#C2A676] transition-all duration-300 shadow-md group active:scale-95"
                     >
                       <span>Explore {col.title.split(' ')[0]} Sanctuary</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform" />
                     </Link>
 
                     <Link
                       to={`/shop?category=all`}
-                      className="text-xs uppercase tracking-[0.18em] text-[#73706B] dark:text-[#9A968F] hover:text-[#141414] dark:hover:text-white transition-colors"
+                      className="text-xs uppercase tracking-[0.18em] text-[#64748B] dark:text-[#94A3B8] hover:text-[#192238] dark:hover:text-white transition-colors"
                     >
                       View All Catalog &rarr;
                     </Link>
@@ -292,9 +292,9 @@ export default function CollectionsPage() {
 
               {/* Showcase Product Silhouettes in this Department */}
               {pavilionProducts.length > 0 && (
-                <div className="mt-10 pt-8 border-t border-[#E8E6E1]/60 dark:border-[#24222E]/60">
+                <div className="mt-10 pt-8 border-t border-[#E2E8F0]/60 dark:border-[#2D3A58]/60">
                   <div className="flex items-center justify-between mb-6">
-                    <span className="text-[11px] uppercase tracking-[0.25em] text-[#73706B] dark:text-[#9A968F] font-semibold flex items-center gap-2">
+                    <span className="text-[11px] uppercase tracking-[0.25em] text-[#64748B] dark:text-[#94A3B8] font-semibold flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#C2A676]" />
                       Featured Pieces from this Pavilion
                     </span>
@@ -319,27 +319,27 @@ export default function CollectionsPage() {
       </section>
 
       {/* Bespoke Concierge Banner */}
-      <section className="bg-[#F3F1EC] dark:bg-[#13111C] border-y border-[#E8E6E1] dark:border-[#24222E] py-16 lg:py-20">
+      <section className="bg-[#F5F1E8] dark:bg-[#17213C] border-y border-[#E2E8F0] dark:border-[#2D3A58] py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-6">
           <span className="text-[10px] uppercase tracking-[0.3em] text-[#C2A676] font-semibold block">
             Custom Procurement & Private Viewing
           </span>
-          <h3 className="font-serif text-3xl sm:text-4xl font-light text-[#141414] dark:text-white uppercase">
+          <h3 className="font-serif text-3xl sm:text-4xl font-light text-[#192238] dark:text-white uppercase">
             Seeking a specific timepiece, custom device, or archive piece?
           </h3>
-          <p className="text-sm text-[#73706B] dark:text-[#9A968F] font-light max-w-xl mx-auto">
+          <p className="text-sm text-[#64748B] dark:text-[#94A3B8] font-light max-w-xl mx-auto">
             Our atelier concierge procures rare horology, limited edition flagship technology, and bespoke couture across all continents.
           </p>
           <div className="pt-2 flex flex-wrap justify-center gap-4">
             <Link
               to="/about"
-              className="px-6 py-3 rounded-full text-xs uppercase tracking-widest font-semibold bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] hover:opacity-90 transition-opacity"
+              className="px-6 py-3 rounded-full text-xs uppercase tracking-widest font-semibold bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] hover:bg-[#1D4ED8] transition-colors"
             >
               Atelier Heritage & Services
             </Link>
             <Link
               to="/shop"
-              className="px-6 py-3 rounded-full text-xs uppercase tracking-widest font-semibold border border-[#141414] dark:border-white/30 text-[#141414] dark:text-white hover:bg-[#141414]/5 dark:hover:bg-white/5 transition-all"
+              className="px-6 py-3 rounded-full text-xs uppercase tracking-widest font-semibold border border-[#192238] dark:border-white/30 text-[#192238] dark:text-white hover:bg-[#192238]/5 dark:hover:bg-white/5 transition-all"
             >
               Browse Complete Inventory
             </Link>

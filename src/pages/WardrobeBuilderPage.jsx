@@ -24,7 +24,6 @@ import { mockProducts } from '../data/mockProducts';
 import { formatPrice } from '../utils/currency';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import SpatialSoundscapePlayer from '../components/SpatialSoundscapePlayer';
 
 /**
  * Total Life Capsule Studio (Omnichannel Atelier Lab)
@@ -192,13 +191,6 @@ export default function WardrobeBuilderPage() {
               })}
             </div>
 
-            {/* Spatial Soundscape Audio Player if an audio item is in capsule */}
-            {selectedAudio && (
-              <div className="pt-2">
-                <SpatialSoundscapePlayer productName={selectedAudio.name} />
-              </div>
-            )}
-
             {/* Financial Summary */}
             <div className="pt-4 border-t border-[#E8E6E1] dark:border-[#24222E] space-y-2 text-xs">
               <div className="flex justify-between text-[#787570] dark:text-[#9A968F]">
@@ -226,7 +218,7 @@ export default function WardrobeBuilderPage() {
               <button
                 onClick={handleAddCapsuleToCart}
                 disabled={addingCapsule || selectedCapsuleItems.length === 0}
-                className="w-full mt-3 py-3.5 bg-[#141414] dark:bg-[#C2A676] text-white dark:text-[#0B0A0E] text-xs uppercase tracking-[0.2em] font-bold rounded-xl hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg"
+                className="w-full mt-3 py-3.5 bg-[#192238] dark:bg-[#C2A676] text-white dark:text-[#111827] text-xs uppercase tracking-[0.2em] font-bold rounded-xl hover:bg-[#1D4ED8] dark:hover:bg-[#C2A676] disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span>{addingCapsule ? 'Adding Capsule...' : `Acquire Total Capsule (${selectedCapsuleItems.length} Items)`}</span>
@@ -248,8 +240,8 @@ export default function WardrobeBuilderPage() {
                   onClick={() => setActiveDimension(dim.id)}
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-semibold transition-all ${
                     isActive
-                      ? 'bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] shadow-sm'
-                      : 'bg-[#F3F1EC] dark:bg-[#181622] text-[#787570] dark:text-[#9A968F] hover:text-[#141414] dark:hover:text-white border border-[#E8E6E1] dark:border-[#24222E]'
+                      ? 'bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] shadow-sm'
+                      : 'bg-[#F3F1EC] dark:bg-[#1E293B] text-[#64748B] dark:text-[#94A3B8] hover:text-[#192238] dark:hover:text-white border border-[#E2E8F0] dark:border-[#2D3A58]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -262,12 +254,12 @@ export default function WardrobeBuilderPage() {
           {/* Active Dimension Items */}
           <div className="space-y-4">
             <div className="flex justify-between items-baseline">
-              <h2 className="text-xs uppercase font-bold tracking-[0.2em] text-[#141414] dark:text-white flex items-center gap-2">
+              <h2 className="text-xs uppercase font-bold tracking-[0.2em] text-[#192238] dark:text-white flex items-center gap-2">
                 <currentDim.icon className="w-4 h-4 text-[#C2A676]" />
                 Select {currentDim.label}
               </h2>
-              <span className="text-[11px] text-[#787570] dark:text-[#9A968F]">
-                Selected: <strong className="text-[#141414] dark:text-white">{currentDim.selected?.name || 'None'}</strong>
+              <span className="text-[11px] text-[#64748B] dark:text-[#94A3B8]">
+                Selected: <strong className="text-[#192238] dark:text-white">{currentDim.selected?.name || 'None'}</strong>
               </span>
             </div>
 
@@ -280,27 +272,27 @@ export default function WardrobeBuilderPage() {
                     onClick={() => currentDim.setter(item)}
                     className={`relative p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between group ${
                       isSelected
-                        ? 'border-[#141414] dark:border-[#C2A676] ring-2 ring-[#C2A676] bg-white dark:bg-[#1A1822] shadow-md'
-                        : 'border-[#E8E6E1] dark:border-[#24222E] bg-[#FAF9F5] dark:bg-[#13111C] hover:border-black/30 dark:hover:border-white/30'
+                        ? 'border-[#192238] dark:border-[#C2A676] ring-2 ring-[#C2A676] bg-white dark:bg-[#1E293B] shadow-md'
+                        : 'border-[#E2E8F0] dark:border-[#2D3A58] bg-[#FAF8F5] dark:bg-[#17213C] hover:border-[#192238]/30 dark:hover:border-white/30'
                     }`}
                   >
-                    <div className="aspect-[4/5] rounded-xl overflow-hidden mb-2 bg-[#F3F1EC] dark:bg-[#181622]">
+                    <div className="aspect-[4/5] rounded-xl overflow-hidden mb-2 bg-[#F3F1EC] dark:bg-[#1E293B]">
                       <img src={item.images?.[0]} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                     <div>
-                      <span className="text-[9px] uppercase tracking-wider text-[#787570] dark:text-[#9A968F] block truncate">
+                      <span className="text-[9px] uppercase tracking-wider text-[#64748B] dark:text-[#94A3B8] block truncate">
                         {item.brand || item.categoryName}
                       </span>
-                      <h4 className="text-xs font-serif font-bold text-[#141414] dark:text-white truncate mt-0.5">
+                      <h4 className="text-xs font-serif font-bold text-[#192238] dark:text-white truncate mt-0.5">
                         {item.name}
                       </h4>
-                      <p className="text-[11px] font-semibold text-[#141414] dark:text-[#C2A676] mt-1 font-mono">
+                      <p className="text-[11px] font-semibold text-[#192238] dark:text-[#C2A676] mt-1 font-mono">
                         {formatPrice(item.sale_price || item.base_price)}
                       </p>
                     </div>
 
                     {isSelected && (
-                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#141414] dark:bg-[#C2A676] text-white dark:text-[#0B0A0E] flex items-center justify-center text-[10px] shadow-sm">
+                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#192238] dark:bg-[#C2A676] text-white dark:text-[#111827] flex items-center justify-center text-[10px] shadow-sm">
                         <Check className="w-3 h-3 stroke-[3]" />
                       </div>
                     )}

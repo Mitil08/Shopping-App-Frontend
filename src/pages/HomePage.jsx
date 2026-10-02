@@ -18,6 +18,9 @@ import {
   Flame,
   Clock,
   Timer,
+  Globe,
+  Truck,
+  MapPin,
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import Hero3DScene from '../components/Hero3DScene';
@@ -65,6 +68,118 @@ export default function HomePage() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
   const [isCursorActive, setIsCursorActive] = useState(false);
+  const [activeGlobalRegion, setActiveGlobalRegion] = useState('all');
+
+  const globalShippingCorridors = [
+    {
+      id: 'all',
+      flag: '🌐',
+      region: 'Worldwide (190+ Countries)',
+      time: '3–6 Days Express Air',
+      courier: 'DHL Express & FedEx Priority',
+      duties: 'Pre-Calculated & Guaranteed',
+      threshold: 'Free over ₹10,000 / $120',
+      description: 'Dispatched directly from India ateliers with complete end-to-end tracking and customs handling.',
+    },
+    {
+      id: 'in',
+      flag: '🇮🇳',
+      region: 'India (Domestic)',
+      time: '2–3 Days Direct Dispatch',
+      courier: 'BlueDart Air & Delhivery Prime',
+      duties: 'All GST Included',
+      threshold: 'Free over ₹10,000',
+      description: 'Next-day dispatch from our central artisan and electronics vaults in New Delhi, Bengaluru & Mumbai.',
+    },
+    {
+      id: 'us',
+      flag: '🇺🇸',
+      region: 'United States & Canada',
+      time: '3–5 Days Doorstep',
+      courier: 'FedEx International Priority',
+      duties: 'Pre-cleared US Customs',
+      threshold: 'Free over $120 USD',
+      description: 'Zero surprise customs invoices upon delivery. Seamless clearance into JFK, ORD, and LAX hubs.',
+    },
+    {
+      id: 'uk',
+      flag: '🇬🇧',
+      region: 'United Kingdom',
+      time: '3–4 Days Air Delivery',
+      courier: 'DHL Express UK / Royal Mail',
+      duties: 'UK VAT & Duties Calculated',
+      threshold: 'Free over £95 GBP',
+      description: 'Dedicated air freight line direct from New Delhi to London Heathrow with expedited clearance.',
+    },
+    {
+      id: 'eu',
+      flag: '🇪🇺',
+      region: 'European Union',
+      time: '4–6 Days Tracked Air',
+      courier: 'DHL Express Europe',
+      duties: 'IOSS Pre-Registered VAT',
+      threshold: 'Free over €110 EUR',
+      description: 'Compliant with all EU import regulations with zero doorstep handling surcharge for clients.',
+    },
+    {
+      id: 'ae',
+      flag: '🇦🇪',
+      region: 'UAE & Middle East',
+      time: '2–4 Days Express',
+      courier: 'Aramex & DHL Express',
+      duties: 'GCC Customs Pre-Cleared',
+      threshold: 'Free over 450 AED',
+      description: 'Ultra-fast daily air cargo corridors between Mumbai/Delhi and Dubai/Abu Dhabi international airports.',
+    },
+  ];
+
+  const indianHeritageGuilds = [
+    {
+      city: 'Varanasi, India',
+      state: 'Uttar Pradesh',
+      craft: 'Mulberry Silk Charmeuse & Heritage Weaving',
+      desc: 'Generational weavers operating pit-looms, creating weightless silk drapes with architectural luster.',
+      icon: '✨',
+      badge: 'GI Tag Certified',
+      badgeColor: 'from-amber-500 to-rose-500',
+    },
+    {
+      city: 'Srinagar, Kashmir',
+      state: 'Jammu & Kashmir',
+      craft: 'High-Altitude Pashmina & Noble Cashmere',
+      desc: 'Ethically combed Changthangi goat fibers hand-spun into 12-micron cloud-weight luxury knitwear.',
+      icon: '🏔️',
+      badge: 'Master Guild Verified',
+      badgeColor: 'from-rose-500 to-purple-600',
+    },
+    {
+      city: 'Kannauj, India',
+      state: 'Uttar Pradesh',
+      craft: 'Deg-Bhapka Steam-Distilled Botanical Extraits',
+      desc: 'The ancient perfume capital, crafting pure mitti attar, wild Assam agarwood & Damascus rose.',
+      icon: '🌿',
+      badge: 'Royal Heritage Distillation',
+      badgeColor: 'from-emerald-500 to-teal-600',
+    },
+    {
+      city: 'Jaipur, Rajasthan',
+      state: 'Rajasthan',
+      craft: 'Gemstone Cabochon Finishing & Horology',
+      desc: 'Master lapidaries cutting emeralds and sapphire crystals for artisanal chronometers and dials.',
+      icon: '💎',
+      badge: 'Heritage Lapidary Guild',
+      badgeColor: 'from-blue-500 to-indigo-600',
+    },
+    {
+      city: 'Bengaluru, India',
+      state: 'Karnataka',
+      craft: 'Titanium Aerospace Tech & Precision Audio',
+      desc: 'Precision tech laboratories crafting Grade 5 titanium smartphone bodies and acoustic chambers.',
+      icon: '⚡',
+      badge: 'Quantum Engineering Hub',
+      badgeColor: 'from-purple-500 to-pink-500',
+    },
+  ];
 
   // Amazon-grade Lightning Deals Countdown Timer State for Homepage
   const [dealTimeLeft, setDealTimeLeft] = useState({ hours: 4, minutes: 28, seconds: 45 });
@@ -200,11 +315,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="relative flex flex-col overflow-hidden bg-[#FAF9F5] text-[#141414]">
+    <div className="relative flex flex-col overflow-hidden bg-[#FAF8F5] text-[#192238]">
 
 
       {/* 1. Full-Width Editorial Hero Section with Dynamic 3D WebGL Scene & Ambient Glows */}
-      <section className="relative min-h-[90vh] lg:min-h-[96vh] flex items-center justify-center overflow-hidden bg-[#0B0A0E]">
+      <section className="relative min-h-[90vh] lg:min-h-[96vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#131B34] via-[#1A2548] to-[#141C36]">
         {/* Real 3D Interactive WebGL Three.js Scene (Gyroscopic Core, Quantum Torus Rings & Product Geometry) */}
         <Hero3DScene />
 
@@ -252,7 +367,7 @@ export default function HomePage() {
         </motion.div>
 
         {/* Ambient Dark Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0A0E] via-[#0B0A0E]/75 to-black/50 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-[#111827]/80 to-[#172554]/40 pointer-events-none" />
 
         {/* Hero Content with Staggered Entrance Animation */}
         <div className="relative z-20 max-w-5xl mx-auto px-6 text-center text-[#FAF9F5] py-24 sm:py-32">
@@ -275,7 +390,7 @@ export default function HomePage() {
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 </motion.div>
                 <span className="bg-gradient-to-r from-amber-200 via-rose-200 to-purple-200 bg-clip-text text-transparent font-bold">
-                  {t.heroTag || 'FLAGSHIP INNOVATION & TIMELESS CRAFT / 2026 EDITION'}
+                  {t.heroTag || 'INDIA CRAFT HERITAGE • SERVING 190+ COUNTRIES WORLDWIDE'}
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
               </motion.div>
@@ -305,7 +420,7 @@ export default function HomePage() {
               className="max-w-2xl mx-auto text-sm sm:text-base font-light text-[#E2DFD8] tracking-wider leading-relaxed"
             >
               {t.heroSubtitle ||
-                'From titanium flagship smartphones and spatial acoustics to Tuscan footwear, rare extract perfumes, and architectural home living.'}
+                'Directly sourced from India\'s master artisan guilds and tech engineering labs—delivering to discerning clientele across 190+ countries with express air transit.'}
             </motion.p>
 
             {/* Action Buttons with Colorful Animations & Micro-Interactions */}
@@ -323,9 +438,8 @@ export default function HomePage() {
               >
                 <Link
                   to="/shop"
-                  className="group relative w-full sm:w-auto px-9 py-4 rounded-full overflow-hidden bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white text-xs uppercase tracking-[0.25em] font-bold shadow-2xl shadow-rose-500/35 hover:shadow-rose-500/60 transition-all duration-300 flex items-center justify-center gap-3"
+                  className="btn-sheen group relative w-full sm:w-auto px-9 py-4 rounded-full overflow-hidden bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white text-xs uppercase tracking-[0.25em] font-bold shadow-2xl shadow-rose-500/35 hover:shadow-rose-500/60 transition-all duration-300 flex items-center justify-center gap-3 active:scale-95"
                 >
-                  <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                   <span className="relative z-10">{t.shopCollection || 'Explore All Departments'}</span>
                   <ArrowRight className="w-4 h-4 text-amber-200 relative z-10 group-hover:translate-x-1.5 transition-transform duration-200" />
                 </Link>
@@ -340,7 +454,7 @@ export default function HomePage() {
               >
                 <Link
                   to="/collections"
-                  className="group relative w-full sm:w-auto px-9 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/25 hover:border-amber-300/70 text-[#FAF9F5] text-xs uppercase tracking-[0.25em] font-semibold transition-all duration-300 shadow-xl flex items-center justify-center gap-2.5"
+                  className="btn-sheen group relative w-full sm:w-auto px-9 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/25 hover:border-amber-300/70 text-[#FAF9F5] text-xs uppercase tracking-[0.25em] font-semibold transition-all duration-300 shadow-xl flex items-center justify-center gap-2.5 active:scale-95"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-45 transition-transform duration-300" />
                   <span className="group-hover:text-amber-200 transition-colors">
@@ -410,7 +524,7 @@ export default function HomePage() {
       </section>
 
       {/* 2. Infinite Haute Couture Marquee Ticker with Colorful Gradient Borders */}
-      <div className="relative bg-[#100F14] text-[#FAF9F5] py-4 overflow-hidden whitespace-nowrap select-none border-y border-[#26242E]">
+      <div className="relative bg-gradient-to-r from-[#17213E] via-[#24315C] to-[#17213E] text-[#FEF3C7] py-4 overflow-hidden whitespace-nowrap select-none border-y border-[#324376]">
         <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-violet-500 via-rose-500 to-amber-500" />
         <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-amber-500 via-rose-500 to-violet-500" />
 
@@ -468,10 +582,10 @@ export default function HomePage() {
               </div>
               <div className="text-left">
                 <span className="text-xs uppercase tracking-[0.18em] font-bold text-[#141414] block group-hover:text-emerald-700 transition-colors">
-                  {t.ethicallySourcedFibers || 'Ethically Sourced Natural Fibers'}
+                  {t.ethicallySourcedFibers || "Handcrafted in India's Heritage Guilds"}
                 </span>
                 <span className="text-[11px] text-[#73706B] font-light">
-                  100% Traceable to origin mills
+                  100% Traceable Indian artisanal provenance
                 </span>
               </div>
             </motion.div>
@@ -483,14 +597,14 @@ export default function HomePage() {
               className="flex items-center justify-center gap-4 p-5 rounded-2xl bg-white border border-[#E8E6E1] shadow-md hover:shadow-xl hover:border-amber-300 transition-all duration-300 group"
             >
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 group-hover:scale-110 transition-transform duration-300">
-                <ShieldCheck className="w-5 h-5" />
+                <Globe className="w-5 h-5" />
               </div>
               <div className="text-left">
                 <span className="text-xs uppercase tracking-[0.18em] font-bold text-[#141414] block group-hover:text-amber-700 transition-colors">
-                  {t.complimentaryExpressShipping || 'Complimentary Express Shipping'}
+                  {t.complimentaryExpressShipping || 'Worldwide Express Air Dispatch'}
                 </span>
                 <span className="text-[11px] text-[#73706B] font-light">
-                  Free on all orders over ₹10,000
+                  Delivering to 190+ countries with DHL & FedEx
                 </span>
               </div>
             </motion.div>
@@ -502,14 +616,14 @@ export default function HomePage() {
               className="flex items-center justify-center gap-4 p-5 rounded-2xl bg-white border border-[#E8E6E1] shadow-md hover:shadow-xl hover:border-violet-300 transition-all duration-300 group"
             >
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-violet-500/20 group-hover:scale-110 transition-transform duration-300">
-                <Sparkles className="w-5 h-5" />
+                <ShieldCheck className="w-5 h-5" />
               </div>
               <div className="text-left">
                 <span className="text-xs uppercase tracking-[0.18em] font-bold text-[#141414] block group-hover:text-violet-700 transition-colors">
-                  {t.complimentary30DayReturns || '30-Day Atelier Guarantee'}
+                  {t.complimentary30DayReturns || 'Pre-Calculated Global Duties & VAT'}
                 </span>
                 <span className="text-[11px] text-[#73706B] font-light">
-                  Tailoring adjustment assistance
+                  Zero surprise fees at doorstep delivery worldwide
                 </span>
               </div>
             </motion.div>
@@ -610,7 +724,7 @@ export default function HomePage() {
       </section>
 
       {/* 4.5 Amazon-Style Lightning Deals & Flash Countdown Section */}
-      <section id="flash-deals" className="py-16 bg-[#141318] text-[#FAF9F5] border-y border-[#26242E] relative overflow-hidden">
+      <section id="flash-deals" className="py-16 bg-gradient-to-b from-[#182346] via-[#1E2D58] to-[#16203E] text-[#F8FAFC] border-y border-[#2D3E70] relative overflow-hidden">
         {/* Ambient Glow */}
         <div className="absolute -top-32 right-10 w-96 h-96 bg-amber-500/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute -bottom-32 left-10 w-96 h-96 bg-rose-500/10 rounded-full blur-[100px] pointer-events-none" />
@@ -885,6 +999,172 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 6.5 Crafted in India & Worldwide Dispatch (190+ Countries) Interactive Showcase */}
+      <section className="py-24 bg-gradient-to-b from-[#141D3B] via-[#1C2852] to-[#141D3B] text-[#F8FAFC] border-y border-[#2A3B6B] relative overflow-hidden">
+        {/* Background Ambient Orbs */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-amber-500/15 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-rose-500/15 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-rose-500/20 to-purple-500/20 border border-white/20 text-[#FAF8F5] text-[10px] sm:text-[11px] uppercase tracking-[0.28em] font-bold">
+              <span>🇮🇳</span>
+              <span>CRAFTED IN INDIA • DELIVERING WORLDWIDE TO 190+ COUNTRIES</span>
+            </div>
+            <h2 className="font-serif text-3xl sm:text-5xl uppercase tracking-wider text-white">
+              The Indian Heritage Maison &amp; Global Atelier
+            </h2>
+            <p className="text-xs sm:text-sm text-[#CBD5E1] font-light leading-relaxed max-w-2xl mx-auto">
+              Directly rooted in India's master artisanal centers. Every piece is hand-selected from generational guilds in Varanasi, Kashmir, Kannauj, and Jaipur—then dispatched worldwide with guaranteed international customs clearance.
+            </p>
+          </div>
+
+          {/* Interactive Worldwide Shipping Corridor Navigator */}
+          <div className="bg-[#1C274E] border border-[#304072] rounded-3xl p-6 sm:p-8 shadow-2xl mb-16">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-[#2A2738] mb-6">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#C2A676] block font-semibold mb-1">
+                  Global Logistics Matrix
+                </span>
+                <h3 className="font-serif text-xl sm:text-2xl text-white">
+                  Live Worldwide Delivery Estimates from India
+                </h3>
+              </div>
+              <div className="flex items-center gap-2 text-[11px] text-[#A3A099] font-mono bg-[#110F18] px-3.5 py-1.5 rounded-full border border-white/10 shrink-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Express Air Corridors Active</span>
+              </div>
+            </div>
+
+            {/* Region Selector Tabs */}
+            <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-none snap-x mb-6">
+              {globalShippingCorridors.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setActiveGlobalRegion(c.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium tracking-wider whitespace-nowrap transition-all duration-200 border ${
+                    activeGlobalRegion === c.id
+                      ? 'bg-gradient-to-r from-amber-500/20 via-rose-500/20 to-purple-500/20 border-[#C2A676] text-white shadow-lg'
+                      : 'bg-[#12111A] border-[#2A2738] text-[#8E8B82] hover:text-white hover:border-[#3D3950]'
+                  }`}
+                >
+                  <span>{c.flag}</span>
+                  <span>{c.region}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Selected Shipping Region Details Banner */}
+            {(() => {
+              const currentCorridor = globalShippingCorridors.find((c) => c.id === activeGlobalRegion) || globalShippingCorridors[0];
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 rounded-2xl bg-[#141C38] border border-[#2A3B6B]">
+                  <div className="space-y-1">
+                    <span className="text-[9px] font-mono uppercase tracking-widest text-[#94A3B8] block">Destination Region</span>
+                    <span className="text-sm font-semibold text-white flex items-center gap-2">
+                      <span>{currentCorridor.flag}</span>
+                      <span>{currentCorridor.region}</span>
+                    </span>
+                    <p className="text-[11px] text-[#CBD5E1] pt-1">{currentCorridor.description}</p>
+                  </div>
+
+                  <div className="space-y-1 border-t md:border-t-0 md:border-l border-[#2A3B6B] pt-3 md:pt-0 md:pl-4">
+                    <span className="text-[9px] font-mono uppercase tracking-widest text-[#94A3B8] block">Transit Duration</span>
+                    <span className="text-sm font-semibold text-amber-300 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>{currentCorridor.time}</span>
+                    </span>
+                    <span className="text-[10px] text-[#94A3B8] font-mono block">Direct Air Cargo</span>
+                  </div>
+
+                  <div className="space-y-1 border-t md:border-t-0 md:border-l border-[#2A3B6B] pt-3 md:pt-0 md:pl-4">
+                    <span className="text-[9px] font-mono uppercase tracking-widest text-[#94A3B8] block">Logistics Partner</span>
+                    <span className="text-sm font-semibold text-white flex items-center gap-1.5">
+                      <Truck className="w-3.5 h-3.5 text-[#FCD34D]" />
+                      <span>{currentCorridor.courier}</span>
+                    </span>
+                    <span className="text-[10px] text-emerald-400 font-mono block">✓ {currentCorridor.duties}</span>
+                  </div>
+
+                  <div className="space-y-1 border-t md:border-t-0 md:border-l border-[#2A3B6B] pt-3 md:pt-0 md:pl-4 flex flex-col justify-between">
+                    <div>
+                      <span className="text-[9px] font-mono uppercase tracking-widest text-[#94A3B8] block">Shipping Threshold</span>
+                      <span className="text-sm font-semibold text-[#FCD34D]">{currentCorridor.threshold}</span>
+                    </div>
+                    <Link
+                      to="/shop"
+                      className="inline-flex items-center gap-1 text-[11px] text-amber-300 hover:text-white uppercase font-bold tracking-wider transition-colors mt-2"
+                    >
+                      <span>Shop with Global Delivery</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* 5 Master Artisan Indian Provenance Guilds Cards */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#FCD34D] block font-semibold">
+                  Generational Provenance
+                </span>
+                <h3 className="font-serif text-2xl text-white">
+                  Direct From India's Iconic Artisan Clusters
+                </h3>
+              </div>
+              <Link
+                to="/about"
+                className="hidden sm:inline-flex items-center gap-1 text-xs uppercase tracking-widest text-[#CBD5E1] hover:text-[#FCD34D] transition-colors"
+              >
+                <span>Discover Heritage History</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {indianHeritageGuilds.map((guild, idx) => (
+                <div
+                  key={idx}
+                  className="p-5 rounded-2xl bg-[#172144] border border-[#2A3B6B] hover:border-[#FCD34D]/80 transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1 hover:shadow-xl"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl">{guild.icon}</span>
+                      <span className={`text-[8.5px] font-mono font-bold tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r ${guild.badgeColor} text-white`}>
+                        {guild.badge}
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-serif text-base text-white group-hover:text-amber-200 transition-colors">
+                        {guild.city}
+                      </h4>
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#8E8B82]">
+                        {guild.state}
+                      </span>
+                    </div>
+                    <div className="text-xs text-[#C2A676] font-medium leading-snug">
+                      {guild.craft}
+                    </div>
+                    <p className="text-[11px] text-[#A3A099] font-light leading-relaxed">
+                      {guild.desc}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 mt-4 border-t border-[#252233] flex items-center justify-between text-[10px] text-[#8E8B82] font-mono uppercase">
+                    <span>Export Ready</span>
+                    <span className="text-emerald-400">190+ Countries</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 7. Trending Products Horizontal Showcase with Colourful Navigation */}
       <section className="py-24 bg-gradient-to-b from-[#F3F1EC]/60 to-[#FAF9F5] border-t border-[#E8E6E1]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -999,10 +1279,9 @@ export default function HomePage() {
               type="submit"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="relative px-7 py-3.5 rounded-full overflow-hidden bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white font-bold text-xs uppercase tracking-[0.18em] shadow-xl shadow-rose-500/30 hover:shadow-rose-500/50 transition-all duration-300 flex items-center justify-center gap-2 group"
+              className="btn-sheen btn-glow-pulse relative px-7 py-3.5 rounded-full overflow-hidden bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white font-bold text-xs uppercase tracking-[0.18em] shadow-xl shadow-rose-500/30 hover:shadow-rose-500/50 transition-all duration-300 flex items-center justify-center gap-2 group active:scale-95"
             >
-              <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-              <Mail className="w-3.5 h-3.5 relative z-10" />
+              <Mail className="w-3.5 h-3.5 relative z-10 group-hover:scale-110 transition-transform" />
               <span className="relative z-10">
                 {newsletterSubmitted ? 'Welcome to Élane' : 'Subscribe'}
               </span>

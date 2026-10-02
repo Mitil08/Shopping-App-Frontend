@@ -282,9 +282,48 @@ export default function CheckoutPage() {
 
           {/* 2. Shipping Address */}
           <div className="bg-white border border-[#E8E6E1] p-6 lg:p-8 space-y-4">
-            <h2 className="font-serif text-lg uppercase tracking-wider text-[#141414] border-b border-[#E8E6E1] pb-3">
-              2. Shipping Address
+            <h2 className="font-serif text-lg uppercase tracking-wider text-[#141414] border-b border-[#E8E6E1] pb-3 flex items-center justify-between">
+              <span>2. Shipping Address</span>
+              <span className="text-[10px] font-mono text-[#C2A676] font-normal uppercase tracking-wider">
+                🇮🇳 Direct Dispatch from India • 190+ Countries
+              </span>
             </h2>
+
+            {/* Country / Destination Selector */}
+            <div>
+              <label className="block text-[11px] uppercase tracking-wider text-[#787570] font-medium mb-1">
+                Destination Country / Region (190+ Countries Supported) *
+              </label>
+              <select
+                name="country"
+                value={formData.country || 'India'}
+                onChange={handleChange}
+                className="w-full bg-[#FAF9F5] border border-[#E8E6E1] px-4 py-2.5 text-xs text-[#141414] focus:outline-none focus:border-[#141414]"
+              >
+                <option value="India">🇮🇳 India (Domestic Express)</option>
+                <option value="United States">🇺🇸 United States (FedEx Priority)</option>
+                <option value="United Kingdom">🇬🇧 United Kingdom (DHL Air)</option>
+                <option value="United Arab Emirates">🇦🇪 United Arab Emirates (Express Air)</option>
+                <option value="Canada">🇨🇦 Canada (Tracked Courier)</option>
+                <option value="Australia">🇦🇺 Australia (Global Priority)</option>
+                <option value="Germany">🇩🇪 Germany (DHL Europe)</option>
+                <option value="France">🇫🇷 France (DHL Europe)</option>
+                <option value="Singapore">🇸🇬 Singapore (Air Express)</option>
+                <option value="Japan">🇯🇵 Japan (Air Priority)</option>
+                <option value="Switzerland">🇨🇭 Switzerland (Doorstep Express)</option>
+                <option value="Saudi Arabia">🇸🇦 Saudi Arabia (Gulf Air Express)</option>
+                <option value="Qatar">🇶🇦 Qatar (Direct Courier)</option>
+                <option value="Italy">🇮🇹 Italy (DHL Europe)</option>
+                <option value="Netherlands">🇳🇱 Netherlands (DHL Europe)</option>
+                <option value="Spain">🇪🇸 Spain (DHL Europe)</option>
+                <option value="Hong Kong">🇭🇰 Hong Kong (Air Cargo)</option>
+                <option value="New Zealand">🇳🇿 New Zealand (Priority Air)</option>
+                <option value="Other Global Destination">🌐 Other International Destination (190+ Countries)</option>
+              </select>
+              <p className="text-[10px] text-[#8E8B82] mt-1 font-mono flex items-center gap-1">
+                <span>✈️ Direct dispatch from India's Master Atelier • Customs duties &amp; taxes pre-cleared</span>
+              </p>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -978,7 +1017,7 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={placingOrder}
-              className="w-full py-4 bg-[#141414] text-[#FAF9F5] text-xs uppercase tracking-[0.25em] font-bold hover:bg-[#2A2A2A] transition-all flex items-center justify-center gap-2 shadow-xl disabled:opacity-50"
+              className="btn-sheen btn-sapphire-glow w-full py-4 bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] text-white text-xs uppercase tracking-[0.25em] font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-xl shadow-blue-900/30 hover:opacity-95 disabled:opacity-50 active:scale-95 group"
             >
               {placingOrder ? (
                 <span>Transmitting Order...</span>
@@ -1052,7 +1091,7 @@ export default function CheckoutPage() {
             <div className="space-y-2 pt-2">
               <button
                 onClick={() => executeOrderCreation(`UPI-MOCK-${Math.floor(100000 + Math.random() * 900000)}`)}
-                className="w-full py-3.5 bg-[#141414] hover:bg-[#2A2A2A] text-[#FAF9F5] text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-md flex items-center justify-center gap-2"
+                className="btn-sheen btn-sapphire-glow w-full py-3.5 bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] text-white text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-md rounded-xl flex items-center justify-center gap-2 active:scale-95 group"
               >
                 <span>Simulate Successful UPI Payment</span>
                 <Check className="w-4 h-4" />
@@ -1060,7 +1099,7 @@ export default function CheckoutPage() {
 
               <button
                 onClick={() => setShowPaymentModal(false)}
-                className="w-full py-2 bg-transparent text-[#787570] hover:text-[#141414] text-[11px] uppercase tracking-wider transition-colors"
+                className="w-full py-2 bg-transparent text-[#787570] hover:text-[#1E3A8A] dark:hover:text-white text-[11px] uppercase tracking-wider transition-colors active:scale-95"
               >
                 Cancel and return to checkout
               </button>

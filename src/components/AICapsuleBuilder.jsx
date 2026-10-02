@@ -175,8 +175,8 @@ export default function AICapsuleBuilder({ onComplete }) {
                   onClick={() => setSelectedVibe(v.id)}
                   className={`px-4 py-2 rounded-full text-xs uppercase tracking-wider font-medium transition-all ${
                     selectedVibe === v.id
-                      ? 'bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] font-bold'
-                      : 'bg-[#F3F1EC] dark:bg-[#181622] text-[#787570] dark:text-[#9A968F] border border-[#E8E6E1] dark:border-[#24222E]'
+                      ? 'bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] font-bold shadow-sm'
+                      : 'bg-[#F3F1EC] dark:bg-[#1E293B] text-[#64748B] dark:text-[#94A3B8] border border-[#E2E8F0] dark:border-[#2D3A58]'
                   }`}
                 >
                   {v.label}
@@ -186,11 +186,11 @@ export default function AICapsuleBuilder({ onComplete }) {
           </div>
 
           {/* Trigger Synthesis */}
-          <div className="pt-4 border-t border-[#E8E6E1] dark:border-[#24222E]">
+          <div className="pt-4 border-t border-[#E2E8F0] dark:border-[#2D3A58]">
             <button
               onClick={handleGenerateCapsule}
               disabled={generating}
-              className="w-full py-4 rounded-xl bg-[#141414] text-white dark:bg-[#FAF9F5] dark:text-[#0B0A0E] text-xs uppercase tracking-[0.2em] font-bold hover:bg-[#C2A676] dark:hover:bg-[#C2A676] transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
+              className="w-full py-4 rounded-xl bg-[#192238] text-white dark:bg-[#FAF8F5] dark:text-[#111827] text-xs uppercase tracking-[0.2em] font-bold hover:bg-[#1D4ED8] dark:hover:bg-[#C2A676] transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
             >
               {generating ? (
                 <>
@@ -259,7 +259,7 @@ export default function AICapsuleBuilder({ onComplete }) {
             <button
               onClick={handleAddBundleToBag}
               disabled={addingAll}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] text-xs uppercase tracking-widest font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-md"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] text-xs uppercase tracking-widest font-bold hover:bg-[#1D4ED8] transition-colors flex items-center justify-center gap-2 shadow-md"
             >
               <ShoppingBag className="w-4 h-4" />
               <span>{addingAll ? 'Adding Capsule...' : 'Add All to Bag (1-Click)'}</span>

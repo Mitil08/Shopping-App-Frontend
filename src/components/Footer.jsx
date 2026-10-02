@@ -17,18 +17,18 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#141414] text-[#FAF9F5] pt-16 pb-12 border-t border-[#262626]">
+    <footer className="bg-gradient-to-b from-[#16203D] to-[#0F172A] text-[#FAF8F5] pt-16 pb-12 border-t border-[#26355E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Newsletter Section */}
-        <div className="pb-16 border-b border-[#262626] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="pb-16 border-b border-[#26355E] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-2">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#C2A676] font-semibold">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#FCD34D] font-bold">
               Clientele Bulletin
             </span>
             <h3 className="font-serif text-2xl sm:text-3xl tracking-wide font-normal">
               JOIN THE PRIVATE LIST
             </h3>
-            <p className="text-xs text-[#A3A099] max-w-md font-light leading-relaxed">
+            <p className="text-xs text-[#CBD5E1] max-w-md font-light leading-relaxed">
               Receive curated seasonal releases, private editorial previews, and exclusive invitations to salon presentations.
             </p>
           </div>
@@ -41,16 +41,16 @@ export default function Footer() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="ENTER YOUR EMAIL ADDRESS"
-                className="flex-1 bg-[#1F1F1F] border border-[#333333] px-4 py-3.5 text-xs text-[#FAF9F5] placeholder-[#787570] tracking-wider focus:outline-none focus:border-[#C2A676] transition-colors"
+                className="flex-1 bg-[#1F294D] border border-[#324578] px-4 py-3.5 text-xs text-[#FAF8F5] placeholder-[#94A3B8] tracking-wider focus:outline-none focus:border-[#FCD34D] transition-colors"
               />
               <button
                 type="submit"
-                className="bg-[#FAF9F5] text-[#141414] px-6 py-3.5 text-xs uppercase tracking-[0.2em] font-bold hover:bg-[#C2A676] hover:text-[#141414] transition-colors shrink-0 flex items-center justify-center"
+                className="bg-gradient-to-r from-[#D97706] to-[#F59E0B] text-white px-6 py-3.5 text-xs uppercase tracking-[0.2em] font-bold hover:from-[#B45309] hover:to-[#D97706] transition-colors shrink-0 flex items-center justify-center shadow-lg shadow-amber-500/20"
               >
                 {subscribed ? <Check className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
               </button>
             </form>
-            <p className="text-[10px] text-[#787570] tracking-wider mt-2.5">
+            <p className="text-[10px] text-[#94A3B8] tracking-wider mt-2.5">
               By subscribing, you agree to our Privacy Policy and Terms of Service. Unsubscribe at any time.
             </p>
           </div>
@@ -62,10 +62,15 @@ export default function Footer() {
           <div className="col-span-2 space-y-4 pr-6">
             <h2 className="font-serif text-2xl tracking-[0.25em] font-semibold uppercase">ÉLANE</h2>
             <p className="text-xs text-[#A3A099] font-light leading-relaxed max-w-sm">
-              Contemporary essentials designed for everyday expression. Uncompromising fabrications, architectural tailoring, and enduring silhouettes crafted in limited numbers.
+              Contemporary luxury crafted by generational Indian artisan guilds and modern ateliers, delivered directly to private clientele in 190+ countries worldwide.
             </p>
-            <div className="pt-2 text-xs text-[#787570] tracking-wider uppercase">
-              Paris • Milan • Tokyo • New York
+            <div className="pt-2 space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1F1F1F] border border-[#333333] text-[10px] text-[#C2A676] font-mono uppercase tracking-wider">
+                <span>🇮🇳 Crafted in India • Dispatched Worldwide (190+ Countries)</span>
+              </div>
+              <p className="text-[10px] text-[#8E8B82] tracking-wider uppercase font-medium">
+                Global Salons: New Delhi • Mumbai • Dubai • London • New York • Tokyo • Paris
+              </p>
             </div>
           </div>
 

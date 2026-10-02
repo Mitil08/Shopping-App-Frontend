@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Heart, Plus, Minus, ShieldCheck, Truck, RotateCcw, Sparkles, ChevronRight, Check, Zap, Star, MapPin, Clock, ThumbsUp, X, Bell, Crown } from 'lucide-react';
+import { Heart, Plus, Minus, ShieldCheck, Truck, RotateCcw, Sparkles, ChevronRight, Check, Zap, Star, MapPin, Clock, ThumbsUp, X, Bell, Crown, Layers } from 'lucide-react';
 import { productApi } from '../services/productApi';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useCompare } from '../context/CompareContext';
 import ProductCard from '../components/ProductCard';
 import VirtualFittingModal from '../components/VirtualFittingModal';
 import MonogramStudioModal from '../components/MonogramStudioModal';
 import Interactive3DProductViewer from '../components/Interactive3DProductViewer';
 import VaultHoldBar from '../components/VaultHoldBar';
 import GroupGiftModal from '../components/GroupGiftModal';
-import SpatialSoundscapePlayer from '../components/SpatialSoundscapePlayer';
+import ProductReviewsStudio from '../components/ProductReviewsStudio';
 import { mockProducts } from '../data/mockProducts';
 import { formatPrice } from '../utils/currency';
 
@@ -19,6 +20,7 @@ export default function ProductDetailPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { addToCompare, removeFromCompare, isInCompare, openCompare } = useCompare();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -375,9 +377,9 @@ export default function ProductDetailPage() {
                 {/* 3D Model Launcher Pill */}
                 <button
                   onClick={() => setShow3DViewer(true)}
-                  className="absolute bottom-4 right-4 px-3.5 py-2 rounded-full bg-black/70 hover:bg-black text-[#C2A676] text-[11px] uppercase tracking-widest font-semibold backdrop-blur-md border border-[#C2A676]/40 shadow-lg flex items-center gap-1.5 transition-all hover:scale-105"
+                  className="btn-sheen btn-glow-pulse absolute bottom-4 right-4 px-4 py-2 rounded-full bg-slate-900/85 hover:bg-slate-900 text-[#FCD34D] text-[11px] uppercase tracking-widest font-semibold backdrop-blur-md border border-amber-400/50 shadow-lg flex items-center gap-1.5 transition-all active:scale-95 group"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-45 transition-transform duration-300" />
                   <span>Inspect in 3D (360°)</span>
                 </button>
               </>
@@ -561,7 +563,7 @@ export default function ProductDetailPage() {
             <button
               type="button"
               onClick={() => setShowMonogramModal(true)}
-              className="px-3.5 py-2 border border-[#141414] dark:border-[#C2A676] text-[11px] uppercase tracking-wider font-semibold text-[#141414] dark:text-[#FAF9F5] hover:bg-[#141414] hover:text-white dark:hover:bg-[#C2A676] dark:hover:text-[#141414] transition-all whitespace-nowrap self-start sm:self-auto"
+              className="btn-sheen px-3.5 py-2 border border-[#1E3A8A] dark:border-[#C2A676] text-[11px] uppercase tracking-wider font-semibold text-[#1E3A8A] dark:text-[#FAF9F5] hover:bg-[#1E3A8A] hover:text-white dark:hover:bg-[#C2A676] dark:hover:text-[#141414] rounded-lg transition-all whitespace-nowrap self-start sm:self-auto active:scale-95"
             >
               {appliedMonogram ? 'Edit Monogram' : 'Customize Monogram'}
             </button>
@@ -569,13 +571,6 @@ export default function ProductDetailPage() {
 
           {/* Quantity and Actions */}
           <div className="space-y-4 pt-2">
-            {/* Spatial Soundscape Audio Player for Audio/Wearables/Sanctuary Products */}
-            {(product?.category_id === 'cat-audio-wearables' || product?.name?.toLowerCase().includes('headphone') || product?.name?.toLowerCase().includes('sound') || product?.name?.toLowerCase().includes('acoustic')) && (
-              <div className="mb-4">
-                <SpatialSoundscapePlayer productName={product.name} />
-              </div>
-            )}
-
             {/* 15-Minute Vault Hold & Exclusive Reservation */}
             <div className="mb-4">
               <VaultHoldBar product={product} variant={selectedVariant} />
@@ -584,18 +579,18 @@ export default function ProductDetailPage() {
             {/* Quantity and Actions */}
             <div className="flex gap-4">
               {/* Stepper */}
-              <div className="flex items-center border border-[#E8E6E1] bg-white w-32 justify-between px-2">
+              <div className="flex items-center border border-[#CBD5E1] dark:border-[#334155] bg-white dark:bg-[#1E293B] w-32 justify-between px-2 rounded-xl">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="p-2 text-[#787570] hover:text-[#141414]"
+                  className="p-2 text-[#64748B] hover:text-[#1E3A8A] active:scale-75 transition-all"
                   aria-label="Decrease quantity"
                 >
                   <Minus className="w-3.5 h-3.5" />
                 </button>
-                <span className="text-xs font-semibold text-[#141414]">{quantity}</span>
+                <span className="text-xs font-semibold text-[#192238] dark:text-white">{quantity}</span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
-                  className="p-2 text-[#787570] hover:text-[#141414]"
+                  className="p-2 text-[#64748B] hover:text-[#1E3A8A] active:scale-75 transition-all"
                   aria-label="Increase quantity"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -606,7 +601,7 @@ export default function ProductDetailPage() {
               <button
                 onClick={handleAddToCart}
                 disabled={addingToCart || !selectedVariant || selectedVariant.stock_quantity === 0}
-                className="flex-1 py-4 bg-white border border-[#141414] text-[#141414] text-xs uppercase tracking-[0.2em] font-bold hover:bg-[#FAF9F5] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="btn-sheen flex-1 py-4 bg-white dark:bg-[#1E293B] border-2 border-[#1E3A8A] dark:border-[#60A5FA] text-[#1E3A8A] dark:text-[#93C5FD] text-xs uppercase tracking-[0.2em] font-bold hover:bg-blue-50/70 dark:hover:bg-blue-900/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50 rounded-xl shadow-sm active:scale-95 group"
               >
                 {addingToCart ? (
                   <span>Adding to Bag...</span>
@@ -621,23 +616,48 @@ export default function ProductDetailPage() {
               <button
                 onClick={handleBuyNow}
                 disabled={buyingNow || !selectedVariant || selectedVariant.stock_quantity === 0}
-                className="flex-1 py-4 bg-[#141414] text-[#FAF9F5] text-xs uppercase tracking-[0.2em] font-bold hover:bg-[#2A2A2A] transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                className="btn-sheen btn-sapphire-glow flex-1 py-4 bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] text-white text-xs uppercase tracking-[0.2em] font-bold hover:opacity-95 transition-all shadow-lg shadow-blue-900/25 flex items-center justify-center gap-2 disabled:opacity-50 rounded-xl active:scale-95 group"
               >
-                <Zap className="w-3.5 h-3.5 fill-[#FAF9F5]" />
+                <Zap className="w-3.5 h-3.5 fill-white group-hover:scale-125 transition-transform duration-200" />
                 {buyingNow ? <span>Initiating Checkout...</span> : <span>Buy Now</span>}
               </button>
 
               {/* Wishlist Button */}
               <button
                 onClick={() => toggleWishlist(product)}
-                className="p-4 border border-[#E8E6E1] bg-white hover:border-[#141414] text-[#141414] transition-colors"
+                className={`p-4 border rounded-xl transition-all hover:scale-105 active:scale-90 ${
+                  isLiked
+                    ? 'heart-pop border-rose-400 bg-rose-50/50 dark:bg-rose-950/30 text-rose-600'
+                    : 'border-[#CBD5E1] dark:border-[#334155] bg-white dark:bg-[#1E293B] hover:border-rose-400 text-[#64748B]'
+                }`}
                 aria-label="Toggle wishlist"
+                title="Save to Wishlist"
               >
                 <Heart
                   className={`w-4 h-4 ${
-                    isLiked ? 'fill-[#141414] text-[#141414]' : 'text-[#141414]'
+                    isLiked ? 'fill-rose-500 text-rose-500' : 'text-current'
                   }`}
                 />
+              </button>
+
+              {/* Garment Silhouette Compare Button */}
+              <button
+                onClick={() => {
+                  if (isInCompare(product?.id)) {
+                    openCompare();
+                  } else {
+                    addToCompare(product);
+                  }
+                }}
+                className={`p-4 border rounded-xl transition-all hover:scale-105 hover:rotate-6 active:scale-90 ${
+                  isInCompare(product?.id)
+                    ? 'border-[#D97706] bg-amber-500/15 text-[#D97706] dark:text-[#FCD34D]'
+                    : 'border-[#CBD5E1] dark:border-[#334155] bg-white dark:bg-[#1E293B] hover:border-[#1E3A8A] text-[#64748B]'
+                }`}
+                aria-label="Compare silhouette"
+                title={isInCompare(product?.id) ? 'View in Comparison Studio' : 'Add to Comparison Studio'}
+              >
+                <Layers className="w-4 h-4" />
               </button>
             </div>
 
@@ -685,7 +705,7 @@ export default function ProductDetailPage() {
                   <MapPin className="w-3.5 h-3.5 text-[#C2A676]" />
                   Check Delivery & Services
                 </span>
-                <span className="text-[10px] text-[#787570] font-mono">India Dispatch</span>
+                <span className="text-[10px] text-[#787570] font-mono">India & Worldwide (190+ Countries)</span>
               </div>
 
               <form onSubmit={handleCheckPincode} className="flex gap-2">
@@ -698,12 +718,12 @@ export default function ProductDetailPage() {
                     setPincode(e.target.value.replace(/\D/g, ''));
                     setPincodeChecked(false);
                   }}
-                  className="flex-1 bg-white border border-[#E8E6E1] px-3 py-2 text-xs text-[#141414] focus:outline-none focus:border-[#141414] font-mono"
+                  className="flex-1 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#334155] px-3.5 py-2 text-xs text-[#192238] dark:text-white rounded-lg focus:outline-none focus:border-[#2563EB] font-mono"
                 />
                 <button
                   type="submit"
                   disabled={pincodeLoading}
-                  className="px-4 py-2 bg-[#141414] text-[#FAF9F5] text-xs uppercase tracking-wider font-semibold hover:bg-[#2A2A2A] transition-colors disabled:opacity-50"
+                  className="btn-sheen px-5 py-2 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white text-xs uppercase tracking-wider font-semibold rounded-lg transition-all disabled:opacity-50 active:scale-95 shadow-sm"
                 >
                   {pincodeLoading ? 'Checking...' : 'Check'}
                 </button>
@@ -804,125 +824,27 @@ export default function ProductDetailPage() {
               )}
 
               {activeTab === 'shipping' && (
-                <div className="space-y-2.5">
-                  <p>
-                    We offer complimentary express courier shipping on all orders over ₹10,000. Dispatched from our central logistics atelier within 24 business hours.
+                <div className="space-y-3">
+                  <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E8E6E1] text-[11px] text-[#141414] space-y-1">
+                    <p className="font-semibold text-[#C2A676] flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+                      <span>🇮🇳</span>
+                      <span>Handcrafted in India • Dispatched Worldwide (190+ Countries)</span>
+                    </p>
+                    <p className="text-[#63605A] leading-relaxed">
+                      Every piece is inspected at our central India atelier and dispatched via DHL Express or FedEx International Priority with pre-cleared customs duties and transit insurance.
+                    </p>
+                  </div>
+                  <p className="text-xs text-[#787570] leading-relaxed">
+                    Domestic India transit: 2–3 business days. Worldwide international transit: 3–6 business days. Complimentary worldwide express shipping on orders over ₹10,000 / $120.
                   </p>
-                  <p>
-                    Returns are accepted within 30 days of receipt in original condition with unclipped security tags.
+                  <p className="text-xs text-[#787570] leading-relaxed">
+                    Worldwide returns accepted within 30 days of receipt in original condition with unclipped security tags.
                   </p>
                 </div>
               )}
 
               {activeTab === 'reviews' && (
-                <div className="space-y-5">
-                  {/* Rating Breakdown Bar */}
-                  <div className="p-4 bg-[#F8F7F4] border border-[#E8E6E1] flex flex-col sm:flex-row items-center gap-6">
-                    <div className="text-center sm:border-r sm:border-[#E8E6E1] sm:pr-6">
-                      <div className="text-3xl font-serif text-[#141414] font-medium">
-                        {product.rating || 4.9}
-                      </div>
-                      <div className="flex items-center justify-center gap-1 text-amber-500 my-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        ))}
-                      </div>
-                      <span className="text-[10px] text-[#787570] uppercase tracking-wider">
-                        {product.reviewsCount || 24} Verified Ratings
-                      </span>
-                    </div>
-
-                    <div className="flex-1 w-full space-y-1.5">
-                      {[
-                        { stars: '5 star', percent: 84 },
-                        { stars: '4 star', percent: 12 },
-                        { stars: '3 star', percent: 4 },
-                        { stars: '2 star', percent: 0 },
-                        { stars: '1 star', percent: 0 },
-                      ].map((item) => (
-                        <div key={item.stars} className="flex items-center gap-2 text-[10px]">
-                          <span className="w-10 text-[#787570] font-medium">{item.stars}</span>
-                          <div className="flex-1 bg-[#E8E6E1] h-2 rounded-full overflow-hidden">
-                            <div className="bg-amber-400 h-full rounded-full" style={{ width: `${item.percent}%` }} />
-                          </div>
-                          <span className="w-8 text-right font-mono text-[#787570]">{item.percent}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Action Bar: Write a Review */}
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-xs font-semibold text-[#141414] uppercase tracking-wider">
-                      Customer Testimonials ({2 + userReviews.length})
-                    </span>
-                    <button
-                      onClick={() => setShowReviewModal(true)}
-                      className="px-3 py-1.5 bg-[#141414] hover:bg-[#2A2A2A] text-[#FAF9F5] text-[10px] uppercase tracking-widest font-semibold transition-colors flex items-center gap-1.5"
-                    >
-                      <Sparkles className="w-3 h-3 text-[#C2A676]" />
-                      <span>Write A Review</span>
-                    </button>
-                  </div>
-
-                  {/* Customer Reviews List */}
-                  <div className="space-y-4 pt-1">
-                    {/* User-submitted Reviews */}
-                    {userReviews.map((rev) => (
-                      <div key={rev.id} className="border-b border-[#E8E6E1] pb-3 space-y-1.5 bg-[#FAF9F5]/70 p-3 border">
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-[#141414] text-xs">{rev.name}</span>
-                          <span className="text-[10px] text-[#787570]">{rev.city} • {rev.date}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex text-amber-500 gap-0.5">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-3 h-3 ${i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-[#E8E6E1]'}`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-[10px] text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
-                            Fit: {rev.fit}
-                          </span>
-                        </div>
-                        <p className="font-serif text-xs font-medium text-[#141414] pt-0.5">{rev.title}</p>
-                        <p className="text-xs text-[#63605A] leading-relaxed">{rev.text}</p>
-                      </div>
-                    ))}
-
-                    <div className="border-b border-[#E8E6E1] pb-3 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-[#141414]">Kavita Sharma</span>
-                        <span className="text-[10px] text-[#787570]">Verified Buyer • Mumbai</span>
-                      </div>
-                      <div className="flex text-amber-500 gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                        ))}
-                      </div>
-                      <p className="text-xs text-[#63605A] pt-1">
-                        "Exceptional drape and finishing. The fabric feels substantially luxurious and arrived in under 24 hours in Mumbai."
-                      </p>
-                    </div>
-
-                    <div className="border-b border-[#E8E6E1] pb-3 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-[#141414]">Aditya Rao</span>
-                        <span className="text-[10px] text-[#787570]">Verified Buyer • Bengaluru</span>
-                      </div>
-                      <div className="flex text-amber-500 gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                        ))}
-                      </div>
-                      <p className="text-xs text-[#63605A] pt-1">
-                        "Accurate sizing and zero loose threads. Truly on par with international atelier suiting."
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <ProductReviewsStudio product={product} slug={slug} />
               )}
             </div>
           </div>

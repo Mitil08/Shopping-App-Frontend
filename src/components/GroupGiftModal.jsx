@@ -137,7 +137,7 @@ export default function GroupGiftModal({ product, onClose }) {
             />
             <button
               onClick={handleCopyLink}
-              className="px-4 py-2 bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] rounded-lg text-xs uppercase tracking-wider font-semibold hover:opacity-90 flex items-center gap-1.5"
+              className="px-4 py-2 bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] rounded-lg text-xs uppercase tracking-wider font-semibold hover:bg-[#1D4ED8] transition-colors flex items-center gap-1.5"
             >
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied' : 'Share'}</span>

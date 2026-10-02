@@ -107,14 +107,14 @@ export default function UnboxingSimulator({ order, onClose }) {
                 <img
                   src={firstItem.image || firstItem.images?.[0]}
                   alt={firstItem.name}
-                  className="w-20 h-20 object-cover rounded-lg bg-[#F3F1EC] dark:bg-[#0B0A0E] border border-[#E8E6E1] dark:border-[#24222E]"
+                  className="w-20 h-20 object-cover rounded-lg bg-[#F3F1EC] dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#2D3A58]"
                 />
                 <div className="flex-1 min-w-0 text-left">
                   <div className="inline-flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mb-1">
                     <CheckCircle className="w-3.5 h-3.5" />
                     <span>Flawless Quality Certified</span>
                   </div>
-                  <h4 className="font-serif text-sm font-semibold truncate text-[#141414] dark:text-white">
+                  <h4 className="font-serif text-sm font-semibold truncate text-[#192238] dark:text-white">
                     {firstItem.name}
                   </h4>
                   <p className="text-xs font-mono text-[#C2A676] font-bold mt-0.5">
@@ -124,7 +124,7 @@ export default function UnboxingSimulator({ order, onClose }) {
               </div>
 
               {/* Digital Certificate Token Presentation */}
-              <div className="w-full p-4 rounded-xl bg-gradient-to-r from-[#181622] via-[#0E0D14] to-[#181622] border border-[#C2A676]/40 text-white flex items-center justify-between">
+              <div className="w-full p-4 rounded-xl bg-gradient-to-r from-[#17213C] via-[#212D52] to-[#17213C] border border-[#C2A676]/40 text-white flex items-center justify-between">
                 <div className="text-left">
                   <span className="text-[9px] uppercase tracking-widest text-[#C2A676] font-bold block">
                     CRYPTOGRAPHIC VAULT RECORD
@@ -143,13 +143,13 @@ export default function UnboxingSimulator({ order, onClose }) {
         </div>
 
         {/* Bottom Navigation Buttons */}
-        <div className="pt-4 border-t border-[#E8E6E1] dark:border-[#24222E] flex justify-between items-center gap-4">
+        <div className="pt-4 border-t border-[#E2E8F0] dark:border-[#2D3A58] flex justify-between items-center gap-4">
           <div className="flex items-center gap-1.5">
             {[0, 1, 2, 3].map((stepIdx) => (
               <span
                 key={stepIdx}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  stepIdx === stage ? 'w-6 bg-[#C2A676]' : stepIdx < stage ? 'bg-[#141414] dark:bg-white' : 'bg-[#E8E6E1] dark:bg-[#24222E]'
+                  stepIdx === stage ? 'w-6 bg-[#C2A676]' : stepIdx < stage ? 'bg-[#192238] dark:bg-white' : 'bg-[#E2E8F0] dark:border-[#2D3A58]'
                 }`}
               />
             ))}
@@ -158,7 +158,7 @@ export default function UnboxingSimulator({ order, onClose }) {
           {stage < 3 ? (
             <button
               onClick={handleNextStage}
-              className="px-6 py-2.5 rounded-full bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] text-xs uppercase tracking-widest font-semibold hover:opacity-90 flex items-center gap-2 shadow-md"
+              className="px-6 py-2.5 rounded-full bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] text-xs uppercase tracking-widest font-semibold hover:bg-[#1D4ED8] transition-colors flex items-center gap-2 shadow-md"
             >
               <span>{stage === 0 ? 'Break Wax Seal' : stage === 1 ? 'Untie Silk Ribbon' : 'Reveal Piece'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -166,7 +166,7 @@ export default function UnboxingSimulator({ order, onClose }) {
           ) : (
             <button
               onClick={onClose}
-              className="px-6 py-2.5 rounded-full bg-[#141414] text-white dark:bg-[#C2A676] dark:text-[#0B0A0E] text-xs uppercase tracking-widest font-semibold hover:opacity-90"
+              className="px-6 py-2.5 rounded-full bg-[#192238] text-white dark:bg-[#C2A676] dark:text-[#111827] text-xs uppercase tracking-widest font-semibold hover:bg-[#1D4ED8] transition-colors"
             >
               Enjoy Acquisition
             </button>

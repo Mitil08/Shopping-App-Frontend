@@ -173,7 +173,7 @@ export default function SpatialSoundscapePlayer({ productName = 'Spatial Acousti
           onClick={togglePlayback}
           className={`px-4 py-2 rounded-full text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-2 shadow-md ${
             isPlaying
-              ? 'bg-[#C2A676] text-[#0B0A0E] hover:opacity-90'
+              ? 'bg-[#C2A676] text-[#111827] hover:opacity-90'
               : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
           }`}
         >

@@ -101,7 +101,7 @@ export default function VaultHoldBar({ product, variant }) {
 
       <button
         onClick={handleStartHold}
-        className="px-3.5 py-1.5 rounded-lg border border-[#141414] dark:border-[#C2A676] text-[10px] uppercase tracking-wider font-bold text-[#141414] dark:text-[#C2A676] hover:bg-[#141414] hover:text-white dark:hover:bg-[#C2A676] dark:hover:text-[#0B0A0E] transition-colors"
+        className="px-3.5 py-1.5 rounded-lg border border-[#192238] dark:border-[#C2A676] text-[10px] uppercase tracking-wider font-bold text-[#192238] dark:text-[#C2A676] hover:bg-[#192238] hover:text-white dark:hover:bg-[#C2A676] dark:hover:text-[#111827] transition-colors"
       >
         Lock 15 Min Hold
       </button>
