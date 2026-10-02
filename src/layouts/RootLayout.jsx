@@ -8,9 +8,14 @@ import AssistantWidget from '../components/AssistantWidget';
 import Global3DCanvas from '../components/Global3DCanvas';
 import CompareFloatingBar from '../components/CompareFloatingBar';
 import CompareStudioModal from '../components/CompareStudioModal';
+import RoyalSplashOpening from '../components/RoyalSplashOpening';
 
 export default function RootLayout() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [showOpeningSplash, setShowOpeningSplash] = useState(() => {
+    // Show on initial session load
+    return !sessionStorage.getItem('elane_splash_seen');
+  });
   const location = useLocation();
 
   // Scroll to top on every route change
@@ -18,8 +23,18 @@ export default function RootLayout() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [location.pathname]);
 
+  const handleSplashComplete = () => {
+    sessionStorage.setItem('elane_splash_seen', 'true');
+    setShowOpeningSplash(false);
+  };
+
   return (
     <div className="relative min-h-screen flex flex-col bg-[#FAF8F5] dark:bg-[#172554] text-[#192238] dark:text-[#F8FAFC] transition-colors duration-300">
+      {/* Grand Opening Pre-Entrance Animation */}
+      {showOpeningSplash && (
+        <RoyalSplashOpening onComplete={handleSplashComplete} />
+      )}
+
       {/* Global Interactive 3D Canvas Background */}
       <Global3DCanvas />
 
