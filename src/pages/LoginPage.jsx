@@ -15,7 +15,9 @@ import {
   ShieldCheck, 
   Fingerprint,
   Zap,
-  Globe
+  Globe,
+  Store,
+  User
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -23,6 +25,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function LoginPage() {
+  const [accountType, setAccountType] = useState('customer'); // 'customer' | 'seller'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +39,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const redirectPath = location.state?.from?.pathname || '/profile';
+  const redirectPath = location.state?.from?.pathname || (accountType === 'seller' ? '/seller/dashboard' : '/profile');
 
   const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -82,6 +85,10 @@ export default function LoginPage() {
       setEmail('client@elane-studio.com');
       setPassword('ClientPass123!');
       handleLoginSubmit('client@elane-studio.com', 'ClientPass123!');
+    } else if (demoRole === 'seller') {
+      setEmail('seller@elane-studio.com');
+      setPassword('SellerPass123!');
+      handleLoginSubmit('seller@elane-studio.com', 'SellerPass123!');
     } else if (demoRole === 'admin') {
       setEmail('admin@elane-studio.com');
       setPassword('AdminPass123!');
@@ -148,11 +155,42 @@ export default function LoginPage() {
             </div>
 
             <h1 className="font-serif text-3xl sm:text-4xl text-[#192238] dark:text-white font-normal uppercase tracking-wide">
-              Sign In
+              {accountType === 'seller' ? 'Vendor Sign In' : 'Client Sign In'}
             </h1>
             <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-2 font-light max-w-sm mx-auto leading-relaxed">
-              Access your bespoke commissions, authenticated archive passes, saved wishlist, and concierge services.
+              {accountType === 'seller'
+                ? 'Sign in to access your Merchant Studio, manage catalog inventory, and fulfill customer orders.'
+                : 'Access your bespoke commissions, authenticated archive passes, saved wishlist, and concierge services.'}
             </p>
+          </div>
+
+          {/* Account Type Selector: Sign In as User vs Vendor */}
+          <div className="mb-6 p-1 rounded-2xl bg-[#F1F5F9] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] grid grid-cols-2 gap-1">
+            <button
+              type="button"
+              onClick={() => { setAccountType('customer'); setFormError(''); }}
+              className={`py-2.5 px-3 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+                accountType === 'customer'
+                  ? 'bg-white dark:bg-[#1E293B] text-[#192238] dark:text-[#F8FAFC] shadow-sm border border-[#CBD5E1]/50 dark:border-[#475569]'
+                  : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#192238] dark:hover:text-[#F8FAFC]'
+              }`}
+            >
+              <User className="w-3.5 h-3.5 text-blue-500" />
+              <span>Sign In as User</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setAccountType('seller'); setFormError(''); }}
+              className={`py-2.5 px-3 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+                accountType === 'seller'
+                  ? 'bg-gradient-to-r from-[#D97706] to-[#B45309] text-white shadow-md shadow-amber-500/20'
+                  : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#D97706]'
+              }`}
+            >
+              <Store className="w-3.5 h-3.5" />
+              <span>Sign In as Vendor</span>
+            </button>
           </div>
 
           {/* Form Error Notice */}
@@ -218,21 +256,25 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Primary Sign-In Button with Royal Sheen & Sapphire Glow */}
+            {/* Primary Sign-In Button */}
             <div className="pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-sheen btn-sapphire-glow w-full py-4 bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] text-white text-xs uppercase tracking-[0.25em] font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-900/30 hover:opacity-95 disabled:opacity-50 active:scale-95 group"
+                className={`btn-sheen w-full py-4 text-white text-xs uppercase tracking-[0.25em] font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg hover:opacity-95 disabled:opacity-50 active:scale-95 group ${
+                  accountType === 'seller'
+                    ? 'bg-gradient-to-r from-[#D97706] to-[#B45309] shadow-amber-500/25'
+                    : 'btn-sapphire-glow bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] shadow-blue-900/30'
+                }`}
               >
                 {loading ? (
                   <>
-                    <Sparkles className="w-4 h-4 animate-spin text-blue-200" />
+                    <Sparkles className="w-4 h-4 animate-spin text-amber-200" />
                     <span>Verifying Credentials...</span>
                   </>
                 ) : (
                   <>
-                    <span>Sign In to Account</span>
+                    <span>{accountType === 'seller' ? 'Sign In to Vendor Studio' : 'Sign In as Client'}</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200" />
                   </>
                 )}
@@ -247,7 +289,7 @@ export default function LoginPage() {
               <span className="text-[#D97706] dark:text-[#FCD34D]">One-Click Login</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {/* VIP Client Instant Sign-In Button */}
               <button
                 type="button"
@@ -260,10 +302,31 @@ export default function LoginPage() {
                   </div>
                   <div>
                     <span className="text-xs font-bold text-[#192238] dark:text-white block leading-tight">
-                      VIP Client Pass
+                      VIP Client
                     </span>
                     <span className="text-[10px] text-[#787570] dark:text-[#94A3B8] font-mono">
-                      Genevieve Laurent
+                      Genevieve
+                    </span>
+                  </div>
+                </div>
+              </button>
+
+              {/* Vendor Instant Sign-In Button */}
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('seller')}
+                className="btn-sheen p-2.5 rounded-xl border border-emerald-400/40 bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent text-left hover:border-emerald-400 active:scale-95 transition-all group"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <Store className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-[#192238] dark:text-white block leading-tight">
+                      Merchant
+                    </span>
+                    <span className="text-[10px] text-[#787570] dark:text-[#94A3B8] font-mono">
+                      Maison Silk
                     </span>
                   </div>
                 </div>
@@ -281,10 +344,10 @@ export default function LoginPage() {
                   </div>
                   <div>
                     <span className="text-xs font-bold text-[#192238] dark:text-white block leading-tight">
-                      Atelier Admin
+                      Admin Pass
                     </span>
                     <span className="text-[10px] text-[#787570] dark:text-[#94A3B8] font-mono">
-                      Administrator Pass
+                      Administrator
                     </span>
                   </div>
                 </div>
@@ -320,12 +383,12 @@ export default function LoginPage() {
 
           {/* New Member Registration Link Button */}
           <div className="mt-8 pt-6 border-t border-[#CBD5E1] dark:border-[#2D4170] text-center text-xs text-[#64748B] dark:text-[#94A3B8]">
-            New to the ÉLANE Atelier?{' '}
+            New to ÉLANE?{' '}
             <Link
               to="/register"
               className="btn-sheen inline-block font-bold text-[#1E3A8A] dark:text-[#60A5FA] uppercase tracking-wider hover:underline ml-1 active:scale-95 transition-transform"
             >
-              Create Client Account &rarr;
+              {accountType === 'seller' ? 'Register as Vendor &rarr;' : 'Create User Account &rarr;'}
             </Link>
           </div>
         </div>

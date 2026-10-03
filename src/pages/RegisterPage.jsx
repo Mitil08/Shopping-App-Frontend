@@ -18,7 +18,11 @@ import {
   CheckCircle2,
   KeyRound,
   RotateCcw,
-  Fingerprint
+  Fingerprint,
+  Store,
+  Building2,
+  Phone,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -26,10 +30,16 @@ import { useTheme } from '../context/ThemeContext';
 import { authApi } from '../services/authApi';
 
 export default function RegisterPage() {
+  const [accountType, setAccountType] = useState('customer'); // 'customer' | 'seller'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  // Vendor specific fields
+  const [storeName, setStoreName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [gstin, setGstin] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [formError, setFormError] = useState('');
@@ -102,6 +112,16 @@ export default function RegisterPage() {
       return;
     }
 
+    if (accountType === 'seller' && !storeName.trim()) {
+      setFormError('Please enter your Store or Maison Name.');
+      return;
+    }
+
+    if (accountType === 'seller' && !phone.trim()) {
+      setFormError('Please enter your contact phone number.');
+      return;
+    }
+
     if (password.length < 8) {
       setFormError('Password must contain at least 8 characters.');
       return;
@@ -124,7 +144,14 @@ export default function RegisterPage() {
       }
 
       // 2. Dispatch 6-digit OTP to user's real email address
-      const otpRes = await authApi.sendOtp({ email: trimmedEmail, name: name.trim() });
+      const otpRes = await authApi.sendOtp({ 
+        email: trimmedEmail, 
+        name: name.trim(),
+        role: accountType,
+        storeName: storeName.trim(),
+        gstin: gstin.trim(),
+        phone: phone.trim(),
+      });
       if (otpRes?.success) {
         setIsGoogleFlow(false);
         setShowOtpModal(true);
@@ -166,7 +193,14 @@ export default function RegisterPage() {
       }
 
       // 2. Dispatch 6-digit OTP to selected Google account
-      const otpRes = await authApi.sendOtp({ email: finalEmail, name: finalName });
+      const otpRes = await authApi.sendOtp({ 
+        email: finalEmail, 
+        name: finalName,
+        role: accountType,
+        storeName: storeName.trim() || (accountType === 'seller' ? `${finalName}'s Atelier` : ''),
+        gstin: gstin.trim(),
+        phone: phone.trim(),
+      });
       if (otpRes?.success) {
         setIsGoogleFlow(true);
         setShowOtpModal(true);
@@ -200,10 +234,14 @@ export default function RegisterPage() {
         otp: cleanOtp,
         password: password || 'GoogleAuthSecurePass123!',
         name: name.trim() || 'Google Client',
+        role: accountType,
+        storeName: storeName.trim(),
+        gstin: gstin.trim(),
+        phone: phone.trim(),
       });
-      success('Email successfully verified! Welcome to ÉLANE Atelier.');
+      success(accountType === 'seller' ? 'Merchant store activated! Welcome to ÉLANE Merchant Studio.' : 'Email successfully verified! Welcome to ÉLANE Atelier.');
       setShowOtpModal(false);
-      navigate('/profile');
+      navigate(accountType === 'seller' ? '/seller/dashboard' : '/profile');
     } catch (err) {
       setOtpError(err.message || 'Invalid or expired verification code. Please check your email and try again.');
     } finally {
@@ -216,7 +254,14 @@ export default function RegisterPage() {
     setOtpLoading(true);
     setOtpError('');
     try {
-      await authApi.sendOtp({ email: email.trim(), name: name.trim() });
+      await authApi.sendOtp({ 
+        email: email.trim(), 
+        name: name.trim(),
+        role: accountType,
+        storeName: storeName.trim(),
+        gstin: gstin.trim(),
+        phone: phone.trim(),
+      });
       setResendCooldown(60);
       success(`New verification code sent to ${email}`);
     } catch (err) {
@@ -279,8 +324,39 @@ export default function RegisterPage() {
               Create Account
             </h1>
             <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-2 font-light max-w-sm mx-auto leading-relaxed">
-              Register to unlock personal atelier styling, express worldwide air transit, and private salon viewings.
+              {accountType === 'seller'
+                ? 'Join ÉLANE as a Merchant Partner to list bespoke garments and manage orders worldwide.'
+                : 'Register to unlock personal atelier styling, express worldwide air transit, and private salon viewings.'}
             </p>
+          </div>
+
+          {/* Account Type Selector: User vs Vendor */}
+          <div className="mb-6 p-1 rounded-2xl bg-[#F1F5F9] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] grid grid-cols-2 gap-1">
+            <button
+              type="button"
+              onClick={() => { setAccountType('customer'); setFormError(''); }}
+              className={`py-2.5 px-3 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+                accountType === 'customer'
+                  ? 'bg-white dark:bg-[#1E293B] text-[#192238] dark:text-[#F8FAFC] shadow-sm border border-[#CBD5E1]/50 dark:border-[#475569]'
+                  : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#192238] dark:hover:text-[#F8FAFC]'
+              }`}
+            >
+              <User className="w-3.5 h-3.5 text-blue-500" />
+              <span>Sign Up as User</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setAccountType('seller'); setFormError(''); }}
+              className={`py-2.5 px-3 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+                accountType === 'seller'
+                  ? 'bg-gradient-to-r from-[#D97706] to-[#B45309] text-white shadow-md shadow-amber-500/20'
+                  : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#D97706]'
+              }`}
+            >
+              <Store className="w-3.5 h-3.5" />
+              <span>Sign Up as Vendor</span>
+            </button>
           </div>
 
           {/* 1-Click Fast Google Sign-Up Button */}
@@ -304,7 +380,7 @@ export default function RegisterPage() {
                     <path fill="#FBBC05" d="M5.32 14.27c-.24-.72-.38-1.49-.38-2.27s.14-1.55.38-2.27V6.58H1.21C.44 8.11 0 9.99 0 12s.44 3.89 1.21 5.42l4.11-3.15z"/>
                     <path fill="#EA4335" d="M12 4.77c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.25 2.54 1.21 6.58l4.11 3.15c.94-2.83 3.58-4.96 6.68-4.96z"/>
                   </svg>
-                  <span>Sign Up with Google (1-Click Auto-Fill)</span>
+                  <span>Sign Up with Google ({accountType === 'seller' ? 'Vendor' : 'User'} Auto-Fill)</span>
                 </>
               )}
             </button>
@@ -327,6 +403,56 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleInitiateRegistration} className="space-y-4">
+            {/* Vendor Specific Inputs if accountType === 'seller' */}
+            {accountType === 'seller' && (
+              <div className="space-y-4 p-4 rounded-2xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 mb-2">
+                <div>
+                  <label className="block text-[11px] uppercase tracking-wider text-[#D97706] font-bold mb-1.5 flex items-center gap-1.5">
+                    <Store className="w-3.5 h-3.5" />
+                    <span>Store / Maison Name *</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={storeName}
+                    onChange={(e) => setStoreName(e.target.value)}
+                    placeholder="e.g. Maison Silk & Tailoring Co."
+                    className="w-full bg-white dark:bg-[#1E293B] border border-amber-500/30 rounded-xl px-4 py-3.5 text-xs text-[#192238] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#D97706] focus:ring-2 focus:ring-amber-500/20 transition-all shadow-inner"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider text-[#64748B] dark:text-[#CBD5E1] font-semibold mb-1.5 flex items-center gap-1">
+                      <Phone className="w-3 h-3 text-[#94A3B8]" />
+                      <span>Contact Phone *</span>
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+91 98765 43210"
+                      className="w-full bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#334155] rounded-xl px-4 py-3.5 text-xs text-[#192238] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#D97706] transition-all shadow-inner"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider text-[#64748B] dark:text-[#CBD5E1] font-semibold mb-1.5 flex items-center gap-1">
+                      <FileText className="w-3 h-3 text-[#94A3B8]" />
+                      <span>GSTIN / Tax ID (Opt.)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={gstin}
+                      onChange={(e) => setGstin(e.target.value)}
+                      placeholder="27AABCM8291Q1Z4"
+                      className="w-full bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#334155] rounded-xl px-4 py-3.5 text-xs text-[#192238] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#D97706] transition-all shadow-inner"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
             <div>
               <label className="block text-[11px] uppercase tracking-wider text-[#64748B] dark:text-[#CBD5E1] font-semibold mb-1.5">
                 Full Name *
@@ -436,16 +562,22 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading || googleLoading}
-                className="btn-sheen btn-sapphire-glow w-full py-4 bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] text-white text-xs uppercase tracking-[0.25em] font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-900/30 hover:opacity-95 disabled:opacity-50 active:scale-95 group"
+                className={`btn-sheen w-full py-4 text-white text-xs uppercase tracking-[0.25em] font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg hover:opacity-95 disabled:opacity-50 active:scale-95 group ${
+                  accountType === 'seller'
+                    ? 'bg-gradient-to-r from-[#D97706] to-[#B45309] shadow-amber-500/25'
+                    : 'btn-sapphire-glow bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] shadow-blue-900/30'
+                }`}
               >
                 {loading ? (
                   <>
-                    <Sparkles className="w-4 h-4 animate-spin text-blue-200" />
-                    <span>Verifying &amp; Sending OTP...</span>
+                    <Sparkles className="w-4 h-4 animate-spin text-amber-200" />
+                    <span>Verifying Email &amp; Dispatching OTP...</span>
                   </>
                 ) : (
                   <>
-                    <span>Verify Email &amp; Join Atelier</span>
+                    <span>
+                      {accountType === 'seller' ? 'Verify Email & Launch Vendor Store' : 'Verify Email & Join Atelier'}
+                    </span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200" />
                   </>
                 )}
