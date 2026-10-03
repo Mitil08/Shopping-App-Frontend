@@ -474,12 +474,12 @@ export default function Hero3DScene() {
 
     window.addEventListener('resize', handleResize);
 
-    let clock = new THREE.Clock();
+    const startTime = performance.now();
     let animId;
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      const elapsedTime = (performance.now() - startTime) * 0.001;
 
       // Smooth camera / stage parallax
       mouseX += (targetX - mouseX) * 0.05;

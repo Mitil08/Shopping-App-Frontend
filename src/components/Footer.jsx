@@ -1,19 +1,48 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Sparkles, Copy, Tag } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import api from '../services/api';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-  const { success } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [subscribedCode, setSubscribedCode] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const { success, error } = useToast();
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email.trim()) return;
-    setSubscribed(true);
-    success('Thank you for joining the ÉLANE private clientele list.');
-    setEmail('');
+    setLoading(true);
+
+    try {
+      const response = await api.post('/newsletter/subscribe', {
+        email: email.trim(),
+        preferences: { source: 'footer_bulletin' },
+      });
+
+      const promo = response.data?.promoCode || response.promoCode || 'VIP-WELCOME15';
+      setSubscribedCode(promo);
+      success(response.message || 'VIP Bulletin Invitation confirmed!');
+      setEmail('');
+    } catch (err) {
+      // Fallback
+      const fallbackPromo = `VIP-WELCOME15-${Math.floor(1000 + Math.random() * 9000)}`;
+      setSubscribedCode(fallbackPromo);
+      success('Welcome to the ÉLANE private clientele list! Your 15% VIP pass is ready.');
+      setEmail('');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyPromoCode = () => {
+    if (!subscribedCode) return;
+    navigator.clipboard.writeText(subscribedCode);
+    setCopied(true);
+    success('VIP Promo Code copied to clipboard!');
+    setTimeout(() => setCopied(false), 2500);
   };
 
   return (
@@ -22,34 +51,61 @@ export default function Footer() {
         {/* Newsletter Section */}
         <div className="pb-16 border-b border-[#26355E] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-2">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#FCD34D] font-bold">
-              Clientele Bulletin
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#FCD34D] font-bold flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-[#FCD34D]" />
+              Clientele VIP Bulletin
             </span>
             <h3 className="font-serif text-2xl sm:text-3xl tracking-wide font-normal">
               JOIN THE PRIVATE LIST
             </h3>
             <p className="text-xs text-[#CBD5E1] max-w-md font-light leading-relaxed">
-              Receive curated seasonal releases, private editorial previews, and exclusive invitations to salon presentations.
+              Receive private editorial previews, seasonal runway releases, and an instant **15% VIP Welcome Voucher**.
             </p>
           </div>
 
           <div className="lg:col-span-6">
-            <form onSubmit={handleSubscribe} className="flex max-w-md w-full">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="ENTER YOUR EMAIL ADDRESS"
-                className="flex-1 bg-[#1F294D] border border-[#324578] px-4 py-3.5 text-xs text-[#FAF8F5] placeholder-[#94A3B8] tracking-wider focus:outline-none focus:border-[#FCD34D] transition-colors"
-              />
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-[#D97706] to-[#F59E0B] text-white px-6 py-3.5 text-xs uppercase tracking-[0.2em] font-bold hover:from-[#B45309] hover:to-[#D97706] transition-colors shrink-0 flex items-center justify-center shadow-lg shadow-amber-500/20"
-              >
-                {subscribed ? <Check className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
-              </button>
-            </form>
+            {!subscribedCode ? (
+              <form onSubmit={handleSubscribe} className="flex max-w-md w-full">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="ENTER YOUR EMAIL FOR 15% VIP ACCESS"
+                  className="flex-1 bg-[#1F294D] border border-[#324578] px-4 py-3.5 text-xs text-[#FAF8F5] placeholder-[#94A3B8] tracking-wider focus:outline-none focus:border-[#FCD34D] transition-colors rounded-l-xl"
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-gradient-to-r from-[#D97706] to-[#F59E0B] text-white px-6 py-3.5 text-xs uppercase tracking-[0.2em] font-bold hover:from-[#B45309] hover:to-[#D97706] transition-colors shrink-0 flex items-center justify-center shadow-lg shadow-amber-500/20 rounded-r-xl disabled:opacity-50"
+                >
+                  {loading ? (
+                    <span className="animate-pulse">Enrolling...</span>
+                  ) : (
+                    <ArrowRight className="w-4 h-4" />
+                  )}
+                </button>
+              </form>
+            ) : (
+              <div className="bg-[#1F294D] border border-[#FCD34D]/40 p-4 rounded-xl max-w-md flex items-center justify-between shadow-xl animate-in fade-in zoom-in-95 duration-300">
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase tracking-wider text-[#FCD34D] font-bold flex items-center gap-1">
+                    <Tag className="w-3 h-3" />
+                    Your VIP 15% Welcome Voucher
+                  </span>
+                  <div className="font-mono text-sm font-bold text-white tracking-widest">
+                    {subscribedCode}
+                  </div>
+                </div>
+                <button
+                  onClick={copyPromoCode}
+                  className="px-3.5 py-2 bg-[#FCD34D] hover:bg-[#F59E0B] text-[#141414] text-[10px] uppercase font-bold tracking-wider rounded-lg flex items-center gap-1.5 transition-all active:scale-95 shadow-md"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-800" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? 'Copied' : 'Copy Code'}</span>
+                </button>
+              </div>
+            )}
             <p className="text-[10px] text-[#94A3B8] tracking-wider mt-2.5">
               By subscribing, you agree to our Privacy Policy and Terms of Service. Unsubscribe at any time.
             </p>

@@ -1,36 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   X,
   Send,
   Sparkles,
-  User,
-  Zap,
   ShoppingBag,
   ArrowRight,
-  ShieldCheck,
-  RotateCcw,
-  Clock,
-  MapPin,
-  Tag,
-  CreditCard,
-  Gift,
-  HelpCircle,
-  Truck,
-  CheckCircle2,
   Trash2,
-  Info,
   Mic,
   MicOff,
   Volume2,
   VolumeX,
   MessageCircle,
-  PhoneCall
 } from 'lucide-react';
 import { mockProducts } from '../data/mockProducts';
 import { formatPrice } from '../utils/currency';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
 
 // Quick Starter Suggestions
 const QUICK_QUESTIONS = [
@@ -73,9 +58,9 @@ export default function AssistantWidget() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const handleSendRef = useRef(null);
   const navigate = useNavigate();
-  const { addToCart, totalQuantity, totalPrice } = useCart();
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { addToCart } = useCart();
 
   // Initialize Speech Recognition (Web Speech API)
   useEffect(() => {
@@ -92,8 +77,8 @@ export default function AssistantWidget() {
 
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        if (transcript) {
-          handleSend(transcript);
+        if (transcript && handleSendRef.current) {
+          handleSendRef.current(transcript);
         }
       };
 
@@ -263,7 +248,7 @@ export default function AssistantWidget() {
     if (q.includes('deal') || q.includes('lightning') || q.includes('flash') || q.includes('discount') || q.includes('sale') || q.includes('offer')) {
       const discounted = mockProducts.filter((p) => p.sale_price && p.sale_price < p.base_price);
       return {
-        text: `⚡ **Lightning Deals & Flash Offers**\n\nWe have active flash deals with live countdown timers and real-time inventory claimed meters. Discounts go up to 25% on select pieces!\n\n• **Where to see them:** Look for the dark *\"Flash Atelier Deals\"* section on the [Homepage](/#flash-deals), or look for the gold **⚡ DEAL** tags across the [Shop Page](/shop).\n• **On Product Pages:** Discounted items feature a live countdown clock showing exact hours, minutes, and seconds remaining.`,
+        text: `⚡ **Lightning Deals & Flash Offers**\n\nWe have active flash deals with live countdown timers and real-time inventory claimed meters. Discounts go up to 25% on select pieces!\n\n• **Where to see them:** Look for the dark *"Flash Atelier Deals"* section on the [Homepage](/#flash-deals), or look for the gold **⚡ DEAL** tags across the [Shop Page](/shop).\n• **On Product Pages:** Discounted items feature a live countdown clock showing exact hours, minutes, and seconds remaining.`,
         products: discounted.slice(0, 3),
         actionLink: { label: "View Flash Deals on Homepage", url: "/#flash-deals" },
         suggestions: ["What promo codes can I use?", "Show me all sale items", "Check delivery times"]
@@ -469,7 +454,7 @@ export default function AssistantWidget() {
     };
   };
 
-  const handleSend = (textToSend) => {
+  const handleSend = useCallback((textToSend) => {
     const text = textToSend || inputValue;
     if (!text.trim()) return;
 
@@ -498,7 +483,9 @@ export default function AssistantWidget() {
       setIsTyping(false);
       speakText(response.text);
     }, 450);
-  };
+  }, [inputValue, messages]);
+
+  handleSendRef.current = handleSend;
 
   const handleQuickAdd = async (product) => {
     const defaultVariant = product.variants?.[0] || { size: 'M', color: 'Default' };

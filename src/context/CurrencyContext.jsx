@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { registerCurrencyFormatter } from '../utils/currency';
 
 // Supported international currencies with luxury formatting tokens
@@ -83,6 +83,26 @@ export const CURRENCIES = {
     minDecimals: 2,
     maxDecimals: 2,
   },
+  AUD: {
+    code: 'AUD',
+    symbol: 'A$',
+    name: 'Australian Dollar',
+    rateFromINR: 0.0185,
+    locale: 'en-AU',
+    flag: '🇦🇺',
+    minDecimals: 2,
+    maxDecimals: 2,
+  },
+  CHF: {
+    code: 'CHF',
+    symbol: 'CHF',
+    name: 'Swiss Franc',
+    rateFromINR: 0.0105,
+    locale: 'de-CH',
+    flag: '🇨🇭',
+    minDecimals: 2,
+    maxDecimals: 2,
+  },
 };
 
 const CurrencyContext = createContext(null);
@@ -97,10 +117,18 @@ export const CurrencyProvider = ({ children }) => {
     }
   });
 
+  const [liveRates, setLiveRates] = useState(() => {
+    try {
+      const cached = localStorage.getItem('elane_live_rates');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return {};
+  });
+
   const [geoDetected, setGeoDetected] = useState(false);
   const [detectedCountry, setDetectedCountry] = useState(null);
 
-  // Auto-detect visitor approximate region if not manually overridden
+  // Auto-detect visitor approximate region if not manually chosen
   useEffect(() => {
     const hasManualChoice = localStorage.getItem('elane_preferred_currency');
     if (hasManualChoice) {
@@ -116,12 +144,18 @@ export const CurrencyProvider = ({ children }) => {
       } else if (timeZone.includes('London') || timeZone.includes('Europe/Belfast')) {
         setCurrencyCode('GBP');
         setDetectedCountry('United Kingdom');
-      } else if (timeZone.includes('Paris') || timeZone.includes('Berlin') || timeZone.includes('Madrid') || timeZone.includes('Rome')) {
-        setCurrencyCode('EUR');
-        setDetectedCountry('European Union');
+      } else if (timeZone.includes('Paris') || timeZone.includes('Berlin') || timeZone.includes('Madrid') || timeZone.includes('Rome') || timeZone.includes('Zurich')) {
+        setCurrencyCode(timeZone.includes('Zurich') ? 'CHF' : 'EUR');
+        setDetectedCountry(timeZone.includes('Zurich') ? 'Switzerland' : 'European Union');
       } else if (timeZone.includes('Dubai')) {
         setCurrencyCode('AED');
         setDetectedCountry('United Arab Emirates');
+      } else if (timeZone.includes('Tokyo')) {
+        setCurrencyCode('JPY');
+        setDetectedCountry('Japan');
+      } else if (timeZone.includes('Sydney') || timeZone.includes('Melbourne')) {
+        setCurrencyCode('AUD');
+        setDetectedCountry('Australia');
       } else if (timeZone.includes('New_York') || timeZone.includes('Los_Angeles') || timeZone.includes('Chicago') || timeZone.includes('America')) {
         setCurrencyCode('USD');
         setDetectedCountry('United States');
@@ -144,14 +178,18 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
-  const activeCurrency = CURRENCIES[currencyCode] || CURRENCIES.INR;
+  const baseConfig = CURRENCIES[currencyCode] || CURRENCIES.INR;
+  const currentRate = liveRates[currencyCode] || baseConfig.rateFromINR;
+
+  const activeCurrency = {
+    ...baseConfig,
+    rateFromINR: currentRate,
+  };
 
   /**
    * Converts and formats a given amount (expressed in base INR) into the selected currency.
-   * @param {number|string} inrAmount - Price in base INR
-   * @param {boolean} [forceDecimals=false] - Whether to enforce cents/decimals
    */
-  const format = (inrAmount, forceDecimals = false) => {
+  const format = useCallback((inrAmount, forceDecimals = false) => {
     if (inrAmount === null || inrAmount === undefined || isNaN(Number(inrAmount))) {
       return `${activeCurrency.symbol}0`;
     }
@@ -167,25 +205,25 @@ export const CurrencyProvider = ({ children }) => {
       maximumFractionDigits: maxDec,
     });
 
-    if (activeCurrency.code === 'AED') {
+    if (activeCurrency.code === 'AED' || activeCurrency.code === 'CHF') {
       return `${formatted} ${activeCurrency.symbol}`;
     }
 
     return `${activeCurrency.symbol}${formatted}`;
-  };
+  }, [activeCurrency]);
 
   // Sync with global currency.js formatPrice helper
   useEffect(() => {
     registerCurrencyFormatter(format, activeCurrency.symbol);
-  }, [currencyCode, activeCurrency]);
+  }, [currencyCode, activeCurrency, format]);
 
   /**
    * Raw numerical conversion from base INR to current currency
    */
-  const convert = (inrAmount) => {
+  const convert = useCallback((inrAmount) => {
     if (inrAmount === null || inrAmount === undefined || isNaN(Number(inrAmount))) return 0;
     return Number(inrAmount) * activeCurrency.rateFromINR;
-  };
+  }, [activeCurrency]);
 
   return (
     <CurrencyContext.Provider
@@ -223,3 +261,4 @@ export const useCurrency = () => {
   }
   return ctx;
 };
+

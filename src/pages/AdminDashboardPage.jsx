@@ -6,33 +6,33 @@ import { formatPrice } from '../utils/currency';
 import WhatsAppNotificationSimulator from '../components/WhatsAppNotificationSimulator';
 
 export default function AdminDashboardPage() {
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalSales: 48620,
     totalOrders: 142,
     totalUsers: 89,
     totalProducts: mockProducts.length,
   });
 
-  const [orders, setOrders] = useState([]);
-  const [lowStockProducts, setLowStockProducts] = useState([]);
+  const [orders] = useState(() => {
+    try {
+      const localOrders = JSON.parse(localStorage.getItem('elane_orders') || '[]');
+      const sampleOrders = [
+        { id: 'ORD-L89K2-4912', customer: 'Genevieve Laurent', itemsCount: 2, total: 850.0, status: 'Confirmed', date: '2026-09-28' },
+        { id: 'ORD-K71M4-9210', customer: 'Julian Thorne', itemsCount: 1, total: 590.0, status: 'Shipped', date: '2026-09-27' },
+        { id: 'ORD-B23V8-1049', customer: 'Helena Vance', itemsCount: 3, total: 1120.0, status: 'Processing', date: '2026-09-27' },
+        { id: 'ORD-C44P9-3821', customer: 'Marcus Sterling', itemsCount: 1, total: 340.0, status: 'Delivered', date: '2026-09-26' },
+      ];
+      return [...localOrders, ...sampleOrders];
+    } catch {
+      return [];
+    }
+  });
 
-  useEffect(() => {
-    // Get stored orders + default sample
-    const localOrders = JSON.parse(localStorage.getItem('elane_orders') || '[]');
-    const sampleOrders = [
-      { id: 'ORD-L89K2-4912', customer: 'Genevieve Laurent', itemsCount: 2, total: 850.0, status: 'Confirmed', date: '2026-09-28' },
-      { id: 'ORD-K71M4-9210', customer: 'Julian Thorne', itemsCount: 1, total: 590.0, status: 'Shipped', date: '2026-09-27' },
-      { id: 'ORD-B23V8-1049', customer: 'Helena Vance', itemsCount: 3, total: 1120.0, status: 'Processing', date: '2026-09-27' },
-      { id: 'ORD-C44P9-3821', customer: 'Marcus Sterling', itemsCount: 1, total: 340.0, status: 'Delivered', date: '2026-09-26' },
-    ];
-    setOrders([...localOrders, ...sampleOrders]);
-
-    // Find products with variants where stock <= 5
-    const lowStock = mockProducts
+  const [lowStockProducts] = useState(() => {
+    return mockProducts
       .filter((p) => p.variants?.some((v) => v.stock_quantity <= 5))
       .slice(0, 5);
-    setLowStockProducts(lowStock);
-  }, []);
+  });
 
   return (
     <div className="space-y-8">

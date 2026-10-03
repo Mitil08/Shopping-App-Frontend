@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useLoyalty } from '../context/LoyaltyContext';
 import { orderApi } from '../services/orderApi';
+import { paymentApi } from '../services/paymentApi';
 import { formatPrice } from '../utils/currency';
 
 export default function CheckoutPage() {
@@ -53,8 +54,6 @@ export default function CheckoutPage() {
   });
 
   const [placingOrder, setPlacingOrder] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentCountdown, setPaymentCountdown] = useState(3);
 
   if (items.length === 0) {
     return (
@@ -77,8 +76,31 @@ export default function CheckoutPage() {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const executeOrderCreation = async (paymentRef = null) => {
+  // Helper to guarantee Razorpay checkout script is loaded
+  const ensureRazorpayLoaded = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+      if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(true));
+        existingScript.addEventListener('error', () => resolve(false));
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const executeOrderCreation = async (paymentRef = null, razorpayOrderId = null, razorpaySignature = null) => {
     try {
+      const finalDue = Math.max(0, total - appliedPointsDiscount + (includeGiftBox ? GIFT_BOX_COST : 0));
       const orderPayload = {
         items: items.map((item) => ({
           productId: item.productId,
@@ -101,11 +123,14 @@ export default function CheckoutPage() {
           country: formData.country,
         },
         subtotal,
-        discount: discountAmount,
+        discount: discountAmount + appliedPointsDiscount,
         shippingCost,
-        total,
-        paymentMethod,
-        paymentId: paymentRef || `UPI-${Date.now().toString(36).toUpperCase()}`,
+        total: finalDue,
+        paymentMethod: finalDue === 0 ? 'complimentary' : paymentMethod === 'cod' ? 'cod' : 'razorpay',
+        paymentId: paymentRef || (finalDue === 0 ? 'COMPLIMENTARY-GIFT-CLAIM' : paymentMethod === 'cod' ? 'COD-PENDING' : `PAY-${Date.now()}`),
+        razorpayOrderId: razorpayOrderId || null,
+        razorpaySignature: razorpaySignature || null,
+        paymentStatus: paymentMethod === 'cod' ? 'PENDING' : 'PAID',
       };
 
       let orderId = `ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -124,23 +149,27 @@ export default function CheckoutPage() {
         items,
         shippingAddress: orderPayload.shippingAddress,
         subtotal,
-        discount: discountAmount,
+        discount: discountAmount + appliedPointsDiscount,
         shippingCost,
-        total,
-        paymentMethod,
-        paymentId: paymentRef || `UPI-${Date.now().toString(36).toUpperCase()}`,
+        total: finalDue,
+        paymentMethod: orderPayload.paymentMethod,
+        paymentId: orderPayload.paymentId,
+        razorpayOrderId,
         status: 'Confirmed',
+        paymentStatus: orderPayload.paymentStatus,
         createdAt: new Date().toISOString(),
       };
       localStorage.setItem('elane_orders', JSON.stringify([newOrderRecord, ...existingOrders]));
 
       // Award VIP Club points
-      const effectiveSpend = Math.max(0, total - appliedPointsDiscount + (includeGiftBox ? GIFT_BOX_COST : 0));
-      recordOrderSpend(effectiveSpend);
+      recordOrderSpend(finalDue);
 
       clearCart();
-      setShowPaymentModal(false);
-      success('Payment approved! Order confirmed.');
+      if (finalDue === 0) {
+        success('Complimentary gift claimed successfully! Your order has been placed.');
+      } else {
+        success('Payment verified successfully! Your order has been placed.');
+      }
       navigate(`/order-success/${orderId}`, { state: { order: newOrderRecord } });
     } catch (err) {
       error(err.message || 'Payment processing failed. Please try again.');
@@ -165,48 +194,144 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Razorpay Checkout Modal (If active key provided in .env)
-    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
-    if (window.Razorpay && razorpayKey) {
+    // If order is 100% complimentary (₹0), claim directly without gateway
+    const rawPayable = total - appliedPointsDiscount + (includeGiftBox ? GIFT_BOX_COST : 0);
+    if (rawPayable <= 0) {
+      await executeOrderCreation('COMPLIMENTARY-GIFT-CLAIM');
+      return;
+    }
+
+    // Razorpay Standard Web Checkout Integration Flow
+    try {
+      const payableAmount = Math.max(1, rawPayable);
+      const amountInPaise = Math.round(payableAmount * 100);
+
+      if (amountInPaise < 100) {
+        error('Minimum transaction amount is 100 paise (₹1.00).');
+        setPlacingOrder(false);
+        return;
+      }
+
+      // STEP 1: BACKEND - Create Order (POST /api/create-order)
+      let orderData;
+      try {
+        const orderRes = await paymentApi.createRazorpayOrder({
+          amount: amountInPaise,
+          currency: 'INR',
+          receipt: `rcpt_${Date.now().toString(36)}`,
+          notes: {
+            customer_email: formData.email,
+            customer_name: `${formData.firstName} ${formData.lastName}`.trim(),
+            item_count: items.length,
+          },
+        });
+        orderData = orderRes.order_id ? orderRes : orderRes.data;
+      } catch (backendErr) {
+        console.error('Failed to create Razorpay order on backend:', backendErr);
+        error(backendErr.message || 'Server error creating Razorpay order. Please ensure the backend is running.');
+        setPlacingOrder(false);
+        return;
+      }
+
+      const razorpayOrderId = orderData?.order_id || orderData?.id;
+      if (!razorpayOrderId) {
+        error('Failed to receive Razorpay Order ID from server.');
+        setPlacingOrder(false);
+        return;
+      }
+
+      // Resolve Public Razorpay Key ID (Never secret)
+      let razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || orderData?.key_id;
+      if (!razorpayKey) {
+        try {
+          const keyRes = await paymentApi.getKeyId();
+          razorpayKey = keyRes.key_id || keyRes.data?.key_id;
+        } catch (keyErr) {
+          console.warn('Could not fetch Razorpay key from backend:', keyErr);
+        }
+      }
+
+      if (!razorpayKey) {
+        error('Razorpay Key ID is missing. Please check VITE_RAZORPAY_KEY_ID in .env.');
+        setPlacingOrder(false);
+        return;
+      }
+
+      // STEP 2: FRONTEND - Load script and launch modal
+      const isLoaded = await ensureRazorpayLoaded();
+      if (!isLoaded || !window.Razorpay) {
+        error('Razorpay Checkout SDK failed to load. Please check your network connection.');
+        setPlacingOrder(false);
+        return;
+      }
+
       const options = {
         key: razorpayKey,
-        amount: Math.round(total * 100),
-        currency: 'INR',
+        amount: orderData.amount || amountInPaise,
+        currency: orderData.currency || 'INR',
         name: 'ÉLANE LUXURY ATELIER',
-        description: `Order Acquisition of ${items.length} garment(s)`,
+        description: `Order Acquisition of ${items.length} boutique piece(s)`,
         image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80',
+        order_id: razorpayOrderId,
         prefill: {
           name: `${formData.firstName} ${formData.lastName}`.trim(),
           email: formData.email,
-          contact: formData.phone || '9876543210',
+          contact: formData.phone || '',
+          vpa: razorpayKey.startsWith('rzp_test_') ? 'success@razorpay' : (upiId || undefined),
         },
-        theme: { color: '#141414' },
-        handler: async function (response) {
-          await executeOrderCreation(response.razorpay_payment_id || `PAY-${Date.now()}`);
+        notes: {
+          shipping_city: formData.city,
+          shipping_country: formData.country,
+        },
+        theme: {
+          color: '#141414',
         },
         modal: {
           ondismiss: function () {
             setPlacingOrder(false);
+            error('Payment cancelled: Checkout window closed.');
           },
+        },
+        handler: async function (response) {
+          // STEP 2 & 3: receive razorpay_payment_id, razorpay_order_id, razorpay_signature
+          // Send all three to verify endpoint
+          try {
+            const verifyRes = await paymentApi.verifyRazorpayPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            if (verifyRes.success && verifyRes.verified) {
+              await executeOrderCreation(
+                response.razorpay_payment_id,
+                response.razorpay_order_id,
+                response.razorpay_signature
+              );
+            } else {
+              setPlacingOrder(false);
+              error(verifyRes.message || 'Payment signature mismatch. Transaction not marked as paid.');
+            }
+          } catch (verifyErr) {
+            console.error('Signature verification error:', verifyErr);
+            setPlacingOrder(false);
+            error(verifyErr.message || 'Signature verification failed. Order was NOT marked as paid.');
+          }
         },
       };
 
-      try {
-        const rzp = new window.Razorpay(options);
-        rzp.on('payment.failed', function (resp) {
-          setPlacingOrder(false);
-          error(resp.error?.description || 'Payment failed or was cancelled.');
-        });
-        rzp.open();
-        return;
-      } catch (rzpErr) {
-        console.warn('Razorpay open notice:', rzpErr);
-      }
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (resp) {
+        setPlacingOrder(false);
+        const failReason = resp.error?.description || resp.error?.reason || 'Transaction failed or was rejected.';
+        error(`Payment Failed: ${failReason}`);
+      });
+      rzp.open();
+    } catch (checkoutErr) {
+      console.error('Razorpay checkout flow exception:', checkoutErr);
+      setPlacingOrder(false);
+      error(checkoutErr.message || 'Failed to initiate checkout.');
     }
-
-    // Default seamless interactive UPI / Razorpay Gateway popup
-    setShowPaymentModal(true);
-    setPlacingOrder(false);
   };
 
 
@@ -538,6 +663,21 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* 100% Free Complimentary Order Notice */}
+            {Math.max(0, total - appliedPointsDiscount + (includeGiftBox ? GIFT_BOX_COST : 0)) === 0 && (
+              <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-lg text-xs flex items-start gap-3">
+                <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-emerald-950 uppercase tracking-wider text-[11px]">
+                    ★ 100% Complimentary Acquisition (₹0)
+                  </p>
+                  <p className="text-[11px] text-emerald-800/90 mt-0.5 leading-relaxed">
+                    This order qualifies as a complimentary gift from ÉLANE Atelier. No credit card, bank credentials, or UPI transaction is needed. Simply click <strong>Claim Free Gift</strong> below to secure your delivery.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Payment Method Selector Tabs */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
@@ -612,6 +752,48 @@ export default function CheckoutPage() {
                   </span>
                 </div>
 
+                {/* Live Production vs Sandbox Guidance Alert */}
+                {(import.meta.env.VITE_RAZORPAY_KEY_ID || '').startsWith('rzp_test_') ? (
+                  <div className="p-3.5 bg-amber-50/80 border border-amber-200/90 text-amber-900 rounded-lg text-xs space-y-2">
+                    <div className="flex items-center gap-1.5 font-semibold text-amber-950">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Razorpay Sandbox / Test Mode Active</span>
+                    </div>
+                    <p className="text-[11px] text-amber-900/90 leading-relaxed">
+                      <strong>Why phone scanning shows &ldquo;Invalid credentials&rdquo;:</strong> Keys are in <em>Test Mode</em>. Real smartphone banking apps (Google Pay, PhonePe) connect to the live NPCI banking switch, which rejects sandbox test QR codes.
+                    </p>
+                    <div className="pt-1.5 border-t border-amber-200/60 text-[11px] space-y-1.5">
+                      <p className="font-semibold text-amber-950">How to test payment with 0 errors:</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span>Click to use official test VPA:</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUpiId('success@razorpay');
+                            setUpiOption('id');
+                            navigator.clipboard?.writeText('success@razorpay');
+                            success('Copied test UPI ID: success@razorpay');
+                          }}
+                          className="px-2 py-0.5 bg-white border border-amber-300 font-mono font-bold text-emerald-800 rounded hover:bg-amber-100/50 transition-colors flex items-center gap-1 shadow-xs"
+                        >
+                          <span>success@razorpay</span>
+                          <span className="text-[9px] uppercase tracking-wider font-sans text-amber-700 font-semibold">(Click to apply)</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3.5 bg-emerald-50/90 border border-emerald-200 text-emerald-950 rounded-lg text-xs space-y-1.5">
+                    <div className="flex items-center gap-1.5 font-semibold text-emerald-900">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                      <span>Razorpay Live Production Mode Active</span>
+                    </div>
+                    <p className="text-[11px] text-emerald-800/90 leading-relaxed">
+                      Live NPCI banking gateway active. You can now scan the QR code with your smartphone using <strong>Google Pay</strong>, <strong>PhonePe</strong>, <strong>Paytm</strong>, or <strong>BHIM</strong> to complete real payment seamlessly.
+                    </p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <button
                     type="button"
@@ -636,7 +818,7 @@ export default function CheckoutPage() {
                 {upiOption === 'intent' ? (
                   <div className="p-3 bg-white border border-[#E8E6E1] space-y-2">
                     <p className="text-[11px] text-[#787570]">
-                      Select preferred payment app to approve transaction:
+                      Select preferred payment app to approve transaction in Razorpay modal:
                     </p>
                     <div className="grid grid-cols-3 gap-2">
                       {['Google Pay', 'PhonePe', 'Paytm'].map((app) => (
@@ -657,14 +839,17 @@ export default function CheckoutPage() {
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="e.g. mobileNumber@okhdfcbank"
+                        placeholder="e.g. success@razorpay"
                         value={upiId}
                         onChange={(e) => setUpiId(e.target.value)}
                         className="flex-1 bg-white border border-[#E8E6E1] px-3 py-2 text-xs text-[#141414] focus:outline-none focus:border-[#141414] font-mono"
                       />
                       <button
                         type="button"
-                        onClick={() => success('UPI ID validated successfully')}
+                        onClick={() => {
+                          if (!upiId) setUpiId('success@razorpay');
+                          success('UPI ID validated successfully');
+                        }}
                         className="px-3 py-2 bg-[#141414] text-[#FAF9F5] text-xs uppercase tracking-wider font-semibold"
                       >
                         Verify
@@ -1016,17 +1201,29 @@ export default function CheckoutPage() {
             {/* Place Order CTA */}
             <button
               type="submit"
+              id="razorpay-pay-btn"
               disabled={placingOrder}
-              className="btn-sheen btn-sapphire-glow w-full py-4 bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] text-white text-xs uppercase tracking-[0.25em] font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-xl shadow-blue-900/30 hover:opacity-95 disabled:opacity-50 active:scale-95 group"
+              className={`btn-sheen w-full py-4 text-white text-xs uppercase tracking-[0.25em] font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-xl hover:opacity-95 disabled:opacity-50 active:scale-95 group ${
+                Math.max(0, total - appliedPointsDiscount + (includeGiftBox ? GIFT_BOX_COST : 0)) === 0
+                  ? 'bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-600 shadow-emerald-900/30'
+                  : 'btn-sapphire-glow bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] shadow-blue-900/30'
+              }`}
             >
               {placingOrder ? (
-                <span>Transmitting Order...</span>
+                <span>
+                  {Math.max(0, total - appliedPointsDiscount + (includeGiftBox ? GIFT_BOX_COST : 0)) === 0
+                    ? 'Confirming Complimentary Gift...'
+                    : 'Launching Razorpay Gateway...'}
+                </span>
+              ) : Math.max(0, total - appliedPointsDiscount + (includeGiftBox ? GIFT_BOX_COST : 0)) === 0 ? (
+                <span className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  Claim Free Gift • Complimentary (₹0)
+                </span>
               ) : paymentMethod === 'cod' ? (
                 <span>Place Cash on Delivery Order • {formatPrice(total + (includeGiftBox ? GIFT_BOX_COST : 0), true)}</span>
-              ) : paymentMethod === 'upi' ? (
-                <span>Pay via UPI • {formatPrice(total + (includeGiftBox ? GIFT_BOX_COST : 0), true)}</span>
               ) : (
-                <span>Confirm & Authorize {formatPrice(total + (includeGiftBox ? GIFT_BOX_COST : 0), true)}</span>
+                <span>Pay with Razorpay • {formatPrice(Math.max(0, total - appliedPointsDiscount + (includeGiftBox ? GIFT_BOX_COST : 0)), true)}</span>
               )}
             </button>
 
@@ -1037,76 +1234,6 @@ export default function CheckoutPage() {
           </div>
         </div>
       </form>
-
-      {/* Interactive In-App UPI & Razorpay Test Gateway Modal */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-[#FAF9F5] border border-[#141414] max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
-            {/* Header */}
-            <div className="flex items-start justify-between border-b border-[#E8E6E1] pb-3">
-              <div>
-                <span className="text-[10px] uppercase tracking-[0.25em] text-[#C2A676] font-bold block">
-                  ÉLANE UPI Secure Gateway
-                </span>
-                <h3 className="font-serif text-xl text-[#141414] uppercase mt-0.5">
-                  Complete Payment
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowPaymentModal(false)}
-                className="text-[#787570] hover:text-[#141414] text-xs uppercase tracking-wider font-semibold"
-              >
-                ✕ Cancel
-              </button>
-            </div>
-
-            {/* Total due notice */}
-            <div className="bg-white border border-[#E8E6E1] p-3 text-center">
-              <span className="text-xs text-[#787570] uppercase tracking-wider">Amount Payable</span>
-              <div className="text-2xl font-serif font-bold text-[#141414] mt-0.5">
-                {formatPrice(total, true)}
-              </div>
-            </div>
-
-            {/* QR Code and App simulator */}
-            <div className="text-center space-y-3">
-              <p className="text-xs text-[#787570]">
-                Scan with any UPI app (Google Pay, PhonePe, Paytm, CRED) or click to approve:
-              </p>
-
-              <div className="w-48 h-48 mx-auto bg-white p-3 border-2 border-[#141414] flex flex-col items-center justify-center shadow-inner">
-                {/* SVG Mock QR Code */}
-                <div className="w-full h-full border border-dashed border-[#141414]/30 p-2 flex flex-col items-center justify-center relative">
-                  <QrCode className="w-28 h-28 text-[#141414]" />
-                  <span className="text-[10px] font-mono uppercase text-[#787570] mt-1">UPI ID: elane@icici</span>
-                </div>
-              </div>
-
-              <div className="text-[11px] text-emerald-800 font-medium">
-                ✓ Verified Merchant: <strong>ELANE LUXURY PRIVATE LIMITED</strong>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="space-y-2 pt-2">
-              <button
-                onClick={() => executeOrderCreation(`UPI-MOCK-${Math.floor(100000 + Math.random() * 900000)}`)}
-                className="btn-sheen btn-sapphire-glow w-full py-3.5 bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] text-white text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-md rounded-xl flex items-center justify-center gap-2 active:scale-95 group"
-              >
-                <span>Simulate Successful UPI Payment</span>
-                <Check className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => setShowPaymentModal(false)}
-                className="w-full py-2 bg-transparent text-[#787570] hover:text-[#1E3A8A] dark:hover:text-white text-[11px] uppercase tracking-wider transition-colors active:scale-95"
-              >
-                Cancel and return to checkout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

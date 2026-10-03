@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Plus, Zap, Layers } from 'lucide-react';
+import { Heart, Plus, Zap, Layers, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -41,14 +41,14 @@ export default function ProductCard({ product }) {
 
   return (
     <div
-      className="group relative flex flex-col bg-transparent"
+      className="group relative flex flex-col bg-transparent rounded-2xl p-1.5 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#C2A676]/10"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image Container */}
+      {/* Image Container with Luxury Radius & Hairline Border */}
       <Link
         to={`/product/${product.slug || product.id}`}
-        className="relative w-full aspect-[3/4] bg-[#F3F1EC] overflow-hidden block"
+        className="relative w-full aspect-[3/4] bg-[#F3F1EC] dark:bg-[#1E293B] overflow-hidden block rounded-xl border border-black/5 dark:border-white/10 group-hover:border-[#C2A676]/50 transition-colors duration-500 shadow-xs"
       >
         {/* Primary Image */}
         <img
@@ -56,7 +56,7 @@ export default function ProductCard({ product }) {
           alt={product.name}
           loading="lazy"
           className={`w-full h-full object-cover object-center transition-all duration-700 ease-out ${
-            isHovered && product.images?.[1] ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
+            isHovered && product.images?.[1] ? 'opacity-0 scale-108' : 'opacity-100 scale-100'
           }`}
         />
 
@@ -67,18 +67,24 @@ export default function ProductCard({ product }) {
             alt={`${product.name} alternate view`}
             loading="lazy"
             className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out ${
-              isHovered ? 'opacity-100 scale-105' : 'opacity-0 scale-100'
+              isHovered ? 'opacity-100 scale-108' : 'opacity-0 scale-100'
             }`}
           />
         )}
 
         {/* Discount Badge & Lightning Deal Tag */}
-        {hasDiscount && (
+        {product.base_price === 0 ? (
           <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
-            <span className="bg-[#141414] text-[#FAF9F5] text-[10px] uppercase font-bold tracking-widest px-2 py-0.5">
+            <span className="bg-emerald-600 text-white text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-sm shadow-md animate-pulse">
+              ★ 100% FREE
+            </span>
+          </div>
+        ) : hasDiscount && (
+          <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
+            <span className="bg-[#141414] dark:bg-[#FAF9F5] text-[#FAF9F5] dark:text-[#141414] text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-xs shadow-md">
               -{discountPercent}%
             </span>
-            <span className="bg-[#C2A676] text-[#141414] text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 flex items-center gap-1 shadow-xs">
+            <span className="bg-[#C2A676] text-[#141414] text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 flex items-center gap-1 shadow-md rounded-xs">
               <Zap className="w-2.5 h-2.5 fill-[#141414]" />
               <span>Deal</span>
             </span>
@@ -89,7 +95,7 @@ export default function ProductCard({ product }) {
         <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
           <button
             onClick={handleWishlistToggle}
-            className={`p-2 bg-white/90 hover:bg-white backdrop-blur-xs text-[#1E293B] transition-all duration-300 shadow-xs hover:scale-115 active:scale-90 rounded-full ${
+            className={`p-2 bg-white/90 dark:bg-[#1E293B]/90 hover:bg-white dark:hover:bg-[#1E293B] backdrop-blur-md text-[#1E293B] dark:text-white transition-all duration-300 shadow-md hover:scale-115 active:scale-90 rounded-full border border-black/5 dark:border-white/10 ${
               isLiked ? 'heart-pop' : ''
             }`}
             aria-label={isLiked ? 'Remove from wishlist' : 'Add to wishlist'}
@@ -97,7 +103,7 @@ export default function ProductCard({ product }) {
           >
             <Heart
               className={`w-4 h-4 transition-colors duration-300 ${
-                isLiked ? 'fill-[#E11D48] text-[#E11D48]' : 'text-[#1E293B] hover:text-[#E11D48] stroke-[1.5]'
+                isLiked ? 'fill-[#E11D48] text-[#E11D48]' : 'text-[#1E293B] dark:text-white hover:text-[#E11D48] stroke-[1.5]'
               }`}
             />
           </button>
@@ -112,10 +118,10 @@ export default function ProductCard({ product }) {
                 addToCompare(product);
               }
             }}
-            className={`p-2 backdrop-blur-xs transition-all duration-300 shadow-xs hover:scale-115 active:scale-90 rounded-full ${
+            className={`p-2 backdrop-blur-md transition-all duration-300 shadow-md hover:scale-115 active:scale-90 rounded-full border border-black/5 dark:border-white/10 ${
               isInCompare(product.id)
-                ? 'bg-[#1E3A8A] text-[#FCD34D]'
-                : 'bg-white/90 hover:bg-white text-[#1E293B] hover:text-[#1E3A8A]'
+                ? 'bg-[#1E3A8A] text-[#FCD34D] border-[#FCD34D]/40'
+                : 'bg-white/90 dark:bg-[#1E293B]/90 hover:bg-white text-[#1E293B] dark:text-white hover:text-[#1E3A8A]'
             }`}
             aria-label="Compare garment silhouette"
             title={isInCompare(product.id) ? 'Remove from Comparison' : 'Compare Silhouette & Fabric'}
@@ -129,7 +135,7 @@ export default function ProductCard({ product }) {
           <button
             onClick={handleQuickAdd}
             disabled={quickAddLoading}
-            className="w-full py-2.5 bg-[#FAF8F5]/95 hover:bg-[#1D4ED8] hover:text-white text-[#192238] text-[11px] uppercase tracking-[0.2em] font-bold backdrop-blur-md shadow-lg transition-all duration-200 flex items-center justify-center gap-1.5 rounded-xl btn-sheen group/btn active:scale-95"
+            className="w-full py-2.5 bg-[#FAF8F5]/95 dark:bg-[#1E293B]/95 hover:bg-[#1D4ED8] hover:text-white dark:hover:bg-[#C2A676] dark:hover:text-[#141414] text-[#192238] dark:text-[#FAF9F5] text-[11px] uppercase tracking-[0.2em] font-bold backdrop-blur-md shadow-lg transition-all duration-200 flex items-center justify-center gap-1.5 rounded-xl btn-sheen group/btn active:scale-95 border border-black/5 dark:border-white/10"
           >
             <Plus className="w-3.5 h-3.5 group-hover/btn:rotate-90 transition-transform duration-300" />
             <span>{quickAddLoading ? (t.addingToBag || 'Adding...') : (t.quickAdd || 'Quick Add')}</span>
@@ -138,21 +144,25 @@ export default function ProductCard({ product }) {
       </Link>
 
       {/* Product Details */}
-      <div className="pt-3.5 pb-2 flex flex-col flex-1">
-        <span className="text-[11px] uppercase tracking-[0.2em] text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
+      <div className="pt-3 pb-1 flex flex-col flex-1 px-1">
+        <span className="text-[10px] uppercase tracking-[0.22em] text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
           {product.categoryName || 'Élane Essential'}
         </span>
 
         <Link
           to={`/product/${product.slug || product.id}`}
-          className="font-serif text-base font-normal text-[#192238] dark:text-[#F8FAFC] hover:text-[#D97706] dark:hover:text-[#FCD34D] transition-colors leading-snug line-clamp-1"
+          className="font-serif text-base font-medium text-[#192238] dark:text-[#F8FAFC] hover:text-[#C2A676] dark:hover:text-[#C2A676] transition-colors leading-snug line-clamp-1"
         >
           {product.name}
         </Link>
 
         {/* Price and Material */}
-        <div className="mt-2 flex items-baseline gap-2">
-          {hasDiscount ? (
+        <div className="mt-1.5 flex items-baseline gap-2">
+          {product.base_price === 0 ? (
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700/60 px-2 py-0.5 rounded-sm uppercase tracking-wider font-mono">
+              FREE • COMPLIMENTARY
+            </span>
+          ) : hasDiscount ? (
             <>
               <span className="text-sm font-semibold text-[#192238] dark:text-[#F8FAFC]">{formatPrice(product.sale_price)}</span>
               <span className="text-xs text-[#94A3B8] line-through font-normal">
@@ -164,7 +174,7 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        {/* ÉLANE Privilege Next-Day Delivery Badge (Amazon Prime style) */}
+        {/* ÉLANE Privilege Next-Day Delivery Badge */}
         {(product.is_featured || product.id === 'prod-1' || product.id === 'prod-2' || product.id === 'prod-3' || product.id === 'prod-5' || product.id === 'prod-7') && (
           <div className="mt-1.5 flex items-center gap-1 text-[10px] font-semibold text-[#192238] dark:text-[#F8FAFC]">
             <span className="bg-[#1E294B] border border-[#384A78] text-[#FCD34D] px-1.5 py-0.5 uppercase tracking-wider flex items-center gap-1 font-mono text-[9px] rounded-xs shadow-xs">
@@ -183,12 +193,12 @@ export default function ProductCard({ product }) {
               .map((hex, i) => (
                 <span
                   key={i}
-                  className="w-2.5 h-2.5 rounded-full border border-black/10 inline-block shadow-2xs"
+                  className="w-2.5 h-2.5 rounded-full border border-black/10 dark:border-white/20 inline-block shadow-2xs transition-transform hover:scale-125"
                   style={{ backgroundColor: hex }}
                 />
               ))}
             {product.variants.length > 4 && (
-              <span className="text-[10px] text-[#787570] tracking-tight">
+              <span className="text-[10px] text-[#787570] dark:text-[#94A3B8] tracking-tight">
                 +{product.variants.length - 4}
               </span>
             )}

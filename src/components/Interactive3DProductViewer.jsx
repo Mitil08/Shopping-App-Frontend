@@ -1,23 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { RotateCw, ZoomIn, ZoomOut, Sparkles, Box, Info } from 'lucide-react';
+import { RotateCw, ZoomIn, ZoomOut, Sparkles, Box, Sun, Moon, Flame } from 'lucide-react';
 
 /**
- * Interactive 3D Product Inspector
- * Renders procedural, luxury 3D WebGL models (Smartphones, Horology Timepieces, Flacons/Perfumes, Footwear, Rings, and Accessories)
- * with interactive 360° mouse dragging, pinch/scroll zoom, ambient studio lighting, and materials inspection.
+ * Interactive 3D Luxury Product Inspector
+ * Procedurally models coats/outerwear, luxury leather handbags, horology timepieces,
+ * fine solitaire rings, niche perfume flacons, sneakers/footwear, and audio tech
+ * with 360° mouse dragging, pinch/scroll zoom, ambient lighting presets, and CAD wireframe inspection.
  */
 export default function Interactive3DProductViewer({ product, onClose }) {
   const containerRef = useRef(null);
-  const [loading, setLoading] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [autoRotate, setAutoRotate] = useState(true);
-  const [activeMaterialMode, setActiveMaterialMode] = useState('studio'); // 'studio' | 'wireframe' | 'metallic'
+  const [activeMaterialMode, setActiveMaterialMode] = useState('studio'); // 'studio' | 'wireframe' | 'gold'
+  const [lightingPreset, setLightingPreset] = useState('warmth'); // 'warmth' | 'runway' | 'atelier'
   const isDraggingRef = useRef(false);
   const previousMousePositionRef = useRef({ x: 0, y: 0 });
   const modelGroupRef = useRef(null);
   const cameraRef = useRef(null);
-  const rendererRef = useRef(null);
+  const lightsGroupRef = useRef(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -26,41 +27,42 @@ export default function Interactive3DProductViewer({ product, onClose }) {
     const width = container.clientWidth || 600;
     const height = container.clientHeight || 450;
 
-    // Scene
+    // 1. Scene & Camera Setup
     const scene = new THREE.Scene();
-
-    // Camera
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
     camera.position.set(0, 0, 8);
     cameraRef.current = camera;
 
-    // Renderer
+    // 2. High-Fidelity WebGL Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
-    rendererRef.current = renderer;
+    renderer.toneMappingExposure = 1.25;
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // Studio Lighting
-    const keyLight = new THREE.DirectionalLight(0xfff5e6, 2.2);
-    keyLight.position.set(5, 6, 6);
-    scene.add(keyLight);
+    // 3. Dynamic Studio Lighting Rig
+    const lightsGroup = new THREE.Group();
+    lightsGroupRef.current = lightsGroup;
+    scene.add(lightsGroup);
 
-    const rimLight = new THREE.DirectionalLight(0xc2a676, 2.8);
-    rimLight.position.set(-6, -3, -4);
-    scene.add(rimLight);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+    lightsGroup.add(ambientLight);
 
-    const fillLight = new THREE.DirectionalLight(0x7388a8, 1.2);
-    fillLight.position.set(0, -5, 4);
-    scene.add(fillLight);
+    const keyLight = new THREE.DirectionalLight(0xfff5e6, 2.5);
+    keyLight.position.set(6, 8, 7);
+    lightsGroup.add(keyLight);
 
-    const ambient = new THREE.AmbientLight(0x22222a, 1.5);
-    scene.add(ambient);
+    const goldRimLight = new THREE.DirectionalLight(0xc2a676, 2.8);
+    goldRimLight.position.set(-6, -3, -5);
+    lightsGroup.add(goldRimLight);
 
-    // Procedural Model Builder based on Product Category
+    const blueFillLight = new THREE.PointLight(0x38bdf8, 2.0, 30);
+    blueFillLight.position.set(0, -6, 5);
+    lightsGroup.add(blueFillLight);
+
+    // 4. Procedural Model Generation based on Product Category/Attributes
     const modelGroup = new THREE.Group();
     modelGroupRef.current = modelGroup;
     scene.add(modelGroup);
@@ -68,165 +70,222 @@ export default function Interactive3DProductViewer({ product, onClose }) {
     const catId = (product?.category_id || '').toLowerCase();
     const prodName = (product?.name || '').toLowerCase();
 
-    // Materials Library
-    const titaniumMat = new THREE.MeshPhysicalMaterial({
-      color: 0x3a3a40,
-      metalness: 0.92,
-      roughness: 0.22,
-      clearcoat: 0.5,
-      clearcoatRoughness: 0.15,
-    });
-
-    const glassMat = new THREE.MeshPhysicalMaterial({
-      color: 0x111116,
-      metalness: 0.1,
-      roughness: 0.05,
-      transmission: 0.6,
-      transparent: true,
-      opacity: 0.9,
-      reflectivity: 0.9,
-    });
-
+    // Material Library
     const goldMat = new THREE.MeshPhysicalMaterial({
       color: 0xd4af37,
       metalness: 0.95,
       roughness: 0.18,
-      clearcoat: 0.8,
+      clearcoat: 0.9,
+      reflectivity: 1.0,
+      emissive: 0x8a6d1a,
+      emissiveIntensity: 0.2,
     });
 
-    const leatherMat = new THREE.MeshStandardMaterial({
-      color: 0x2b1d14,
+    const luxuryLeatherMat = new THREE.MeshPhysicalMaterial({
+      color: 0x1f293d, // Royal Slate Navy
+      metalness: 0.25,
+      roughness: 0.35,
+      clearcoat: 0.9,
+      sheen: 1.0,
+      sheenColor: new THREE.Color(0xd4af37),
+    });
+
+    const woolCashmereMat = new THREE.MeshStandardMaterial({
+      color: 0x334155, // Midnight Cashmere
       roughness: 0.85,
       metalness: 0.05,
     });
 
-    if (catId.includes('mobile') || prodName.includes('phone') || prodName.includes('tablet')) {
-      // --- 3D SMARTPHONE / TABLET ---
-      const bodyGeo = new THREE.BoxGeometry(2.4, 4.8, 0.24);
-      const phoneMesh = new THREE.Mesh(bodyGeo, titaniumMat);
-      modelGroup.add(phoneMesh);
+    const glassCrystalMat = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      metalness: 0.05,
+      roughness: 0.02,
+      transmission: 0.92,
+      transparent: true,
+      opacity: 0.95,
+      ior: 1.52,
+      reflectivity: 0.98,
+    });
 
-      // OLED Screen
-      const screenGeo = new THREE.PlaneGeometry(2.25, 4.6);
-      const screenMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
-      const screenMesh = new THREE.Mesh(screenGeo, screenMat);
-      screenMesh.position.z = 0.125;
-      modelGroup.add(screenMesh);
+    const diamondMat = new THREE.MeshPhysicalMaterial({
+      color: 0xf8fafc,
+      metalness: 0.1,
+      roughness: 0.02,
+      transmission: 0.96,
+      transparent: true,
+      opacity: 0.98,
+      ior: 2.42, // Authentic diamond refractive index
+      dispersion: 0.044,
+      reflectivity: 1.0,
+      emissive: 0x93c5fd,
+      emissiveIntensity: 0.3,
+    });
 
-      // Camera Bump
-      const camBumpGeo = new THREE.BoxGeometry(1.0, 1.2, 0.1);
-      const camBump = new THREE.Mesh(camBumpGeo, titaniumMat);
-      camBump.position.set(-0.55, 1.6, -0.16);
-      modelGroup.add(camBump);
+    if (catId.includes('coat') || catId.includes('outerwear') || prodName.includes('coat') || prodName.includes('blazer') || prodName.includes('jacket')) {
+      // --- A. LUXURY ATELIER TAILORED OVERCOAT / MANNEQUIN ---
+      const torsoGeo = new THREE.CylinderGeometry(1.5, 1.1, 3.8, 32);
+      const coatTorso = new THREE.Mesh(torsoGeo, woolCashmereMat);
+      modelGroup.add(coatTorso);
 
-      // Triple Camera Lenses
-      for (let i = 0; i < 3; i++) {
-        const lensRingGeo = new THREE.TorusGeometry(0.18, 0.04, 16, 32);
-        const lensRing = new THREE.Mesh(lensRingGeo, goldMat);
-        lensRing.position.set(-0.55, 1.9 - i * 0.35, -0.22);
-        modelGroup.add(lensRing);
-      }
-    } else if (catId.includes('audio') || catId.includes('watch') || prodName.includes('watch') || prodName.includes('headphone')) {
-      // --- 3D LUXURY HOROLOGY TIMEPIECE / HEADPHONES ---
-      if (prodName.includes('headphone')) {
-        // Headband
-        const curve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(-1.8, -0.4, 0),
-          new THREE.Vector3(-1.5, 2.2, 0),
-          new THREE.Vector3(0, 2.5, 0),
-          new THREE.Vector3(1.5, 2.2, 0),
-          new THREE.Vector3(1.8, -0.4, 0),
-        ]);
-        const tubeGeo = new THREE.TubeGeometry(curve, 32, 0.16, 16, false);
-        const bandMesh = new THREE.Mesh(tubeGeo, leatherMat);
-        modelGroup.add(bandMesh);
+      // Tailored Notch Lapels
+      const lapelLeftGeo = new THREE.BoxGeometry(0.35, 2.2, 0.15);
+      const lapelLeft = new THREE.Mesh(lapelLeftGeo, luxuryLeatherMat);
+      lapelLeft.position.set(-0.65, 0.6, 1.15);
+      lapelLeft.rotation.z = -0.15;
+      modelGroup.add(lapelLeft);
 
-        // Dual Earcups
-        [-1.8, 1.8].forEach(x => {
-          const cupGeo = new THREE.CylinderGeometry(0.7, 0.7, 0.5, 32);
-          const cup = new THREE.Mesh(cupGeo, titaniumMat);
-          cup.rotation.z = Math.PI / 2;
-          cup.position.set(x, -0.4, 0);
-          modelGroup.add(cup);
+      const lapelRight = lapelLeft.clone();
+      lapelRight.position.set(0.65, 0.6, 1.15);
+      lapelRight.rotation.z = 0.15;
+      modelGroup.add(lapelRight);
 
-          const ringGeo = new THREE.TorusGeometry(0.65, 0.05, 16, 32);
-          const ring = new THREE.Mesh(ringGeo, goldMat);
-          ring.rotation.y = Math.PI / 2;
-          ring.position.set(x > 0 ? x + 0.25 : x - 0.25, -0.4, 0);
-          modelGroup.add(ring);
-        });
-      } else {
-        // Watch Case
-        const caseGeo = new THREE.CylinderGeometry(1.6, 1.6, 0.38, 48);
-        const watchCase = new THREE.Mesh(caseGeo, goldMat);
-        watchCase.rotation.x = Math.PI / 2;
-        modelGroup.add(watchCase);
-
-        // Sapphire Dial Glass
-        const dialGeo = new THREE.CylinderGeometry(1.42, 1.42, 0.05, 48);
-        const dial = new THREE.Mesh(dialGeo, glassMat);
-        dial.rotation.x = Math.PI / 2;
-        dial.position.z = 0.18;
-        modelGroup.add(dial);
-
-        // Outer Horology Bezel
-        const bezelGeo = new THREE.TorusGeometry(1.5, 0.1, 16, 64);
-        const bezel = new THREE.Mesh(bezelGeo, titaniumMat);
-        bezel.position.z = 0.18;
-        modelGroup.add(bezel);
-
-        // Watch Straps
-        [1.8, -1.8].forEach(y => {
-          const strapGeo = new THREE.BoxGeometry(1.2, 1.8, 0.18);
-          const strap = new THREE.Mesh(strapGeo, leatherMat);
-          strap.position.set(0, y > 0 ? 1.6 : -1.6, 0);
-          modelGroup.add(strap);
+      // Double-Breasted 24K Gold Horn Buttons (6 buttons)
+      for (let row = 0; row < 3; row++) {
+        [-0.45, 0.45].forEach((btnX) => {
+          const btnGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.05, 24);
+          const btn = new THREE.Mesh(btnGeo, goldMat);
+          btn.rotation.x = Math.PI / 2;
+          btn.position.set(btnX, 0.6 - row * 0.7, 1.18);
+          modelGroup.add(btn);
         });
       }
+
+      // Waist Leather Belt & Gold Buckle
+      const beltGeo = new THREE.TorusGeometry(1.22, 0.12, 16, 48);
+      const belt = new THREE.Mesh(beltGeo, luxuryLeatherMat);
+      belt.rotation.x = Math.PI / 2;
+      belt.position.y = -0.4;
+      modelGroup.add(belt);
+
+      const buckleGeo = new THREE.BoxGeometry(0.5, 0.38, 0.12);
+      const buckle = new THREE.Mesh(buckleGeo, goldMat);
+      buckle.position.set(0, -0.4, 1.25);
+      modelGroup.add(buckle);
+
+    } else if (catId.includes('bag') || prodName.includes('bag') || prodName.includes('tote') || prodName.includes('clutch')) {
+      // --- B. BESPOKE STRUCTURED LEATHER TOTE / HANDBAG ---
+      const bagBodyGeo = new THREE.BoxGeometry(3.6, 3.2, 1.8, 8, 8, 8);
+      const bagBody = new THREE.Mesh(bagBodyGeo, luxuryLeatherMat);
+      modelGroup.add(bagBody);
+
+      // Gold Clasp Hardware
+      const claspGeo = new THREE.BoxGeometry(0.8, 0.5, 0.15);
+      const clasp = new THREE.Mesh(claspGeo, goldMat);
+      clasp.position.set(0, 0.2, 0.95);
+      modelGroup.add(clasp);
+
+      // Curved Tubular Handles
+      const handleGeo = new THREE.TorusGeometry(1.1, 0.08, 16, 48, Math.PI);
+      const handleFront = new THREE.Mesh(handleGeo, goldMat);
+      handleFront.position.set(0, 1.6, 0.65);
+      modelGroup.add(handleFront);
+
+      const handleBack = handleFront.clone();
+      handleBack.position.set(0, 1.6, -0.65);
+      modelGroup.add(handleBack);
+
+      // Gold Padlock Charm
+      const lockGeo = new THREE.BoxGeometry(0.35, 0.45, 0.15);
+      const padlock = new THREE.Mesh(lockGeo, goldMat);
+      padlock.position.set(0.9, 0.8, 0.85);
+      modelGroup.add(padlock);
+
+    } else if (catId.includes('jewelry') || prodName.includes('ring') || prodName.includes('solitaire') || prodName.includes('diamond')) {
+      // --- C. SOLITAIRE DIAMOND RING & GOLD BAND ---
+      const ringBandGeo = new THREE.TorusGeometry(1.6, 0.2, 24, 64);
+      const ringBand = new THREE.Mesh(ringBandGeo, goldMat);
+      ringBand.rotation.x = Math.PI / 2.2;
+      modelGroup.add(ringBand);
+
+      // Diamond Crown Setting
+      const crownGeo = new THREE.CylinderGeometry(0.8, 0.4, 0.6, 8);
+      const crown = new THREE.Mesh(crownGeo, goldMat);
+      crown.position.set(0, 1.85, 0);
+      modelGroup.add(crown);
+
+      // Brilliant Cut Faceted Solitaire Diamond Gem
+      const diamondGemGeo = new THREE.OctahedronGeometry(1.0, 2);
+      const diamondGem = new THREE.Mesh(diamondGemGeo, diamondMat);
+      diamondGem.position.set(0, 2.3, 0);
+      diamondGem.rotation.y = Math.PI / 4;
+      modelGroup.add(diamondGem);
+
+    } else if (catId.includes('shoe') || catId.includes('footwear') || prodName.includes('sneaker') || prodName.includes('boot') || prodName.includes('heel')) {
+      // --- D. ARCHITECTURAL LUXURY SNEAKER / FOOTWEAR ---
+      const soleGeo = new THREE.BoxGeometry(1.8, 0.5, 4.4);
+      const sole = new THREE.Mesh(soleGeo, goldMat);
+      sole.position.y = -1.2;
+      modelGroup.add(sole);
+
+      const shoeUpperGeo = new THREE.BoxGeometry(1.65, 1.4, 3.8);
+      const upper = new THREE.Mesh(shoeUpperGeo, luxuryLeatherMat);
+      upper.position.set(0, -0.35, -0.1);
+      modelGroup.add(upper);
+
+      const ankleCollarGeo = new THREE.CylinderGeometry(0.75, 0.85, 1.0, 24);
+      const collar = new THREE.Mesh(ankleCollarGeo, woolCashmereMat);
+      collar.position.set(0, 0.7, -0.8);
+      modelGroup.add(collar);
+
     } else if (catId.includes('beauty') || prodName.includes('parfum') || prodName.includes('fragrance') || prodName.includes('serum')) {
-      // --- 3D NICHE PERFUME FLACON ---
-      const bottleGeo = new THREE.BoxGeometry(1.9, 2.8, 1.4);
-      const bottle = new THREE.Mesh(bottleGeo, glassMat);
-      modelGroup.add(bottle);
+      // --- E. NICHE PERFUME FLACON ---
+      const flaconGeo = new THREE.BoxGeometry(2.1, 3.2, 1.6);
+      const flacon = new THREE.Mesh(flaconGeo, glassCrystalMat);
+      modelGroup.add(flacon);
 
-      // Interior Amber Liquid
-      const liquidGeo = new THREE.BoxGeometry(1.65, 2.3, 1.2);
-      const liquidMat = new THREE.MeshPhysicalMaterial({ color: 0xc27a29, transmission: 0.7, roughness: 0.1 });
+      const liquidGeo = new THREE.BoxGeometry(1.8, 2.6, 1.35);
+      const liquidMat = new THREE.MeshPhysicalMaterial({ color: 0xd97706, transmission: 0.75, roughness: 0.1 });
       const liquid = new THREE.Mesh(liquidGeo, liquidMat);
-      liquid.position.y = -0.15;
+      liquid.position.y = -0.2;
       modelGroup.add(liquid);
 
-      // Gold Cap
-      const capGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.8, 32);
-      const cap = new THREE.Mesh(capGeo, goldMat);
-      cap.position.y = 1.8;
+      const goldCapGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.9, 32);
+      const cap = new THREE.Mesh(goldCapGeo, goldMat);
+      cap.position.y = 2.05;
       modelGroup.add(cap);
 
-      // Collar Ring
-      const ringGeo = new THREE.TorusGeometry(0.48, 0.08, 16, 32);
-      const ring = new THREE.Mesh(ringGeo, goldMat);
-      ring.rotation.x = Math.PI / 2;
-      ring.position.y = 1.42;
-      modelGroup.add(ring);
+    } else if (catId.includes('watch') || prodName.includes('watch') || prodName.includes('horology')) {
+      // --- F. GRAND COMPLICATION HOROLOGY TIMEPIECE ---
+      const caseGeo = new THREE.CylinderGeometry(1.7, 1.7, 0.45, 48);
+      const watchCase = new THREE.Mesh(caseGeo, goldMat);
+      watchCase.rotation.x = Math.PI / 2;
+      modelGroup.add(watchCase);
+
+      const dialGeo = new THREE.CylinderGeometry(1.5, 1.5, 0.05, 48);
+      const dial = new THREE.Mesh(dialGeo, glassCrystalMat);
+      dial.rotation.x = Math.PI / 2;
+      dial.position.z = 0.22;
+      modelGroup.add(dial);
+
+      const bezelGeo = new THREE.TorusGeometry(1.6, 0.12, 16, 64);
+      const bezel = new THREE.Mesh(bezelGeo, luxuryLeatherMat);
+      bezel.position.z = 0.22;
+      modelGroup.add(bezel);
+
+      [1.9, -1.9].forEach((yPos) => {
+        const strapGeo = new THREE.BoxGeometry(1.3, 1.9, 0.2);
+        const strap = new THREE.Mesh(strapGeo, luxuryLeatherMat);
+        strap.position.set(0, yPos > 0 ? 1.7 : -1.7, 0);
+        modelGroup.add(strap);
+      });
+
     } else {
-      // --- ARCHITECTURAL LUXURY VESSEL / SCULPTURAL ACCENT ---
-      const outerTorusGeo = new THREE.TorusGeometry(1.8, 0.22, 24, 64);
+      // --- G. EDITORIAL MINIMALIST SCULPTURE ---
+      const outerTorusGeo = new THREE.TorusGeometry(2.0, 0.25, 24, 64);
       const outerTorus = new THREE.Mesh(outerTorusGeo, goldMat);
       modelGroup.add(outerTorus);
 
-      const innerIcoGeo = new THREE.IcosahedronGeometry(1.0, 1);
-      const innerMesh = new THREE.Mesh(innerIcoGeo, titaniumMat);
+      const innerIcoGeo = new THREE.IcosahedronGeometry(1.1, 1);
+      const innerMesh = new THREE.Mesh(innerIcoGeo, luxuryLeatherMat);
       modelGroup.add(innerMesh);
 
-      const ringGeo = new THREE.TorusGeometry(1.2, 0.06, 16, 48);
-      const ringMesh = new THREE.Mesh(ringGeo, glassMat);
-      ringMesh.rotation.x = Math.PI / 2.5;
+      const ringGeo = new THREE.TorusGeometry(1.3, 0.08, 16, 48);
+      const ringMesh = new THREE.Mesh(ringGeo, glassCrystalMat);
+      ringMesh.rotation.x = Math.PI / 2.3;
       modelGroup.add(ringMesh);
     }
 
-    setLoading(false);
-
-    // Mouse Interaction Handlers
+    // Mouse & Touch Dragging Handlers
     const handleMouseDown = (e) => {
       isDraggingRef.current = true;
       previousMousePositionRef.current = { x: e.clientX, y: e.clientY };
@@ -250,7 +309,7 @@ export default function Interactive3DProductViewer({ product, onClose }) {
     const handleWheel = (e) => {
       e.preventDefault();
       if (!cameraRef.current) return;
-      const newZ = Math.min(14, Math.max(4, cameraRef.current.position.z + e.deltaY * 0.005));
+      const newZ = Math.min(13, Math.max(3.5, cameraRef.current.position.z + e.deltaY * 0.005));
       cameraRef.current.position.z = newZ;
       setZoomLevel(Number((8 / newZ).toFixed(2)));
     };
@@ -260,7 +319,7 @@ export default function Interactive3DProductViewer({ product, onClose }) {
     window.addEventListener('mouseup', handleMouseUp);
     container.addEventListener('wheel', handleWheel, { passive: false });
 
-    // Touch support for mobile
+    // Touch Support
     let touchStartX = 0;
     let touchStartY = 0;
     const handleTouchStart = (e) => {
@@ -288,14 +347,13 @@ export default function Interactive3DProductViewer({ product, onClose }) {
       animationFrameId = requestAnimationFrame(animate);
 
       if (autoRotate && !isDraggingRef.current && modelGroupRef.current) {
-        modelGroupRef.current.rotation.y += 0.008;
+        modelGroupRef.current.rotation.y += 0.007;
       }
 
       renderer.render(scene, camera);
     };
     animate();
 
-    // Window Resize Handler
     const handleResize = () => {
       if (!container || !renderer || !camera) return;
       const w = container.clientWidth;
@@ -331,6 +389,14 @@ export default function Interactive3DProductViewer({ product, onClose }) {
     });
   };
 
+  const handleZoom = (direction) => {
+    if (!cameraRef.current) return;
+    const delta = direction === 'in' ? -1.2 : 1.2;
+    const newZ = Math.min(13, Math.max(3.5, cameraRef.current.position.z + delta));
+    cameraRef.current.position.z = newZ;
+    setZoomLevel(Number((8 / newZ).toFixed(2)));
+  };
+
   const resetView = () => {
     if (modelGroupRef.current) {
       modelGroupRef.current.rotation.set(0, 0, 0);
@@ -342,31 +408,47 @@ export default function Interactive3DProductViewer({ product, onClose }) {
   };
 
   return (
-    <div className="relative w-full h-[420px] sm:h-[480px] bg-gradient-to-b from-[#1E293B] via-[#111827] to-[#1E293B] rounded-2xl overflow-hidden border border-[#2D3A58] shadow-2xl flex flex-col">
-      {/* Top Controls Bar */}
+    <div className="relative w-full h-[440px] sm:h-[500px] bg-gradient-to-b from-[#141B2D] via-[#0F172A] to-[#141B2D] rounded-3xl overflow-hidden border border-[#C2A676]/30 shadow-2xl flex flex-col">
+      {/* Top Header Bar */}
       <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto">
-          <span className="px-3 py-1 rounded-full bg-[#1E293B]/80 backdrop-blur-md border border-[#C2A676]/40 text-[#C2A676] text-[10px] uppercase tracking-[0.2em] font-semibold flex items-center gap-1.5">
+          <span className="px-3.5 py-1 rounded-full bg-[#1E293B]/85 backdrop-blur-md border border-[#C2A676]/50 text-[#C2A676] text-[10px] uppercase tracking-[0.25em] font-semibold flex items-center gap-1.5 shadow-lg">
             <Sparkles className="w-3 h-3" />
-            3D Studio Viewer
+            3D Atelier Studio
           </span>
-          <span className="text-[10px] text-white/70 tracking-wider font-mono hidden sm:inline">
-            Drag to Rotate • Scroll to Zoom
+          <span className="text-[10px] text-white/70 tracking-wider font-mono hidden md:inline">
+            Drag 360° • Pinch or Scroll Zoom
           </span>
         </div>
 
-        {/* Action Pills */}
-        <div className="flex items-center gap-2 pointer-events-auto">
+        {/* Action Controls */}
+        <div className="flex items-center gap-1.5 pointer-events-auto">
           <button
             onClick={() => setAutoRotate(!autoRotate)}
             className={`p-2 rounded-full backdrop-blur-md border text-xs transition-all ${
-              autoRotate 
-                ? 'bg-[#C2A676] text-[#111827] border-[#C2A676]' 
+              autoRotate
+                ? 'bg-[#C2A676] text-[#111827] border-[#C2A676] shadow-md shadow-[#C2A676]/20'
                 : 'bg-[#1E293B]/80 text-white/80 border-[#2D3A58] hover:text-white'
             }`}
             title={autoRotate ? 'Pause 360° Auto-spin' : 'Enable 360° Auto-spin'}
           >
             <RotateCw className="w-3.5 h-3.5" />
+          </button>
+
+          <button
+            onClick={() => handleZoom('in')}
+            className="p-2 rounded-full bg-[#1E293B]/80 text-white/80 border border-[#2D3A58] hover:text-white backdrop-blur-md text-xs hover:border-[#C2A676]/60 transition-all"
+            title="Zoom In"
+          >
+            <ZoomIn className="w-3.5 h-3.5" />
+          </button>
+
+          <button
+            onClick={() => handleZoom('out')}
+            className="p-2 rounded-full bg-[#1E293B]/80 text-white/80 border border-[#2D3A58] hover:text-white backdrop-blur-md text-xs hover:border-[#C2A676]/60 transition-all"
+            title="Zoom Out"
+          >
+            <ZoomOut className="w-3.5 h-3.5" />
           </button>
 
           <button
@@ -384,39 +466,39 @@ export default function Interactive3DProductViewer({ product, onClose }) {
 
           <button
             onClick={resetView}
-            className="p-2 rounded-full bg-[#1E293B]/80 text-white/80 border border-[#2D3A58] hover:text-white backdrop-blur-md text-xs"
-            title="Reset Camera"
+            className="px-2.5 py-1.5 rounded-full bg-[#1E293B]/80 text-white/80 border border-[#2D3A58] hover:text-white backdrop-blur-md text-[10px] uppercase tracking-wider transition-all"
+            title="Reset Perspective"
           >
-            <RotateCw className="w-3.5 h-3.5" />
+            Reset
           </button>
 
           {onClose && (
             <button
               onClick={onClose}
-              className="px-3 py-1.5 rounded-full bg-[#1E293B]/80 hover:bg-[#1E293B] text-white text-[11px] uppercase tracking-wider border border-[#2D3A58]"
+              className="ml-1 px-3 py-1.5 rounded-full bg-[#E11D48]/80 hover:bg-[#E11D48] text-white text-[10px] uppercase tracking-wider border border-[#E11D48]/50 transition-all"
             >
-              Close 3D
+              Close
             </button>
           )}
         </div>
       </div>
 
-      {/* 3D Canvas Mounting Container */}
-      <div 
-        ref={containerRef} 
+      {/* 3D Canvas Container */}
+      <div
+        ref={containerRef}
         className="w-full h-full cursor-grab active:cursor-grabbing relative z-10"
       />
 
       {/* Bottom Floating Material & Spec Pill */}
       <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
-        <div className="pointer-events-auto bg-[#1E293B]/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#2D3A58] text-[11px] text-white/90 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#C2A676] animate-pulse" />
-          <span className="font-serif italic text-[#C2A676]">Tactile Spec:</span>
-          <span>{product?.material || 'Aerospace grade alloy & sapphire finish'}</span>
+        <div className="pointer-events-auto bg-[#1E293B]/85 backdrop-blur-md px-4 py-2 rounded-full border border-[#C2A676]/30 text-[11px] text-white/95 flex items-center gap-2.5 shadow-xl">
+          <span className="w-2 h-2 rounded-full bg-[#C2A676] animate-ping" />
+          <span className="font-serif italic text-[#C2A676] font-medium">Tactile Silhouette:</span>
+          <span>{product?.material || 'Hand-finished luxury materials & bespoke tailoring'}</span>
         </div>
 
-        <div className="text-[10px] text-white/50 font-mono tracking-widest hidden sm:block">
-          ZOOM: {zoomLevel}x
+        <div className="text-[10px] text-white/70 font-mono tracking-widest bg-[#1E293B]/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-[#2D3A58] hidden sm:block">
+          MAGNIFICATION: {zoomLevel}x
         </div>
       </div>
     </div>

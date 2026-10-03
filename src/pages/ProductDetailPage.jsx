@@ -399,7 +399,16 @@ export default function ProductDetailPage() {
 
             {/* Price display */}
             <div className="mt-3 flex items-baseline gap-3">
-              {product.sale_price ? (
+              {product.base_price === 0 ? (
+                <>
+                  <span className="text-2xl font-serif text-emerald-600 dark:text-emerald-400 font-bold tracking-wide">
+                    FREE • COMPLIMENTARY (₹0)
+                  </span>
+                  <span className="text-xs font-bold text-white bg-emerald-600 px-2.5 py-0.5 tracking-wider uppercase rounded-full shadow-xs">
+                    ★ 100% Free Gift
+                  </span>
+                </>
+              ) : product.sale_price ? (
                 <>
                   <span className="text-2xl font-serif text-[#141414]">{formatPrice(product.sale_price)}</span>
                   <span className="text-base text-[#787570] line-through">{formatPrice(product.base_price)}</span>
@@ -607,6 +616,8 @@ export default function ProductDetailPage() {
                   <span>Adding to Bag...</span>
                 ) : selectedVariant?.stock_quantity === 0 ? (
                   <span>Sold Out</span>
+                ) : product.base_price === 0 ? (
+                  <span>Claim Complimentary Gift</span>
                 ) : (
                   <span>Add To Bag</span>
                 )}
@@ -619,7 +630,13 @@ export default function ProductDetailPage() {
                 className="btn-sheen btn-sapphire-glow flex-1 py-4 bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] text-white text-xs uppercase tracking-[0.2em] font-bold hover:opacity-95 transition-all shadow-lg shadow-blue-900/25 flex items-center justify-center gap-2 disabled:opacity-50 rounded-xl active:scale-95 group"
               >
                 <Zap className="w-3.5 h-3.5 fill-white group-hover:scale-125 transition-transform duration-200" />
-                {buyingNow ? <span>Initiating Checkout...</span> : <span>Buy Now</span>}
+                {buyingNow ? (
+                  <span>Initiating Checkout...</span>
+                ) : product.base_price === 0 ? (
+                  <span>Claim Free Gift (₹0)</span>
+                ) : (
+                  <span>Buy Now</span>
+                )}
               </button>
 
               {/* Wishlist Button */}
