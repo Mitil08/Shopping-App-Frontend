@@ -82,10 +82,9 @@ export default function Navbar({ onOpenSearch }) {
             <Crown className="w-3 h-3 text-[#FCD34D]" />
             <span>Become a Seller</span>
           </Link>
-        </div>
 
           {langMenuOpen && (
-            <div className="absolute left-0 mt-2 w-36 bg-[#1A2444] border border-[#2D3F75] shadow-xl py-1 z-50 animate-in fade-in">
+            <div className="absolute left-0 top-full mt-2 w-36 bg-[#1A2444] border border-[#2D3F75] shadow-xl py-1 z-50 animate-in fade-in">
               <button
                 onClick={() => { setLang('en'); setLangMenuOpen(false); }}
                 className={`w-full text-left px-3 py-1.5 text-[10px] uppercase tracking-wider flex justify-between items-center hover:bg-[#253360] ${
