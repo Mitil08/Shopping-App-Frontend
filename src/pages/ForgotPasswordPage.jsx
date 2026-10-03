@@ -301,27 +301,8 @@ export default function ForgotPasswordPage() {
             </div>
           )}
 
-          {/* Demo Account Passwords Quick Recall Box */}
-          <div className="mt-8 pt-6 border-t border-[#CBD5E1] dark:border-[#2D4170] space-y-2.5">
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-[#64748B] dark:text-[#94A3B8] font-bold">
-              <span>Demo Accounts Credentials</span>
-              <span className="text-[#D97706] dark:text-[#FCD34D]">Quick Recall</span>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-amber-50/60 dark:bg-[#1E293B]/70 border border-amber-300/40 text-xs space-y-1.5 font-mono">
-              <div className="flex justify-between items-center text-[#192238] dark:text-white">
-                <span className="text-[11px] font-semibold">VIP Client:</span>
-                <span className="text-[11px] text-[#D97706] dark:text-[#FCD34D]">client@elane-studio.com / ClientPass123!</span>
-              </div>
-              <div className="flex justify-between items-center text-[#192238] dark:text-white">
-                <span className="text-[11px] font-semibold">Administrator:</span>
-                <span className="text-[11px] text-[#1E3A8A] dark:text-[#60A5FA]">admin@elane-studio.com / AdminPass123!</span>
-              </div>
-            </div>
-          </div>
-
           {/* WhatsApp Direct Stylist Concierge Option */}
-          <div className="mt-4 pt-4 border-t border-[#CBD5E1]/60 dark:border-[#2D4170]/60 flex items-center justify-center">
+          <div className="mt-8 pt-6 border-t border-[#CBD5E1] dark:border-[#2D4170] flex items-center justify-center">
             <a
               href={`https://api.whatsapp.com/send?text=${encodeURIComponent("Hello ÉLANE Concierge! I need assistance recovering my atelier account credentials.")}`}
               target="_blank"
