@@ -32,9 +32,17 @@ export default function RegisterPage() {
   const { theme, toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
 
+  const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
+
+    const trimmedEmail = (email || '').trim();
+    if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
+      setFormError('Please provide a valid, verifiable email address (e.g. name@domain.com).');
+      return;
+    }
 
     if (password.length < 8) {
       setFormError('Password must contain at least 8 characters.');
@@ -49,7 +57,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await register(name, email, password);
+      await register(name.trim(), trimmedEmail, password);
       success('Account registered successfully. Welcome to ÉLANE.');
       navigate('/profile');
     } catch (err) {

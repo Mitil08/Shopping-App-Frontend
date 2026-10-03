@@ -38,12 +38,31 @@ export default function LoginPage() {
 
   const redirectPath = location.state?.from?.pathname || '/profile';
 
+  const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
   const handleLoginSubmit = async (userEmail, userPassword) => {
     setFormError('');
+
+    const trimmedEmail = (userEmail || '').trim();
+    if (!trimmedEmail) {
+      setFormError('Please enter your email address.');
+      return;
+    }
+
+    if (!EMAIL_REGEX.test(trimmedEmail)) {
+      setFormError('Please enter a valid, registered email address (e.g. name@domain.com). Random or malformed emails are not permitted.');
+      return;
+    }
+
+    if (!userPassword) {
+      setFormError('Please enter your password.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await login(userEmail, userPassword);
+      await login(trimmedEmail, userPassword);
       success('Welcome back to ÉLANE');
       navigate(redirectPath, { replace: true });
     } catch (err) {
