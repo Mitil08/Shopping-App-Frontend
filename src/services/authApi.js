@@ -24,5 +24,9 @@ export const authApi = {
 
   updateProfile: async (profileData) => {
     return await api.put('/auth/profile', profileData);
-  }
+  },
+
+  verifyEmail: async (email) => {
+    return await api.post('/auth/verify-email', { email });
+  },
 };

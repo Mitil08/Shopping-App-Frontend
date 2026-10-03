@@ -13,11 +13,14 @@ import {
   Moon, 
   ChevronLeft, 
   ShieldCheck, 
-  Globe 
+  Globe,
+  Loader2,
+  CheckCircle2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
+import { authApi } from '../services/authApi';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -26,6 +29,8 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState('');
+  const [verifyingEmail, setVerifyingEmail] = useState(false);
+  const [emailVerifiedStatus, setEmailVerifiedStatus] = useState(null); // null | { valid: true, provider: '...' } | { valid: false, message: '...' }
 
   const { register } = useAuth();
   const { success } = useToast();
@@ -33,6 +38,32 @@ export default function RegisterPage() {
   const navigate = useNavigate();
 
   const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  const handleEmailBlur = async () => {
+    const trimmedEmail = (email || '').trim();
+    if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
+      setEmailVerifiedStatus(null);
+      return;
+    }
+
+    setVerifyingEmail(true);
+    try {
+      const res = await authApi.verifyEmail(trimmedEmail);
+      if (res?.success) {
+        setEmailVerifiedStatus({ valid: true, provider: res?.data?.provider || 'Verified Mail Server' });
+        setFormError('');
+      } else {
+        setEmailVerifiedStatus({ valid: false, message: res?.message || 'Email domain could not be verified' });
+      }
+    } catch (err) {
+      setEmailVerifiedStatus({
+        valid: false,
+        message: err?.message || 'Email domain does not exist or is not verified with Google/MX servers.',
+      });
+    } finally {
+      setVerifyingEmail(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,6 +88,14 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      // 1. Double check live email validation before submitting
+      const checkRes = await authApi.verifyEmail(trimmedEmail);
+      if (!checkRes?.success) {
+        setFormError(checkRes?.message || 'Email address domain failed live verification.');
+        setLoading(false);
+        return;
+      }
+
       await register(name.trim(), trimmedEmail, password);
       success('Account registered successfully. Welcome to ÉLANE.');
       navigate('/profile');
@@ -150,20 +189,57 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-[11px] uppercase tracking-wider text-[#64748B] dark:text-[#CBD5E1] font-semibold mb-1.5">
-                Email Address *
-              </label>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="block text-[11px] uppercase tracking-wider text-[#64748B] dark:text-[#CBD5E1] font-semibold">
+                  Email Address *
+                </label>
+                {verifyingEmail && (
+                  <span className="text-[10px] text-blue-500 dark:text-blue-400 flex items-center gap-1">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <span>Verifying with Google / MX servers...</span>
+                  </span>
+                )}
+                {!verifyingEmail && emailVerifiedStatus?.valid && (
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 animate-in fade-in">
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>Domain verified ({emailVerifiedStatus.provider})</span>
+                  </span>
+                )}
+              </div>
               <div className="relative">
                 <input
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="g.laurent@domain.com"
-                  className="w-full bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#334155] rounded-xl px-4 py-3.5 text-xs text-[#192238] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner"
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (emailVerifiedStatus) setEmailVerifiedStatus(null);
+                  }}
+                  onBlur={handleEmailBlur}
+                  placeholder="name@gmail.com"
+                  className={`w-full bg-white dark:bg-[#1E293B] border rounded-xl px-4 py-3.5 text-xs text-[#192238] dark:text-white placeholder-[#94A3B8] focus:outline-none transition-all shadow-inner ${
+                    emailVerifiedStatus?.valid
+                      ? 'border-emerald-500/70 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20'
+                      : emailVerifiedStatus?.valid === false
+                      ? 'border-rose-500/70 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
+                      : 'border-[#CBD5E1] dark:border-[#334155] focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20'
+                  }`}
                 />
-                <Mail className="w-4 h-4 text-[#94A3B8] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                  {verifyingEmail ? (
+                    <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
+                  ) : emailVerifiedStatus?.valid ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  ) : (
+                    <Mail className="w-4 h-4 text-[#94A3B8]" />
+                  )}
+                </div>
               </div>
+              {emailVerifiedStatus?.valid === false && (
+                <p className="mt-1 text-[11px] text-rose-600 dark:text-rose-400 leading-tight">
+                  ⚠️ {emailVerifiedStatus.message}
+                </p>
+              )}
             </div>
 
             <div>
