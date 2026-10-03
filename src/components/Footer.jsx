@@ -208,18 +208,18 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="hover:text-[#FAF9F5] transition-colors">
-                  Artisanal Provenance
+                <Link to="/become-seller" className="text-[#FCD34D] font-semibold hover:underline flex items-center gap-1">
+                  <span>Become a Seller ✨</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/seller/dashboard" className="hover:text-[#FAF9F5] transition-colors">
+                  Merchant Console
                 </Link>
               </li>
               <li>
                 <Link to="/about" className="hover:text-[#FAF9F5] transition-colors">
                   Sustainability Mandate
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="hover:text-[#FAF9F5] transition-colors">
-                  Press & Exhibitions
                 </Link>
               </li>
             </ul>

@@ -64,7 +64,7 @@ export default function Navbar({ onOpenSearch }) {
       {/* Editorial Announcement Bar with English / Region Controls */}
       <div className="bg-gradient-to-r from-[#17213C] via-[#212D52] to-[#17213C] text-[#FAF8F5] text-[11px] uppercase tracking-[0.22em] py-2 px-4 sm:px-8 border-b border-[#2C3B6B] transition-all flex justify-between items-center">
         {/* Language Switcher */}
-        <div className="relative">
+        <div className="relative flex items-center gap-4">
           <button
             onClick={() => setLangMenuOpen(!langMenuOpen)}
             className="flex items-center gap-1.5 hover:text-[#FCD34D] transition-colors focus:outline-none"
@@ -74,6 +74,15 @@ export default function Navbar({ onOpenSearch }) {
             <span className="font-semibold">{t.languageName || 'English (US)'}</span>
             <ChevronDown className="w-2.5 h-2.5 opacity-70" />
           </button>
+
+          <Link
+            to="/become-seller"
+            className="hidden md:inline-flex items-center gap-1 text-[10px] text-[#FCD34D] hover:underline font-semibold tracking-widest pl-3 border-l border-[#3E528B]"
+          >
+            <Crown className="w-3 h-3 text-[#FCD34D]" />
+            <span>Become a Seller</span>
+          </Link>
+        </div>
 
           {langMenuOpen && (
             <div className="absolute left-0 mt-2 w-36 bg-[#1A2444] border border-[#2D3F75] shadow-xl py-1 z-50 animate-in fade-in">
@@ -330,6 +339,17 @@ export default function Navbar({ onOpenSearch }) {
                           >
                             <ShieldCheck className="w-3.5 h-3.5 text-[#C2A676]" />
                             Admin Console
+                          </Link>
+                        )}
+
+                        {user?.role === 'seller' && (
+                          <Link
+                            to="/seller/dashboard"
+                            className="flex items-center gap-2.5 px-4 py-2 text-xs tracking-wider uppercase text-[#D97706] font-semibold hover:bg-[#F3F1EC] dark:hover:bg-[#252230] transition-colors"
+                            onClick={() => setUserDropdownOpen(false)}
+                          >
+                            <Crown className="w-3.5 h-3.5 text-[#D97706]" />
+                            Merchant Studio
                           </Link>
                         )}
 

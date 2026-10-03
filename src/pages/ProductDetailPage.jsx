@@ -397,6 +397,17 @@ export default function ProductDetailPage() {
               {product.name}
             </h1>
 
+            {/* Amazon / Flipkart Multi-Vendor Seller Attribution Badge */}
+            <div className="mt-2.5 flex items-center gap-2 text-xs">
+              <span className="text-[#64748B] dark:text-[#94A3B8]">Sold by:</span>
+              <span className="font-semibold text-[#192238] dark:text-[#F8FAFC] underline decoration-[#D97706]/50">
+                {product.sellerName || 'Maison Silk & Tailoring Co.'}
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono font-medium border border-emerald-500/20">
+                <ShieldCheck className="w-3 h-3" /> Verified Merchant (4.9 ★)
+              </span>
+            </div>
+
             {/* Price display */}
             <div className="mt-3 flex items-baseline gap-3">
               {product.base_price === 0 ? (

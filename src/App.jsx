@@ -12,6 +12,7 @@ import { CurrencyProvider } from './context/CurrencyContext';
 
 import RootLayout from './layouts/RootLayout';
 import AdminLayout from './layouts/AdminLayout';
+import SellerLayout from './layouts/SellerLayout';
 
 // Luxury Code-Splitting with React.lazy for high performance
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -24,6 +25,7 @@ const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
 const OrderSuccessPage = lazy(() => import('./pages/OrderSuccessPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const SellerRegisterPage = lazy(() => import('./pages/SellerRegisterPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const WishlistPage = lazy(() => import('./pages/WishlistPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
@@ -39,6 +41,10 @@ const AdminProductEditPage = lazy(() => import('./pages/AdminProductEditPage'));
 const AdminOrdersPage = lazy(() => import('./pages/AdminOrdersPage'));
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'));
 const AdminSupportQueuePage = lazy(() => import('./pages/AdminSupportQueuePage'));
+
+const SellerDashboardPage = lazy(() => import('./pages/SellerDashboardPage'));
+const SellerProductsPage = lazy(() => import('./pages/SellerProductsPage'));
+const SellerOrdersPage = lazy(() => import('./pages/SellerOrdersPage'));
 
 function LuxuryPageLoader() {
   return (
@@ -86,6 +92,8 @@ export default function App() {
                               <Route path="order-success/:orderId" element={<OrderSuccessPage />} />
                               <Route path="login" element={<LoginPage />} />
                               <Route path="register" element={<RegisterPage />} />
+                              <Route path="seller/register" element={<SellerRegisterPage />} />
+                              <Route path="become-seller" element={<SellerRegisterPage />} />
                               <Route path="forgot-password" element={<ForgotPasswordPage />} />
                               <Route path="wishlist" element={<WishlistPage />} />
                               <Route path="profile" element={<ProfilePage />} />
@@ -94,6 +102,15 @@ export default function App() {
                               <Route path="wardrobe-builder" element={<WardrobeBuilderPage />} />
                               <Route path="society" element={<SocietyPage />} />
                               <Route path="*" element={<NotFoundPage />} />
+                            </Route>
+
+                            {/* Seller / Merchant Partner Studio */}
+                            <Route path="/seller" element={<SellerLayout />}>
+                              <Route index element={<SellerDashboardPage />} />
+                              <Route path="dashboard" element={<SellerDashboardPage />} />
+                              <Route path="products" element={<SellerProductsPage />} />
+                              <Route path="products/new" element={<AdminProductEditPage />} />
+                              <Route path="orders" element={<SellerOrdersPage />} />
                             </Route>
 
                             {/* Administrative Back-Office Routes */}
