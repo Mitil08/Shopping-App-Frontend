@@ -14,7 +14,6 @@ import {
   ChevronLeft, 
   ShieldCheck, 
   Fingerprint,
-  Zap,
   Globe,
   Store,
   User
@@ -80,20 +79,10 @@ export default function LoginPage() {
     handleLoginSubmit(email, password);
   };
 
-  const handleDemoLogin = (demoRole) => {
-    if (demoRole === 'client') {
-      setEmail('client@elane-studio.com');
-      setPassword('ClientPass123!');
-      handleLoginSubmit('client@elane-studio.com', 'ClientPass123!');
-    } else if (demoRole === 'seller') {
-      setEmail('seller@elane-studio.com');
-      setPassword('SellerPass123!');
-      handleLoginSubmit('seller@elane-studio.com', 'SellerPass123!');
-    } else if (demoRole === 'admin') {
-      setEmail('admin@elane-studio.com');
-      setPassword('AdminPass123!');
-      handleLoginSubmit('admin@elane-studio.com', 'AdminPass123!');
-    }
+  const handleGoogleSSO = () => {
+    setEmail('client@elane-studio.com');
+    setPassword('ClientPass123!');
+    handleLoginSubmit('client@elane-studio.com', 'ClientPass123!');
   };
 
   const handleBiometricMock = () => {
@@ -282,81 +271,8 @@ export default function LoginPage() {
             </div>
           </form>
 
-          {/* Quick Demo Access Buttons Suite */}
-          <div className="mt-6 pt-5 border-t border-[#CBD5E1] dark:border-[#2D4170] space-y-3">
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-[#64748B] dark:text-[#94A3B8] font-bold">
-              <span>Instant Demo Accounts</span>
-              <span className="text-[#D97706] dark:text-[#FCD34D]">One-Click Login</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {/* VIP Client Instant Sign-In Button */}
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('client')}
-                className="btn-sheen p-2.5 rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent text-left hover:border-amber-400 active:scale-95 transition-all group"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                    <Crown className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-[#192238] dark:text-white block leading-tight">
-                      VIP Client
-                    </span>
-                    <span className="text-[10px] text-[#787570] dark:text-[#94A3B8] font-mono">
-                      Genevieve
-                    </span>
-                  </div>
-                </div>
-              </button>
-
-              {/* Vendor Instant Sign-In Button */}
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('seller')}
-                className="btn-sheen p-2.5 rounded-xl border border-emerald-400/40 bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent text-left hover:border-emerald-400 active:scale-95 transition-all group"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                    <Store className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-[#192238] dark:text-white block leading-tight">
-                      Merchant
-                    </span>
-                    <span className="text-[10px] text-[#787570] dark:text-[#94A3B8] font-mono">
-                      Maison Silk
-                    </span>
-                  </div>
-                </div>
-              </button>
-
-              {/* Atelier Admin Instant Sign-In Button */}
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('admin')}
-                className="btn-sheen p-2.5 rounded-xl border border-blue-400/40 bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-transparent text-left hover:border-blue-400 active:scale-95 transition-all group"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                    <Sparkles className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-[#192238] dark:text-white block leading-tight">
-                      Admin Pass
-                    </span>
-                    <span className="text-[10px] text-[#787570] dark:text-[#94A3B8] font-mono">
-                      Administrator
-                    </span>
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
-
           {/* Alternate Sign-In: Biometrics & Google */}
-          <div className="mt-4 pt-4 border-t border-[#CBD5E1]/60 dark:border-[#2D4170]/60 grid grid-cols-2 gap-2.5">
+          <div className="mt-6 pt-5 border-t border-[#CBD5E1] dark:border-[#2D4170] grid grid-cols-2 gap-2.5">
             <button
               type="button"
               onClick={handleBiometricMock}
@@ -368,7 +284,7 @@ export default function LoginPage() {
 
             <button
               type="button"
-              onClick={() => handleDemoLogin('client')}
+              onClick={handleGoogleSSO}
               className="btn-sheen py-2.5 px-3 rounded-xl border border-[#CBD5E1] dark:border-[#334155] bg-white dark:bg-[#1E293B] text-xs font-semibold text-[#192238] dark:text-white hover:border-[#1E3A8A] flex items-center justify-center gap-2 transition-all active:scale-95"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
