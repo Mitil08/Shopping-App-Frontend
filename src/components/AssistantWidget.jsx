@@ -12,6 +12,7 @@ import {
   Volume2,
   VolumeX,
   MessageCircle,
+  User,
 } from 'lucide-react';
 import { mockProducts } from '../data/mockProducts';
 import { formatPrice } from '../utils/currency';
