@@ -29,4 +29,12 @@ export const authApi = {
   verifyEmail: async (email) => {
     return await api.post('/auth/verify-email', { email });
   },
+
+  sendOtp: async ({ email, name }) => {
+    return await api.post('/auth/send-otp', { email, name });
+  },
+
+  verifyOtp: async ({ email, otp, password, name }) => {
+    return await api.post('/auth/verify-otp', { email, otp, password, name });
+  },
 };

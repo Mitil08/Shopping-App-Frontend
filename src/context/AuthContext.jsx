@@ -70,6 +70,17 @@ export const AuthProvider = ({ children }) => {
     return res;
   };
 
+  const verifyOtpAndRegister = async ({ email, otp, password, name }) => {
+    const res = await authApi.verifyOtp({ email, otp, password, name });
+    if (res?.data?.token && res?.data?.user) {
+      setToken(res.data.token);
+      setUser(res.data.user);
+      localStorage.setItem('elane_token', res.data.token);
+      localStorage.setItem('elane_user', JSON.stringify(res.data.user));
+    }
+    return res;
+  };
+
   const logout = async () => {
     try {
       await authApi.logout();
@@ -102,6 +113,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         register,
+        verifyOtpAndRegister,
         logout,
         updateProfile,
         isAdmin,

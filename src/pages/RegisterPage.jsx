@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -15,7 +15,9 @@ import {
   ShieldCheck, 
   Globe,
   Loader2,
-  CheckCircle2
+  CheckCircle2,
+  KeyRound,
+  RotateCcw
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -29,15 +31,33 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState('');
+  
+  // Real-time domain verification state
   const [verifyingEmail, setVerifyingEmail] = useState(false);
   const [emailVerifiedStatus, setEmailVerifiedStatus] = useState(null); // null | { valid: true, provider: '...' } | { valid: false, message: '...' }
 
-  const { register } = useAuth();
+  // 6-Digit Email OTP verification modal & step state
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  const { verifyOtpAndRegister } = useAuth();
   const { success } = useToast();
   const { theme, toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
 
   const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  // Cooldown countdown timer for OTP resend
+  useEffect(() => {
+    let timer;
+    if (resendCooldown > 0) {
+      timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   const handleEmailBlur = async () => {
     const trimmedEmail = (email || '').trim();
@@ -65,7 +85,7 @@ export default function RegisterPage() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleInitiateRegistration = async (e) => {
     e.preventDefault();
     setFormError('');
 
@@ -88,7 +108,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // 1. Double check live email validation before submitting
+      // 1. Double check live email validation
       const checkRes = await authApi.verifyEmail(trimmedEmail);
       if (!checkRes?.success) {
         setFormError(checkRes?.message || 'Email address domain failed live verification.');
@@ -96,13 +116,63 @@ export default function RegisterPage() {
         return;
       }
 
-      await register(name.trim(), trimmedEmail, password);
-      success('Account registered successfully. Welcome to ÉLANE.');
-      navigate('/profile');
+      // 2. Dispatch 6-digit OTP to user's real email address
+      const otpRes = await authApi.sendOtp({ email: trimmedEmail, name: name.trim() });
+      if (otpRes?.success) {
+        setShowOtpModal(true);
+        setResendCooldown(60);
+        setOtpError('');
+        success(`Verification code dispatched to ${trimmedEmail}`);
+      } else {
+        setFormError(otpRes?.message || 'Failed to dispatch verification code. Please try again.');
+      }
     } catch (err) {
-      setFormError(err.message || 'Registration failed. Email may already be associated with an account.');
+      setFormError(err.message || 'Registration request failed. Please check your email address.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerifyOtpSubmit = async (e) => {
+    e.preventDefault();
+    setOtpError('');
+
+    const cleanOtp = otpCode.trim();
+    if (!cleanOtp || cleanOtp.length !== 6) {
+      setOtpError('Please enter the 6-digit numeric verification code.');
+      return;
+    }
+
+    setOtpLoading(true);
+    try {
+      await verifyOtpAndRegister({
+        email: email.trim(),
+        otp: cleanOtp,
+        password,
+        name: name.trim(),
+      });
+      success('Email successfully verified! Welcome to ÉLANE Atelier.');
+      setShowOtpModal(false);
+      navigate('/profile');
+    } catch (err) {
+      setOtpError(err.message || 'Invalid or expired verification code. Please try again.');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    setOtpLoading(true);
+    setOtpError('');
+    try {
+      await authApi.sendOtp({ email: email.trim(), name: name.trim() });
+      setResendCooldown(60);
+      success(`New verification code sent to ${email}`);
+    } catch (err) {
+      setOtpError(err.message || 'Failed to resend code.');
+    } finally {
+      setOtpLoading(false);
     }
   };
 
@@ -125,7 +195,7 @@ export default function RegisterPage() {
             <span>Return to Boutique</span>
           </Link>
 
-          {/* Interactive Live Theme Switcher Pill Button */}
+          {/* Theme Switcher Button */}
           <button
             type="button"
             onClick={toggleTheme}
@@ -170,7 +240,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleInitiateRegistration} className="space-y-4">
             <div>
               <label className="block text-[11px] uppercase tracking-wider text-[#64748B] dark:text-[#CBD5E1] font-semibold mb-1.5">
                 Full Name *
@@ -285,11 +355,11 @@ export default function RegisterPage() {
                 {loading ? (
                   <>
                     <Sparkles className="w-4 h-4 animate-spin text-blue-200" />
-                    <span>Creating Account...</span>
+                    <span>Verifying &amp; Sending OTP...</span>
                   </>
                 ) : (
                   <>
-                    <span>Join ÉLANE Atelier</span>
+                    <span>Verify Email &amp; Join Atelier</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200" />
                   </>
                 )}
@@ -320,6 +390,96 @@ export default function RegisterPage() {
           </span>
         </div>
       </div>
+
+      {/* 6-Digit Email OTP Verification Modal */}
+      {showOtpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white dark:bg-[#151D34] border border-[#CBD5E1] dark:border-[#2D4170] rounded-3xl p-6 sm:p-8 shadow-2xl transition-all">
+            
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500/20 via-blue-500/20 to-purple-500/20 border border-amber-400/40 text-[#8C6D2D] dark:text-[#FCD34D] flex items-center justify-center mx-auto mb-3">
+                <KeyRound className="w-6 h-6 text-amber-500" />
+              </div>
+              <h3 className="font-serif text-2xl text-[#192238] dark:text-white uppercase tracking-wide">
+                Verify Your Inbox
+              </h3>
+              <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1.5 font-light">
+                We sent a 6-digit verification code to:
+              </p>
+              <p className="text-xs font-mono font-semibold text-[#1E3A8A] dark:text-[#60A5FA] mt-0.5">
+                {email}
+              </p>
+            </div>
+
+            {otpError && (
+              <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-xs text-rose-700 dark:text-rose-300 flex items-start gap-2 animate-in fade-in">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
+                <span className="leading-snug">{otpError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleVerifyOtpSubmit} className="space-y-4">
+              <div>
+                <label className="block text-center text-[11px] uppercase tracking-wider text-[#64748B] dark:text-[#CBD5E1] font-semibold mb-2">
+                  Enter 6-Digit Code
+                </label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  required
+                  autoFocus
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="••••••"
+                  className="w-full text-center text-2xl tracking-[0.4em] font-mono py-3.5 bg-[#FAF8F5] dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#192238] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner font-bold"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={otpLoading || otpCode.length !== 6}
+                  className="btn-sheen btn-sapphire-glow w-full py-3.5 bg-gradient-to-r from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] text-white text-xs uppercase tracking-[0.25em] font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg hover:opacity-95 disabled:opacity-50 active:scale-95"
+                >
+                  {otpLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-blue-200" />
+                      <span>Confirming Code...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Activate My Account</span>
+                      <Check className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+
+            {/* Resend OTP & Cancel Option */}
+            <div className="mt-5 pt-4 border-t border-[#CBD5E1] dark:border-[#2D4170] flex items-center justify-between text-xs text-[#64748B] dark:text-[#94A3B8]">
+              <button
+                type="button"
+                onClick={() => setShowOtpModal(false)}
+                className="hover:underline text-[11px]"
+              >
+                Change Email
+              </button>
+
+              <button
+                type="button"
+                disabled={resendCooldown > 0 || otpLoading}
+                onClick={handleResendOtp}
+                className="inline-flex items-center gap-1 font-semibold text-[#1E3A8A] dark:text-[#60A5FA] hover:underline disabled:opacity-40 disabled:no-underline text-[11px]"
+              >
+                <RotateCcw className="w-3 h-3" />
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
