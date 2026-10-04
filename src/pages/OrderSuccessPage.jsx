@@ -6,6 +6,7 @@ import InvoiceModal from '../components/InvoiceModal';
 import WhatsAppOrderShare from '../components/WhatsAppOrderShare';
 import UnboxingSimulator from '../components/UnboxingSimulator';
 import RealtimeCourierMapModal from '../components/RealtimeCourierMapModal';
+import ShippingLabelModal from '../components/ShippingLabelModal';
 
 export default function OrderSuccessPage() {
   const { orderId } = useParams();
@@ -14,6 +15,7 @@ export default function OrderSuccessPage() {
   const [showInvoice, setShowInvoice] = useState(false);
   const [showUnboxing, setShowUnboxing] = useState(false);
   const [showCourierMap, setShowCourierMap] = useState(false);
+  const [showLabel, setShowLabel] = useState(false);
 
   // Generate deterministic mock AWB and courier tracking number
   const awbNumber = orderId
@@ -259,6 +261,13 @@ export default function OrderSuccessPage() {
           <FileText className="w-4 h-4 text-[#C2A676]" />
           <span>Download Tax Invoice</span>
         </button>
+        <button
+          onClick={() => setShowLabel(true)}
+          className="btn-sheen w-full sm:w-auto px-6 py-3.5 border border-[#192238]/30 dark:border-[#334155] bg-white dark:bg-[#1E293B] hover:bg-[#FAF8F5] dark:hover:bg-[#283548] text-[#192238] dark:text-[#F1F5F9] text-xs uppercase tracking-[0.2em] font-semibold flex items-center justify-center gap-2 rounded-xl transition-colors shadow-2xs active:scale-95"
+        >
+          <Truck className="w-4 h-4 text-[#C2A676]" />
+          <span>Print AWB Manifest</span>
+        </button>
         <Link
           to="/profile/orders"
           className="w-full sm:w-auto px-6 py-3.5 border border-[#E2E8F0] dark:border-[#334155] text-[#64748B] dark:text-[#94A3B8] hover:text-[#192238] dark:hover:text-white hover:border-[#192238] dark:hover:border-[#60A5FA] text-xs uppercase tracking-[0.2em] font-medium rounded-xl transition-colors text-center active:scale-95"
@@ -287,6 +296,14 @@ export default function OrderSuccessPage() {
         isOpen={showInvoice}
         onClose={() => setShowInvoice(false)}
       />
+
+      {/* 3PL Courier AWB Shipping Label Modal */}
+      {showLabel && (
+        <ShippingLabelModal
+          order={order || { id: orderId, total: 0, items: [] }}
+          onClose={() => setShowLabel(false)}
+        />
+      )}
 
       {/* Real-time GPS Courier Tracker Modal */}
       <RealtimeCourierMapModal

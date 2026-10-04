@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useCart } from './CartContext';
 import { useToast } from './ToastContext';
+import { automationApi } from '../services/automationApi';
 
 const WishlistContext = createContext(null);
 
@@ -19,6 +20,12 @@ export const WishlistProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('elane_wishlist', JSON.stringify(wishlist));
+    // Sync with backend for automated price drop & stock alert triggers
+    try {
+      const userStr = localStorage.getItem('elane_auth_user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      automationApi.syncWishlist(user?.id, wishlist, user?.email, user?.phone).catch(() => {});
+    } catch (e) {}
   }, [wishlist]);
 
   const isInWishlist = useCallback(

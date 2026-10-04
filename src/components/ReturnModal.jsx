@@ -12,6 +12,7 @@ import {
   PackageCheck
 } from 'lucide-react';
 import { formatPrice } from '../utils/currency';
+import { shippingApi } from '../services/shippingApi';
 
 const RETURN_REASONS = [
   "Garment size is too small",
@@ -58,7 +59,7 @@ export default function ReturnModal({ isOpen, onClose, order, onReturnSuccess })
 
   if (!isOpen || !order) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
@@ -73,27 +74,35 @@ export default function ReturnModal({ isOpen, onClose, order, onReturnSuccess })
       pickupTimeSlot,
       pickupAddress: order.shippingAddress,
       customerNotes,
-      status: 'Pickup Scheduled',
-      courierPartner: 'BlueDart Express Pickup',
-      awbTracking: `RT-BLU-${Math.random().toString().slice(2, 10)}`,
+      status: 'Reverse Pickup Scheduled',
+      courierPartner: 'Delhivery Reverse Express Direct',
+      awbTracking: `REV-DLH-${order.id.slice(-6).toUpperCase()}IN`,
       createdAt: new Date().toISOString()
     };
 
-    setTimeout(() => {
-      // Save return ticket in localStorage
-      try {
-        const existingReturns = JSON.parse(localStorage.getItem('elane_return_requests') || '[]');
-        localStorage.setItem('elane_return_requests', JSON.stringify([returnTicket, ...existingReturns]));
-      } catch (err) {
-        console.warn('Failed to store return ticket:', err);
+    try {
+      const res = await shippingApi.createReversePickup(order.id, returnTicket);
+      if (res.data?.reverseShipment) {
+        returnTicket.awbTracking = res.data.reverseShipment.reverseAwb;
+        returnTicket.courierPartner = res.data.reverseShipment.courierPartner;
       }
+    } catch (err) {
+      console.warn('Reverse pickup dispatch notice:', err);
+    }
 
-      setSubmittedData(returnTicket);
-      setSubmitting(false);
-      if (onReturnSuccess) {
-        onReturnSuccess(returnTicket);
-      }
-    }, 600);
+    // Save return ticket in localStorage
+    try {
+      const existingReturns = JSON.parse(localStorage.getItem('elane_return_requests') || '[]');
+      localStorage.setItem('elane_return_requests', JSON.stringify([returnTicket, ...existingReturns]));
+    } catch (err) {
+      console.warn('Failed to store return ticket:', err);
+    }
+
+    setSubmittedData(returnTicket);
+    setSubmitting(false);
+    if (onReturnSuccess) {
+      onReturnSuccess(returnTicket);
+    }
   };
 
   return (

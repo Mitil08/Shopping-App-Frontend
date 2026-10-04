@@ -17,6 +17,7 @@ import {
 import { mockProducts } from '../data/mockProducts';
 import { formatPrice } from '../utils/currency';
 import { useCart } from '../context/CartContext';
+import { aiApi } from '../services/aiApi';
 
 // Quick Starter Suggestions
 const QUICK_QUESTIONS = [
@@ -455,21 +456,46 @@ export default function AssistantWidget() {
     };
   };
 
-  const handleSend = useCallback((textToSend) => {
+  const handleSend = useCallback(async (textToSend) => {
     const text = textToSend || inputValue;
     if (!text.trim()) return;
 
     const userMsg = {
       id: Date.now(),
       sender: 'user',
-      text: text.trim()
+      text: text.trim(),
     };
 
     setMessages((prev) => [...prev, userMsg]);
     setInputValue('');
     setIsTyping(true);
 
-    // Realistic responsive AI thinking time
+    try {
+      // Query 24/7 AI Concierge Backend Service
+      const res = await aiApi.chat(text.trim());
+      const aiResponse = res.data;
+
+      if (aiResponse && aiResponse.reply) {
+        const botMsg = {
+          id: Date.now() + 1,
+          sender: 'bot',
+          text: aiResponse.reply,
+          products: aiResponse.products,
+          actionLink: aiResponse.actionLink,
+          suggestions: aiResponse.suggestions,
+          actionType: aiResponse.actionType,
+          actionData: aiResponse.actionData,
+        };
+        setMessages((prev) => [...prev, botMsg]);
+        setIsTyping(false);
+        speakText(aiResponse.reply);
+        return;
+      }
+    } catch (err) {
+      console.warn('AI Concierge live backend notice:', err.message);
+    }
+
+    // Instant local intelligence fallback
     setTimeout(() => {
       const response = processQuery(text);
       const botMsg = {
@@ -478,12 +504,12 @@ export default function AssistantWidget() {
         text: response.text,
         products: response.products,
         actionLink: response.actionLink,
-        suggestions: response.suggestions
+        suggestions: response.suggestions,
       };
       setMessages((prev) => [...prev, botMsg]);
       setIsTyping(false);
       speakText(response.text);
-    }, 450);
+    }, 350);
   }, [inputValue, messages]);
 
   handleSendRef.current = handleSend;

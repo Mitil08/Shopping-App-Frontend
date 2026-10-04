@@ -6,6 +6,9 @@ import { formatPrice } from '../utils/currency';
 import InvoiceModal from '../components/InvoiceModal';
 import ReturnModal from '../components/ReturnModal';
 import WhatsAppOrderShare from '../components/WhatsAppOrderShare';
+import LiveTrackingModal from '../components/LiveTrackingModal';
+import ShippingLabelModal from '../components/ShippingLabelModal';
+import ProductReviewModal from '../components/ProductReviewModal';
 
 export default function OrderDetailPage() {
   const { orderId } = useParams();
@@ -14,6 +17,9 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(!order);
   const [showInvoice, setShowInvoice] = useState(false);
   const [showReturnModal, setShowReturnModal] = useState(false);
+  const [showLiveTracking, setShowLiveTracking] = useState(false);
+  const [showShippingLabel, setShowShippingLabel] = useState(false);
+  const [reviewProduct, setReviewProduct] = useState(null);
   const [activeReturn, setActiveReturn] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('elane_return_requests') || '[]');
@@ -105,6 +111,22 @@ export default function OrderDetailPage() {
               <FileText className="w-3.5 h-3.5 text-[#C2A676]" />
               <span>Tax Invoice</span>
             </button>
+
+            <button
+              onClick={() => setShowLiveTracking(true)}
+              className="px-3 py-1.5 bg-[#141414] text-[#FAF9F5] dark:bg-[#C2A676] dark:text-[#141414] hover:bg-[#2A2A2A] text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-colors"
+            >
+              <Truck className="w-3.5 h-3.5 text-[#C2A676] dark:text-[#141414]" />
+              <span>Live 3PL Track</span>
+            </button>
+
+            <button
+              onClick={() => setReviewProduct(order.items?.[0] || { id: 'general', name: `Order #${order.id} Pieces` })}
+              className="px-3 py-1.5 bg-[#C2A676] text-[#141414] hover:bg-[#b09360] text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-colors"
+            >
+              <span>★ Review (+500 Pts)</span>
+            </button>
+
             <span className="px-3 py-1.5 bg-[#141414] dark:bg-[#C2A676] text-[#FAF9F5] dark:text-[#141414] text-xs uppercase tracking-widest font-semibold">
               {order.status || 'Confirmed'}
             </span>
@@ -346,6 +368,32 @@ export default function OrderDetailPage() {
           setActiveReturn(ticket);
         }}
       />
+
+      {/* Live 3PL Transit Tracker Modal */}
+      {showLiveTracking && (
+        <LiveTrackingModal
+          order={order}
+          onClose={() => setShowLiveTracking(false)}
+        />
+      )}
+
+      {/* 3PL Courier AWB Label Modal */}
+      {showShippingLabel && (
+        <ShippingLabelModal
+          order={order}
+          onClose={() => setShowShippingLabel(false)}
+        />
+      )}
+
+      {/* Verified Product Review & 500 Loyalty Points Modal */}
+      {reviewProduct && (
+        <ProductReviewModal
+          isOpen={Boolean(reviewProduct)}
+          onClose={() => setReviewProduct(null)}
+          product={reviewProduct}
+          orderId={order.id}
+        />
+      )}
     </div>
   );
 }

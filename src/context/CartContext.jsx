@@ -183,6 +183,19 @@ export const CartProvider = ({ children }) => {
     info('Promo coupon removed');
   };
 
+  // Auto-apply discount from URL query parameter (e.g. from Abandoned Cart Recovery emails)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const discountParam = params.get('discount');
+      if (discountParam) {
+        applyPromo(discountParam);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const applyPromo = (code) => {
     const clean = code.trim().toUpperCase();
     if (clean === 'ELANE10' || clean === 'WELCOME10') {
@@ -191,6 +204,12 @@ export const CartProvider = ({ children }) => {
       setPromoCode(clean);
       success(`Coupon ${clean} applied: 10% instant discount!`);
       return { success: true, message: '10% discount applied' };
+    } else if (clean === 'RECOVER5') {
+      setAppliedDiscountRate(0.05);
+      setFlatDiscountAmount(0);
+      setPromoCode(clean);
+      success('✨ 5% Abandoned Bag Courtesy Voucher RECOVER5 applied!');
+      return { success: true, message: '5% recovery discount applied' };
     } else if (clean === 'VIP20') {
       setAppliedDiscountRate(0.2);
       setFlatDiscountAmount(0);
@@ -210,7 +229,7 @@ export const CartProvider = ({ children }) => {
       success('Coupon AMAZON15 applied: 15% instant discount!');
       return { success: true, message: '15% discount applied' };
     } else {
-      return { success: false, message: 'Invalid promo code. Try "WELCOME10", "FESTIVE500", or "VIP20"' };
+      return { success: false, message: 'Invalid promo code. Try "RECOVER5", "WELCOME10", "FESTIVE500", or "VIP20"' };
     }
   };
 

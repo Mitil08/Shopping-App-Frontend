@@ -689,6 +689,14 @@ export default function ProductDetailPage() {
               </button>
             </div>
 
+            {/* Real-Time Low Stock Warning Banner */}
+            {selectedVariant && selectedVariant.stock_quantity > 0 && selectedVariant.stock_quantity <= 3 && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400 font-mono">
+                <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+                <span>⚡ <strong>Only {selectedVariant.stock_quantity} left in stock</strong> — Order now to secure atelier allocation.</span>
+              </div>
+            )}
+
             {/* Split Bill & Group Gifting Option */}
             <div className="pt-2">
               <button
