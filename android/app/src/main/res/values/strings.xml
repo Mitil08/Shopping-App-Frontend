@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ÉLANE Luxury</string>
+    <string name="title_activity_main">ÉLANE Luxury</string>
+    <string name="package_name">com.elane.shoppingapp</string>
+    <string name="custom_url_scheme">com.elane.shoppingapp</string>
+</resources>
