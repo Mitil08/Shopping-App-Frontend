@@ -32,7 +32,7 @@ export default function RootLayout() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#FAF8F5] dark:bg-[#172554] text-[#192238] dark:text-[#F8FAFC] transition-colors duration-300">
+    <div className="relative min-h-[100dvh] flex flex-col bg-[#FAF8F5] dark:bg-[#172554] text-[#192238] dark:text-[#F8FAFC] transition-colors duration-300">
       {/* Grand Opening Pre-Entrance Animation */}
       {showOpeningSplash && (
         <RoyalSplashOpening onComplete={handleSplashComplete} />

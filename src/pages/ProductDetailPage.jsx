@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Heart, Plus, Minus, ShieldCheck, Truck, RotateCcw, Sparkles, ChevronRight, Check, Zap, Star, MapPin, Clock, ThumbsUp, X, Bell, Crown, Layers } from 'lucide-react';
+import { Heart, Plus, Minus, ShieldCheck, Truck, RotateCcw, Sparkles, ChevronRight, Check, Zap, Star, MapPin, Clock, ThumbsUp, X, Bell, Crown, Layers, AlertCircle } from 'lucide-react';
 import { productApi } from '../services/productApi';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';

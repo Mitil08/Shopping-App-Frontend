@@ -1,4 +1,4 @@
-import api from './api';
+import api, { API_BASE_URL } from './api';
 
 export const automationApi = {
   // 1. Abandoned Cart Recovery
@@ -31,8 +31,7 @@ export const automationApi = {
     return res.data;
   },
   getStatementUrl: (settlementId) => {
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-    return `${baseUrl}/automation/settlements/${settlementId}/statement`;
+    return `${API_BASE_URL}/automation/settlements/${settlementId}/statement`;
   },
 
   // 4. Wishlist Price Drops & Restock Alerts

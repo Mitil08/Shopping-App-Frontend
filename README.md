@@ -43,3 +43,28 @@
    ```bash
    npm run build
    ```
+
+## Android Application (Capacitor)
+
+The mobile version of ÉLANE is powered by Capacitor with native Android support.
+
+### Prerequisites
+- Android Studio installed with Android SDK (API 33+)
+- JDK (bundled with Android Studio at `C:\Program Files\Android\Android Studio\jbr`)
+
+### Commands
+- **Sync web assets to Android**:
+  ```bash
+  npm run cap:sync
+  ```
+- **Open in Android Studio**:
+  ```bash
+  npm run cap:open
+  ```
+- **Build APK directly via command line**:
+  ```bash
+  npm run build:apk
+  ```
+- **Output APK location**:
+  `frontend/android/app/build/outputs/apk/debug/app-debug.apk`
+

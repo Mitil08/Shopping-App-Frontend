@@ -13,6 +13,7 @@ import { CurrencyProvider } from './context/CurrencyContext';
 import RootLayout from './layouts/RootLayout';
 import AdminLayout from './layouts/AdminLayout';
 import SellerLayout from './layouts/SellerLayout';
+import CapacitorBridge from './components/CapacitorBridge';
 
 // Luxury Code-Splitting with React.lazy for high performance
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -78,6 +79,7 @@ export default function App() {
                   <LoyaltyProvider>
                     <CompareProvider>
                       <BrowserRouter>
+                        <CapacitorBridge />
                         <Suspense fallback={<LuxuryPageLoader />}>
                           <Routes>
                             {/* Public & Customer Routes */}
