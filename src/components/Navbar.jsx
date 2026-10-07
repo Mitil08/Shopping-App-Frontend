@@ -61,111 +61,7 @@ export default function Navbar({ onOpenSearch }) {
 
   return (
     <>
-      {/* Editorial Announcement Bar with English / Region Controls */}
-      <div className="bg-gradient-to-r from-[#17213C] via-[#212D52] to-[#17213C] text-[#FAF8F5] text-[11px] uppercase tracking-[0.22em] py-2 px-4 sm:px-8 border-b border-[#2C3B6B] transition-all flex justify-between items-center">
-        {/* Language Switcher */}
-        <div className="relative flex items-center gap-4">
-          <button
-            onClick={() => setLangMenuOpen(!langMenuOpen)}
-            className="flex items-center gap-1.5 hover:text-[#FCD34D] transition-colors focus:outline-none"
-            aria-label="Change language"
-          >
-            <Globe className="w-3.5 h-3.5 text-[#FCD34D]" />
-            <span className="font-semibold">{t.languageName || 'English (US)'}</span>
-            <ChevronDown className="w-2.5 h-2.5 opacity-70" />
-          </button>
-
-          <Link
-            to="/become-seller"
-            className="hidden md:inline-flex items-center gap-1 text-[10px] text-[#FCD34D] hover:underline font-semibold tracking-widest pl-3 border-l border-[#3E528B]"
-          >
-            <Crown className="w-3 h-3 text-[#FCD34D]" />
-            <span>Become a Seller</span>
-          </Link>
-
-          {langMenuOpen && (
-            <div className="absolute left-0 top-full mt-2 w-36 bg-[#1A2444] border border-[#2D3F75] shadow-xl py-1 z-50 animate-in fade-in">
-              <button
-                onClick={() => { setLang('en'); setLangMenuOpen(false); }}
-                className={`w-full text-left px-3 py-1.5 text-[10px] uppercase tracking-wider flex justify-between items-center hover:bg-[#253360] ${
-                  lang === 'en' ? 'text-[#FCD34D] font-bold' : 'text-[#FAF8F5]'
-                }`}
-              >
-                <span>English (US)</span>
-                {lang === 'en' && <span className="text-[#FCD34D]">✓</span>}
-              </button>
-              <button
-                onClick={() => { setLang('es'); setLangMenuOpen(false); }}
-                className={`w-full text-left px-3 py-1.5 text-[10px] uppercase tracking-wider flex justify-between items-center hover:bg-[#253360] ${
-                  lang === 'es' ? 'text-[#FCD34D] font-bold' : 'text-[#FAF8F5]'
-                }`}
-              >
-                <span>Español</span>
-                {lang === 'es' && <span className="text-[#FCD34D]">✓</span>}
-              </button>
-              <button
-                onClick={() => { setLang('fr'); setLangMenuOpen(false); }}
-                className={`w-full text-left px-3 py-1.5 text-[10px] uppercase tracking-wider flex justify-between items-center hover:bg-[#253360] ${
-                  lang === 'fr' ? 'text-[#FCD34D] font-bold' : 'text-[#FAF8F5]'
-                }`}
-              >
-                <span>Français</span>
-                {lang === 'fr' && <span className="text-[#FCD34D]">✓</span>}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Center Offer */}
-        <div className="hidden md:block text-center flex-1 text-[#FAF8F5]/95">
-          {t.announcement || '🇮🇳 Crafted in India • ✈️ Express Worldwide Delivery to 190+ Countries • Code'}{' '}
-          <span className="text-[#FCD34D] font-bold">ELANE10</span>
-        </div>
-
-        {/* Currency & Geolocation Switcher Dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setCurrencyMenuOpen(!currencyMenuOpen)}
-            className="flex items-center gap-1.5 text-[10px] tracking-widest font-mono text-[#FAF9F5] hover:text-[#C2A676] transition-colors focus:outline-none"
-            aria-label="Select currency and destination"
-            title="Worldwide Delivery & Currency Selector"
-          >
-            <span className="text-[11px]">{currency.flag}</span>
-            <span className="font-semibold">{currency.code} ({currency.symbol})</span>
-            <span className="hidden xl:inline text-[#8E8B82] text-[9px]">• 190+ Countries</span>
-            <ChevronDown className="w-2.5 h-2.5 opacity-70" />
-          </button>
-
-          {currencyMenuOpen && (
-            <div className="absolute right-0 mt-2 w-52 bg-[#1A2444] border border-[#2D3F75] shadow-2xl py-1 z-50 animate-in fade-in">
-              <div className="px-3 py-1.5 border-b border-[#283868] text-[9px] text-[#CBD5E1] tracking-wider uppercase flex justify-between items-center">
-                <span>{detectedCountry ? `Delivering to: ${detectedCountry}` : 'Dispatched Worldwide'}</span>
-                <span className="text-[#FCD34D] font-bold">190+ Nations</span>
-              </div>
-              {allCurrencies.map((c) => (
-                <button
-                  key={c.code}
-                  onClick={() => {
-                    changeCurrency(c.code);
-                    setCurrencyMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-1.5 text-[10px] uppercase tracking-wider flex justify-between items-center hover:bg-[#253562] transition-colors ${
-                    currencyCode === c.code ? 'text-[#FCD34D] font-bold bg-[#202C50]' : 'text-[#FAF8F5]'
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>{c.flag}</span>
-                    <span>{c.code} • {c.symbol}</span>
-                  </span>
-                  <span className="text-[9px] text-[#94A3B8] lowercase">{c.name.split(' ')[0]}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Main Luxury Header */}
+      {/* Main Luxury Header with Sticky Announcement Bar */}
       <header
         className={`sticky top-0 z-40 transition-all duration-300 ${
           scrolled
@@ -173,14 +69,118 @@ export default function Navbar({ onOpenSearch }) {
             : 'bg-[#FAF8F5] dark:bg-[#121A30] border-b border-[#E2E8F0]/80 dark:border-[#283966]/80'
         }`}
       >
+        {/* Editorial Announcement Bar with English / Region Controls (Sticky & Always Visible) */}
+        <div className="bg-gradient-to-r from-[#17213C] via-[#212D52] to-[#17213C] text-[#FAF8F5] text-[10px] sm:text-[11px] uppercase tracking-wider sm:tracking-[0.22em] py-1.5 sm:py-2 px-3 sm:px-8 border-b border-[#2C3B6B] transition-all flex justify-between items-center w-full">
+          {/* Language Switcher */}
+          <div className="relative flex items-center gap-2 sm:gap-4 shrink-0">
+            <button
+              onClick={() => setLangMenuOpen(!langMenuOpen)}
+              className="flex items-center gap-1 sm:gap-1.5 hover:text-[#FCD34D] transition-colors focus:outline-none"
+              aria-label="Change language"
+            >
+              <Globe className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-[#FCD34D]" />
+              <span className="font-semibold">{t.languageName || 'English (US)'}</span>
+              <ChevronDown className="w-2.5 h-2.5 opacity-70" />
+            </button>
 
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="flex items-center justify-between h-20 gap-4">
+            <Link
+              to="/become-seller"
+              className="hidden md:inline-flex items-center gap-1 text-[10px] text-[#FCD34D] hover:underline font-semibold tracking-widest pl-3 border-l border-[#3E528B]"
+            >
+              <Crown className="w-3 h-3 text-[#FCD34D]" />
+              <span>Become a Seller</span>
+            </Link>
+
+            {langMenuOpen && (
+              <div className="absolute left-0 top-full mt-2 w-36 bg-[#1A2444] border border-[#2D3F75] shadow-xl py-1 z-50 animate-in fade-in">
+                <button
+                  onClick={() => { setLang('en'); setLangMenuOpen(false); }}
+                  className={`w-full text-left px-3 py-1.5 text-[10px] uppercase tracking-wider flex justify-between items-center hover:bg-[#253360] ${
+                    lang === 'en' ? 'text-[#FCD34D] font-bold' : 'text-[#FAF8F5]'
+                  }`}
+                >
+                  <span>English (US)</span>
+                  {lang === 'en' && <span className="text-[#FCD34D]">✓</span>}
+                </button>
+                <button
+                  onClick={() => { setLang('es'); setLangMenuOpen(false); }}
+                  className={`w-full text-left px-3 py-1.5 text-[10px] uppercase tracking-wider flex justify-between items-center hover:bg-[#253360] ${
+                    lang === 'es' ? 'text-[#FCD34D] font-bold' : 'text-[#FAF8F5]'
+                  }`}
+                >
+                  <span>Español</span>
+                  {lang === 'es' && <span className="text-[#FCD34D]">✓</span>}
+                </button>
+                <button
+                  onClick={() => { setLang('fr'); setLangMenuOpen(false); }}
+                  className={`w-full text-left px-3 py-1.5 text-[10px] uppercase tracking-wider flex justify-between items-center hover:bg-[#253360] ${
+                    lang === 'fr' ? 'text-[#FCD34D] font-bold' : 'text-[#FAF8F5]'
+                  }`}
+                >
+                  <span>Français</span>
+                  {lang === 'fr' && <span className="text-[#FCD34D]">✓</span>}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Center Offer (Hidden on mobile for clean breathing room) */}
+          <div className="hidden md:block text-center flex-1 text-[#FAF8F5]/95 px-2">
+            {t.announcement || '🇮🇳 Crafted in India • ✈️ Express Worldwide Delivery to 190+ Countries • Code'}{' '}
+            <span className="text-[#FCD34D] font-bold">ELANE10</span>
+          </div>
+
+          {/* Currency & Geolocation Switcher Dropdown */}
+          <div className="relative shrink-0">
+            <button
+              onClick={() => setCurrencyMenuOpen(!currencyMenuOpen)}
+              className="flex items-center gap-1 sm:gap-1.5 text-[10px] tracking-wider sm:tracking-widest font-mono text-[#FAF9F5] hover:text-[#C2A676] transition-colors focus:outline-none"
+              aria-label="Select currency and destination"
+              title="Worldwide Delivery & Currency Selector"
+            >
+              <span className="text-[11px]">{currency.flag}</span>
+              <span className="font-semibold">{currency.code} ({currency.symbol})</span>
+              <span className="hidden xl:inline text-[#8E8B82] text-[9px]">• 190+ Countries</span>
+              <ChevronDown className="w-2.5 h-2.5 opacity-70" />
+            </button>
+
+            {currencyMenuOpen && (
+              <div className="absolute right-0 mt-2 w-52 bg-[#1A2444] border border-[#2D3F75] shadow-2xl py-1 z-50 animate-in fade-in">
+                <div className="px-3 py-1.5 border-b border-[#283868] text-[9px] text-[#CBD5E1] tracking-wider uppercase flex justify-between items-center">
+                  <span>{detectedCountry ? `Delivering to: ${detectedCountry}` : 'Dispatched Worldwide'}</span>
+                  <span className="text-[#FCD34D] font-bold">190+ Nations</span>
+                </div>
+                {allCurrencies.map((c) => (
+                  <button
+                    key={c.code}
+                    onClick={() => {
+                      changeCurrency(c.code);
+                      setCurrencyMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-1.5 text-[10px] uppercase tracking-wider flex justify-between items-center hover:bg-[#253562] transition-colors ${
+                      currencyCode === c.code ? 'text-[#FCD34D] font-bold bg-[#202C50]' : 'text-[#FAF8F5]'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span>{c.flag}</span>
+                      <span>{c.code} • {c.symbol}</span>
+                    </span>
+                    <span className="text-[9px] text-[#94A3B8] lowercase">{c.name.split(' ')[0]}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Main Navigation Row */}
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-10">
+          <div className="flex items-center justify-between h-14 sm:h-20 gap-2 sm:gap-4">
             {/* LEFT: Mobile Menu Button & Brand Wordmark */}
-            <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-6 shrink-0">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 -ml-2 text-[#192238] dark:text-[#F8FAFC] hover:text-[#D97706] transition-colors rounded-full hover:bg-blue-900/10 dark:hover:bg-white/10"
+                className="lg:hidden p-1.5 -ml-1 text-[#192238] dark:text-[#F8FAFC] hover:text-[#D97706] transition-colors rounded-full hover:bg-blue-900/10 dark:hover:bg-white/10"
                 aria-label="Open mobile menu"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -190,7 +190,7 @@ export default function Navbar({ onOpenSearch }) {
                 to="/"
                 className="group flex flex-col items-start select-none"
               >
-                <span className="font-serif tracking-[0.32em] text-2xl sm:text-[26px] text-[#192238] dark:text-[#F8FAFC] font-semibold uppercase group-hover:text-[#D97706] transition-colors duration-300">
+                <span className="font-serif tracking-[0.22em] sm:tracking-[0.32em] text-xl sm:text-[26px] text-[#192238] dark:text-[#F8FAFC] font-semibold uppercase group-hover:text-[#D97706] transition-colors duration-300">
                   ÉLANE
                 </span>
                 <span className="text-[8px] font-mono tracking-[0.35em] text-[#64748B] dark:text-[#94A3B8] uppercase -mt-1 hidden sm:block">
@@ -199,7 +199,7 @@ export default function Navbar({ onOpenSearch }) {
               </Link>
             </div>
 
-            {/* CENTER: Desktop Navigation Links (Spacious, Centered, Non-Colliding) */}
+            {/* CENTER: Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 flex-1 px-4">
               {navLinks.map((link) => (
                 <NavLink
@@ -223,9 +223,9 @@ export default function Navbar({ onOpenSearch }) {
               ))}
             </nav>
 
-            {/* RIGHT: Curated Luxury Actions (Search, Theme, Compare, Wishlist, User, Bag) */}
-            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-              {/* Quick Search Trigger Pill */}
+            {/* RIGHT: Curated Luxury Actions (Fitted for all mobile screens) */}
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+              {/* Quick Search Trigger Pill (Desktop XL) */}
               <button
                 onClick={onOpenSearch}
                 className="hidden xl:flex items-center gap-2 pl-3 pr-2.5 py-1.5 rounded-full border border-[#E8E6E1] dark:border-[#2D2B38] bg-[#FAF9F5] dark:bg-[#16151F] text-[#8E8B82] hover:text-[#141414] dark:hover:text-[#FAF9F5] hover:border-[#C2A676]/60 transition-all text-[11px] group"
@@ -239,20 +239,20 @@ export default function Navbar({ onOpenSearch }) {
                 </kbd>
               </button>
 
-              {/* Search Icon (for smaller desktop / mobile) */}
+              {/* Search Icon (Always visible on mobile / tablet) */}
               <button
                 onClick={onOpenSearch}
-                className="xl:hidden p-2 text-[#141414] dark:text-[#FAF9F5] hover:text-[#C2A676] transition-colors rounded-full hover:bg-black/5 dark:hover:bg-white/5"
+                className="xl:hidden p-1.5 sm:p-2 text-[#141414] dark:text-[#FAF9F5] hover:text-[#C2A676] transition-colors rounded-full hover:bg-black/5 dark:hover:bg-white/5 active:scale-90"
                 aria-label="Search collection"
                 title="Search collection"
               >
                 <Search className="w-[18px] h-[18px] stroke-[1.75]" />
               </button>
 
-              {/* 1-Click AI Visual Camera Search */}
+              {/* 1-Click AI Visual Camera Search (Visible on sm+; available via Search on mobile) */}
               <button
                 onClick={() => setVisualSearchOpen(true)}
-                className="p-2 text-[#D97706] hover:text-[#B45309] transition-all rounded-full hover:bg-amber-500/10 active:scale-90 hover:scale-110"
+                className="hidden sm:flex p-2 text-[#D97706] hover:text-[#B45309] transition-all rounded-full hover:bg-amber-500/10 active:scale-90 hover:scale-110"
                 aria-label="AI Visual Photo Search"
                 title="AI Visual Photo Search (Upload or Snap outfit)"
               >
@@ -262,7 +262,7 @@ export default function Navbar({ onOpenSearch }) {
               {/* Luxury Atelier Dark / Light Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 text-[#192238] dark:text-[#F8FAFC] hover:text-[#D97706] dark:hover:text-[#FCD34D] transition-all rounded-full hover:bg-blue-900/10 dark:hover:bg-white/10 active:scale-90 group"
+                className="p-1.5 sm:p-2 text-[#192238] dark:text-[#F8FAFC] hover:text-[#D97706] dark:hover:text-[#FCD34D] transition-all rounded-full hover:bg-blue-900/10 dark:hover:bg-white/10 active:scale-90 group"
                 aria-label={`Switch to ${isDark ? 'Light' : 'Dark'} mode`}
                 title={`Switch to ${isDark ? 'Light' : 'Dark'} mode`}
               >
@@ -273,25 +273,25 @@ export default function Navbar({ onOpenSearch }) {
                 )}
               </button>
 
-              {/* Wishlist Link */}
+              {/* Wishlist Link (Always visible) */}
               <Link
                 to="/wishlist"
-                className="p-2 text-[#192238] dark:text-[#F8FAFC] hover:text-[#E11D48] transition-colors relative rounded-full hover:bg-rose-500/10 active:scale-90 group"
+                className="p-1.5 sm:p-2 text-[#192238] dark:text-[#F8FAFC] hover:text-[#E11D48] transition-colors relative rounded-full hover:bg-rose-500/10 active:scale-90 group"
                 aria-label="Wishlist"
                 title="Wishlist"
               >
                 <Heart className="w-[18px] h-[18px] stroke-[1.75] group-hover:scale-110 group-hover:fill-rose-500/20 transition-all" />
                 {wishlistCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 bg-[#E11D48] text-white text-[8.5px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-xs animate-pulse">
+                  <span className="absolute top-0.5 right-0.5 bg-[#E11D48] text-white text-[8px] sm:text-[8.5px] w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full flex items-center justify-center font-bold shadow-xs animate-pulse">
                     {wishlistCount}
                   </span>
                 )}
               </Link>
 
-              {/* Silhouette Comparison Studio Button */}
+              {/* Silhouette Comparison Studio Button (Desktop & Tablet md+) */}
               <button
                 onClick={openCompare}
-                className="p-2 text-[#192238] dark:text-[#F8FAFC] hover:text-[#1E3A8A] dark:hover:text-[#60A5FA] transition-colors relative rounded-full hover:bg-blue-500/10 active:scale-90 group"
+                className="hidden md:flex p-2 text-[#192238] dark:text-[#F8FAFC] hover:text-[#1E3A8A] dark:hover:text-[#60A5FA] transition-colors relative rounded-full hover:bg-blue-500/10 active:scale-90 group"
                 aria-label="Silhouette Comparison Studio"
                 title="Silhouette & Fabric Comparison Studio"
               >
@@ -303,10 +303,8 @@ export default function Navbar({ onOpenSearch }) {
                 )}
               </button>
 
-              <div className="h-4 w-[1px] bg-[#E8E6E1] dark:bg-[#2D2B38] mx-0.5 hidden sm:block" />
-
-              {/* Account Dropdown */}
-              <div className="relative">
+              {/* Account Dropdown (Visible on sm+; available via drawer on mobile) */}
+              <div className="relative hidden sm:block">
                 {isAuthenticated ? (
                   <div>
                     <button
@@ -401,10 +399,10 @@ export default function Navbar({ onOpenSearch }) {
                 )}
               </div>
 
-              {/* Shopping Bag Button (Royal Sapphire Pill Styled with Sheen & Glow) */}
+              {/* Shopping Bag Button (ALWAYS VISIBLE & PROMINENT ON MOBILE & DESKTOP) */}
               <button
                 onClick={openDrawer}
-                className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-[#FEF3C7] hover:from-[#1E40AF] hover:to-[#1D4ED8] transition-all shadow-md shadow-blue-500/25 ml-1 btn-sheen btn-sapphire-glow group"
+                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-[#FEF3C7] hover:from-[#1E40AF] hover:to-[#1D4ED8] transition-all shadow-md shadow-blue-500/25 ml-0.5 btn-sheen btn-sapphire-glow group shrink-0 active:scale-95"
                 aria-label="Shopping bag"
               >
                 <ShoppingBag className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -518,6 +516,36 @@ export default function Navbar({ onOpenSearch }) {
                     </Link>
                   </div>
                 )}
+
+                {/* Mobile Language Picker */}
+                <div className="pt-3 border-t border-[#CBD5E1] dark:border-[#2D4170]">
+                  <p className="text-[10px] uppercase tracking-wider text-[#64748B] dark:text-[#94A3B8] mb-2 font-mono font-bold flex items-center gap-1.5">
+                    <Globe className="w-3 h-3 text-[#FCD34D]" />
+                    <span>Language ({t.languageName || 'English (US)'})</span>
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { code: 'en', name: 'English (US)' },
+                      { code: 'es', name: 'Español' },
+                      { code: 'fr', name: 'Français' },
+                    ].map((l) => (
+                      <button
+                        key={l.code}
+                        onClick={() => {
+                          setLang(l.code);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`btn-sheen px-2 py-1.5 text-[10px] tracking-wider font-mono border rounded-lg transition-all flex items-center justify-center gap-1 active:scale-95 ${
+                          lang === l.code
+                            ? 'bg-[#1E3A8A] text-white border-[#1E3A8A] dark:bg-[#2563EB] font-bold shadow-xs'
+                            : 'border-[#CBD5E1] dark:border-[#334155] bg-white dark:bg-[#1E293B] text-[#475569] dark:text-[#CBD5E1] hover:border-[#1E3A8A]'
+                        }`}
+                      >
+                        <span>{l.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Mobile Currency Picker */}
                 <div className="pt-3 border-t border-[#CBD5E1] dark:border-[#2D4170]">

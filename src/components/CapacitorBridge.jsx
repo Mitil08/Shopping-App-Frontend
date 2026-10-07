@@ -18,7 +18,7 @@ export default function CapacitorBridge() {
     // 2. Set Status Bar appearance
     try {
       StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
-      StatusBar.setBackgroundColor({ color: '#141414' }).catch(() => {});
+      StatusBar.setBackgroundColor({ color: '#17213C' }).catch(() => {});
     } catch {
       // Ignore if unsupported
     }
