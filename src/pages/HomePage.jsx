@@ -23,7 +23,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import Hero3DScene from '../components/Hero3DScene';
+import LuxuryEditorialShowcase from '../components/LuxuryEditorialShowcase';
 import { mockProducts } from '../data/mockProducts';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -318,56 +318,10 @@ export default function HomePage() {
     <div className="relative flex flex-col overflow-hidden bg-[#FAF8F5] text-[#192238]">
 
 
-      {/* 1. Full-Width Editorial Hero Section with Dynamic 3D WebGL Scene & Ambient Glows */}
-      <section className="relative min-h-[90vh] lg:min-h-[96vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#131B34] via-[#1A2548] to-[#141C36]">
-        {/* Real 3D Interactive WebGL Three.js Scene (Gyroscopic Core, Quantum Torus Rings & Product Geometry) */}
-        <Hero3DScene />
-
-        {/* Dynamic Pulsing Ambient Gradient Orbs */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <motion.div
-            animate={{
-              scale: [1, 1.25, 1],
-              opacity: [0.35, 0.6, 0.35],
-              rotate: [0, 45, 0],
-            }}
-            transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute -top-32 -left-32 w-[34rem] h-[34rem] rounded-full bg-gradient-to-br from-purple-600 via-pink-600 to-rose-500 blur-3xl"
-          />
-          <motion.div
-            animate={{
-              scale: [1.2, 0.9, 1.2],
-              opacity: [0.3, 0.55, 0.3],
-              rotate: [0, -40, 0],
-            }}
-            transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/3 -right-32 w-[32rem] h-[32rem] rounded-full bg-gradient-to-bl from-amber-500 via-rose-500 to-purple-600 blur-3xl"
-          />
-          <motion.div
-            animate={{
-              scale: [0.95, 1.2, 0.95],
-              opacity: [0.25, 0.5, 0.25],
-            }}
-            transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute -bottom-24 left-1/4 w-[28rem] h-[28rem] rounded-full bg-gradient-to-tr from-cyan-500 via-teal-500 to-indigo-600 blur-3xl"
-          />
-        </div>
-
-        {/* Background Multi-Category Flagship Editorial Imagery with Slow Ambient Zoom */}
-        <motion.div
-          animate={{ scale: [1, 1.04, 1] }}
-          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute inset-0"
-        >
-          <img
-            src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=2200&q=85"
-            alt="ÉLANE Flagship Superstore Editorial"
-            className="w-full h-full object-cover object-center opacity-30 mix-blend-luminosity filter brightness-[0.8] contrast-[1.2]"
-          />
-        </motion.div>
-
-        {/* Ambient Dark Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-[#111827]/80 to-[#172554]/40 pointer-events-none" />
+      {/* 1. Full-Width Editorial Hero Section with Curated Luxury Atmosphere */}
+      <section className="relative min-h-[90vh] lg:min-h-[96vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0F172A] via-[#1E1B4B] to-[#0F172A]">
+        {/* Curated Luxury Editorial Showcase (App-Relative, Performance-Optimized, No 3D Canvas) */}
+        <LuxuryEditorialShowcase />
 
         {/* Hero Content with Staggered Entrance Animation */}
         <div className="relative z-20 max-w-5xl mx-auto px-6 text-center text-[#FAF9F5] py-24 sm:py-32">

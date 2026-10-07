@@ -5,7 +5,6 @@ import CartDrawer from '../components/CartDrawer';
 import SearchBar from '../components/SearchBar';
 import Footer from '../components/Footer';
 import AssistantWidget from '../components/AssistantWidget';
-import Global3DCanvas from '../components/Global3DCanvas';
 import CompareFloatingBar from '../components/CompareFloatingBar';
 import CompareStudioModal from '../components/CompareStudioModal';
 import RoyalSplashOpening from '../components/RoyalSplashOpening';
@@ -37,9 +36,6 @@ export default function RootLayout() {
       {showOpeningSplash && (
         <RoyalSplashOpening onComplete={handleSplashComplete} />
       )}
-
-      {/* Global Interactive 3D Canvas Background */}
-      <Global3DCanvas />
 
       <Navbar onOpenSearch={() => setSearchOpen(true)} />
       <CartDrawer />
