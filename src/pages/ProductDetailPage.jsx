@@ -323,7 +323,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16 pb-28 lg:pb-16">
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center space-x-2 text-[11px] uppercase tracking-[0.2em] text-[#787570] mb-8">
         <Link to="/" className="hover:text-[#141414] transition-colors">Home</Link>
@@ -1172,10 +1172,10 @@ export default function ProductDetailPage() {
       )}
 
       {/* Sticky Mobile Add To Cart Bar */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#FAF9F5]/95 backdrop-blur-md border-t border-[#E8E6E1] p-4 z-30 flex items-center justify-between gap-4">
-        <div>
-          <p className="font-serif text-sm font-semibold text-[#141414] line-clamp-1">{product.name}</p>
-          <p className="text-xs text-[#787570]">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#FAF9F5]/95 dark:bg-[#151D34]/95 backdrop-blur-md border-t border-[#E8E6E1] dark:border-[#2D4170] p-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="min-w-0 flex-1">
+          <p className="font-serif text-sm font-semibold text-[#141414] dark:text-[#F8FAFC] truncate">{product.name}</p>
+          <p className="text-xs text-[#787570] dark:text-[#94A3B8]">
             {formatPrice(product.sale_price || product.base_price)} • Size: {selectedVariant?.size || 'M'}
           </p>
         </div>
@@ -1183,16 +1183,16 @@ export default function ProductDetailPage() {
           <button
             onClick={handleAddToCart}
             disabled={addingToCart}
-            className="px-4 py-3 bg-white border border-[#141414] text-[#141414] text-xs uppercase tracking-widest font-bold"
+            className="px-4 py-2.5 bg-white dark:bg-[#1E293B] border border-[#141414] dark:border-[#475569] text-[#141414] dark:text-white text-xs uppercase tracking-widest font-bold rounded-lg active:scale-95 transition-transform"
           >
             {addingToCart ? '...' : 'Bag'}
           </button>
           <button
             onClick={handleBuyNow}
             disabled={buyingNow}
-            className="px-5 py-3 bg-[#141414] text-[#FAF9F5] text-xs uppercase tracking-widest font-bold flex items-center gap-1.5 shadow-md"
+            className="px-5 py-2.5 bg-[#141414] dark:bg-[#D97706] text-[#FAF9F5] dark:text-white text-xs uppercase tracking-widest font-bold flex items-center gap-1.5 rounded-lg shadow-md active:scale-95 transition-transform"
           >
-            <Zap className="w-3 h-3 fill-[#FAF9F5]" />
+            <Zap className="w-3.5 h-3.5 fill-current" />
             <span>{buyingNow ? '...' : 'Buy Now'}</span>
           </button>
         </div>

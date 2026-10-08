@@ -60,12 +60,19 @@ export default function RegisterPage() {
   const [showGoogleModal, setShowGoogleModal] = useState(false);
   const [customGoogleEmail, setCustomGoogleEmail] = useState('');
 
-  const { verifyOtpAndRegister } = useAuth();
+  const { register, verifyOtpAndRegister, isAuthenticated, loginWithGoogle } = useAuth();
   const { success } = useToast();
   const { theme, toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
 
   const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  // If already authenticated, redirect straight to the boutique app
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   // Cooldown countdown timer for OTP resend
   useEffect(() => {
@@ -135,81 +142,43 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // 1. Double check live email validation
-      const checkRes = await authApi.verifyEmail(trimmedEmail);
-      if (!checkRes?.success) {
-        setFormError(checkRes?.message || 'Email address domain failed live verification.');
-        setLoading(false);
-        return;
-      }
-
-      // 2. Dispatch 6-digit OTP to user's real email address
-      const otpRes = await authApi.sendOtp({ 
-        email: trimmedEmail, 
-        name: name.trim(),
+      await register(name.trim(), trimmedEmail, password, {
         role: accountType,
         storeName: storeName.trim(),
         gstin: gstin.trim(),
         phone: phone.trim(),
       });
-      if (otpRes?.success) {
-        setIsGoogleFlow(false);
-        setShowOtpModal(true);
-        setResendCooldown(60);
-        setOtpError('');
-        success(`Verification code dispatched to ${trimmedEmail}`);
-      } else {
-        setFormError(otpRes?.message || 'Failed to dispatch verification code. Please try again.');
-      }
+      success(`Welcome to ÉLANE Atelier, ${name.trim()}! Membership activated.`);
+      navigate(accountType === 'seller' ? '/seller/dashboard' : '/', { replace: true });
     } catch (err) {
-      setFormError(err.message || 'Registration request failed. Please check your email address.');
+      if (err.message?.includes('already exists') || err.status === 400) {
+        setFormError(err.message || 'An account with this email address already exists. Please Sign In.');
+      } else {
+        setFormError(err.message || 'Registration request failed. Please check your connection and try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   // Google 1-Click SSO Selection & Auto-Fill Flow
-  const handleGoogleAccountSelect = async (selectedEmail, selectedName) => {
+  const handleGoogleAccountSelect = async (selectedEmail, selectedName, avatar) => {
     setShowGoogleModal(false);
     setGoogleLoading(true);
     setFormError('');
 
-    const finalEmail = selectedEmail.trim();
-    const finalName = selectedName.trim();
-
-    // Auto-fill form fields
-    setEmail(finalEmail);
-    setName(finalName);
-    setPassword('GoogleAuthSecurePass123!');
-    setConfirmPassword('GoogleAuthSecurePass123!');
-
     try {
-      // 1. Verify Google MX domain
-      const checkRes = await authApi.verifyEmail(finalEmail);
-      if (!checkRes?.success) {
-        setFormError(checkRes?.message || 'Google account domain could not be verified.');
-        setGoogleLoading(false);
-        return;
-      }
-
-      // 2. Dispatch 6-digit OTP to selected Google account
-      const otpRes = await authApi.sendOtp({ 
-        email: finalEmail, 
-        name: finalName,
+      await loginWithGoogle({ 
+        email: selectedEmail.trim(), 
+        name: selectedName ? selectedName.trim() : selectedEmail.split('@')[0],
+        picture: avatar,
         role: accountType,
-        storeName: storeName.trim() || (accountType === 'seller' ? `${finalName}'s Atelier` : ''),
+        storeName: storeName.trim(),
         gstin: gstin.trim(),
         phone: phone.trim(),
       });
-      if (otpRes?.success) {
-        setIsGoogleFlow(true);
-        setShowOtpModal(true);
-        setResendCooldown(60);
-        setOtpError('');
-        success(`Google Account connected! Verification code dispatched to ${finalEmail}`);
-      } else {
-        setFormError(otpRes?.message || 'Could not send verification code to this Google account.');
-      }
+      success(accountType === 'seller' ? 'Vendor Studio unlocked with Google!' : 'Welcome to ÉLANE! Signed in with Google.');
+      navigate(accountType === 'seller' ? '/seller/dashboard' : '/');
     } catch (err) {
       setFormError(err.message || 'Google signup failed. Please try again.');
     } finally {
@@ -241,7 +210,7 @@ export default function RegisterPage() {
       });
       success(accountType === 'seller' ? 'Merchant store activated! Welcome to ÉLANE Merchant Studio.' : 'Email successfully verified! Welcome to ÉLANE Atelier.');
       setShowOtpModal(false);
-      navigate(accountType === 'seller' ? '/seller/dashboard' : '/profile');
+      navigate(accountType === 'seller' ? '/seller/dashboard' : '/');
     } catch (err) {
       setOtpError(err.message || 'Invalid or expired verification code. Please check your email and try again.');
     } finally {
@@ -283,11 +252,11 @@ export default function RegisterPage() {
         {/* Top Floating Controls Bar */}
         <div className="flex items-center justify-between mb-6 px-1">
           <Link
-            to="/shop"
+            to="/login"
             className="btn-sheen inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider text-[#64748B] hover:text-[#1E3A8A] dark:text-[#94A3B8] dark:hover:text-white bg-white/70 dark:bg-[#1E293B]/70 backdrop-blur-md border border-[#CBD5E1] dark:border-[#334155] shadow-xs active:scale-95 transition-all group"
           >
             <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-            <span>Return to Boutique</span>
+            <span>Back to Sign In</span>
           </Link>
 
           {/* Theme Switcher Button */}
@@ -571,12 +540,12 @@ export default function RegisterPage() {
                 {loading ? (
                   <>
                     <Sparkles className="w-4 h-4 animate-spin text-amber-200" />
-                    <span>Verifying Email &amp; Dispatching OTP...</span>
+                    <span>Creating Atelier Account...</span>
                   </>
                 ) : (
                   <>
                     <span>
-                      {accountType === 'seller' ? 'Verify Email & Launch Vendor Store' : 'Verify Email & Join Atelier'}
+                      {accountType === 'seller' ? 'Launch Vendor Store' : 'Create Account & Join Atelier'}
                     </span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200" />
                   </>

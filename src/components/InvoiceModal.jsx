@@ -3,10 +3,10 @@ import { formatPrice } from '../utils/currency';
 import { Printer, Download, X, ShieldCheck, Mail, Check, ExternalLink } from 'lucide-react';
 
 export default function InvoiceModal({ order, isOpen, onClose }) {
-  if (!isOpen || !order) return null;
-
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+
+  if (!isOpen || !order) return null;
 
   const orderId = order.id || 'ELN-UNKNOWN';
   const orderDate = new Date(order.createdAt || Date.now()).toLocaleDateString('en-IN', {

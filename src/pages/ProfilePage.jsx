@@ -1,21 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Package, Heart, ShieldCheck, LogOut, Check, Crown, Sparkles, Award, Gift, Zap, ArrowUpRight, ChevronRight } from 'lucide-react';
+import { 
+  User, Package, Heart, ShieldCheck, LogOut, Check, Crown, Sparkles, Award, 
+  Gift, Zap, ArrowUpRight, ChevronRight, Fingerprint, KeyRound, Trash2, Shield, Plus
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useLoyalty } from '../context/LoyaltyContext';
+import { authApi } from '../services/authApi';
 import AuthenticityVault from '../components/AuthenticityVault';
 import { formatPrice } from '../utils/currency';
 
 export default function ProfilePage() {
-  const { user, isAdmin, updateProfile, logout } = useAuth();
+  const { user, isAdmin, updateProfile, logout, registerPasskey, passkeySupported } = useAuth();
   const { success, error } = useToast();
   const { loyaltyData, currentTier, nextTier, progressToNextTier, spendNeededForNextTier, redeemPoints, TIERS } = useLoyalty();
 
-  const [activeTab, setActiveTab] = useState('vault'); // 'vault' | 'privilege' | 'details'
+  const [activeTab, setActiveTab] = useState('vault'); // 'vault' | 'privilege' | 'security' | 'details'
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [saving, setSaving] = useState(false);
+
+  // Passkey State
+  const [passkeys, setPasskeys] = useState([]);
+  const [loadingPasskeys, setLoadingPasskeys] = useState(false);
+  const [registeringPasskey, setRegisteringPasskey] = useState(false);
+  const [newDeviceName, setNewDeviceName] = useState('My Device Key');
+
+  useEffect(() => {
+    if (activeTab === 'security' && user) {
+      loadPasskeys();
+    }
+  }, [activeTab, user]);
+
+  const loadPasskeys = async () => {
+    setLoadingPasskeys(true);
+    try {
+      const res = await authApi.getPasskeys();
+      setPasskeys(res?.data || []);
+    } catch (err) {
+      console.warn('Failed to load passkeys:', err);
+    } finally {
+      setLoadingPasskeys(false);
+    }
+  };
+
+  const handleRegisterPasskey = async (e) => {
+    e.preventDefault();
+    const label = newDeviceName.trim() || 'My Biometric Key';
+    setRegisteringPasskey(true);
+    try {
+      await registerPasskey(label);
+      success(`Passkey "${label}" registered with Touch ID / Biometrics!`);
+      setNewDeviceName('My Device Key');
+      await loadPasskeys();
+    } catch (err) {
+      error(err.message || 'Passkey enrollment failed or was cancelled.');
+    } finally {
+      setRegisteringPasskey(false);
+    }
+  };
+
+  const handleDeletePasskey = async (id, deviceName) => {
+    try {
+      await authApi.deletePasskey(id);
+      success(`Passkey "${deviceName || 'Key'}" removed.`);
+      setPasskeys((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      error(err.message || 'Failed to remove passkey.');
+    }
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -91,6 +145,23 @@ export default function ProfilePage() {
             </div>
             <span className="text-[9px] font-mono px-1.5 py-0.5 uppercase bg-[#C2A676]/20 text-[#C2A676] font-bold">
               {currentTier.id.toUpperCase()}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('security')}
+            className={`w-full text-left flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider font-semibold transition-all ${
+              activeTab === 'security'
+                ? 'bg-[#141414] text-[#C2A676] dark:bg-[#C2A676] dark:text-[#141414] shadow-xs'
+                : 'bg-white dark:bg-[#181722] hover:bg-[#F3F1EC] dark:hover:bg-neutral-800 text-[#141414] dark:text-white border border-[#E8E6E1] dark:border-[#2A2834]'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <Fingerprint className="w-4 h-4 text-[#C2A676]" />
+              <span>Passkeys & Touch ID</span>
+            </div>
+            <span className="text-[9px] font-mono px-1.5 py-0.5 uppercase bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold">
+              FIDO2
             </span>
           </button>
 
@@ -358,6 +429,150 @@ export default function ProfilePage() {
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {/* Tab 3: Biometric Passkeys & Security */}
+        {activeTab === 'security' && (
+          <div className="md:col-span-3 space-y-6">
+            <div className="bg-white dark:bg-[#16151E] border border-[#E8E6E1] dark:border-[#2A2834] p-6 lg:p-8 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8E6E1] dark:border-[#26242E] pb-4">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[10px] font-mono font-semibold uppercase tracking-wider mb-1">
+                    <Shield className="w-3 h-3 text-amber-500" />
+                    <span>WebAuthn FIDO2 Standard</span>
+                  </div>
+                  <h2 className="font-serif text-xl sm:text-2xl uppercase tracking-wider text-[#141414] dark:text-white">
+                    Biometric Passkeys & Touch ID
+                  </h2>
+                  <p className="text-xs text-[#787570] dark:text-[#A3A099] mt-1">
+                    Sign in instantaneously using Apple Touch ID, Face ID, Windows Hello, or Android Fingerprint.
+                  </p>
+                </div>
+
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E8E6E1] dark:border-[#2A2834] text-[11px] font-medium">
+                  <span className={`w-2 h-2 rounded-full ${passkeySupported ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                  <span className="text-[#141414] dark:text-white">
+                    {passkeySupported ? 'Biometrics Available' : 'WebAuthn Ready'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Enroll New Passkey Section */}
+              <div className="p-5 rounded-xl bg-gradient-to-br from-[#FAF9F5] to-[#F3F1EC] dark:from-[#1A1924] dark:to-[#12111A] border border-[#E8E6E1] dark:border-[#2A2834] space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <KeyRound className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs uppercase tracking-wider font-semibold text-[#141414] dark:text-white">
+                      Enroll This Device Passkey
+                    </h3>
+                    <p className="text-[11px] text-[#787570] dark:text-[#A3A099]">
+                      Create a hardware-bound cryptographic credential stored in your device's Secure Enclave.
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleRegisterPasskey} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+                  <input
+                    type="text"
+                    value={newDeviceName}
+                    onChange={(e) => setNewDeviceName(e.target.value)}
+                    placeholder="Device nickname (e.g., MacBook Touch ID, Windows Hello)"
+                    className="flex-1 bg-white dark:bg-[#121118] border border-[#E8E6E1] dark:border-[#2A2834] px-4 py-2.5 text-xs text-[#141414] dark:text-white rounded-lg focus:outline-none focus:border-[#141414] dark:focus:border-[#C2A676]"
+                  />
+                  <button
+                    type="submit"
+                    disabled={registeringPasskey}
+                    className="px-5 py-2.5 bg-[#141414] dark:bg-[#C2A676] text-[#FAF9F5] dark:text-[#141414] text-xs uppercase tracking-wider font-semibold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50 shrink-0"
+                  >
+                    <Fingerprint className={`w-4 h-4 ${registeringPasskey ? 'animate-pulse' : ''}`} />
+                    <span>{registeringPasskey ? 'Enrolling...' : 'Register Passkey'}</span>
+                  </button>
+                </form>
+              </div>
+
+              {/* Registered Passkeys List */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs uppercase tracking-wider font-semibold text-[#141414] dark:text-white">
+                    Enrolled Biometric Keys ({passkeys.length})
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={loadPasskeys}
+                    className="text-[11px] text-[#787570] dark:text-[#A3A099] hover:underline"
+                  >
+                    Refresh
+                  </button>
+                </div>
+
+                {loadingPasskeys ? (
+                  <div className="py-8 text-center text-xs text-[#787570]">
+                    Loading enrolled passkeys...
+                  </div>
+                ) : passkeys.length === 0 ? (
+                  <div className="py-8 px-4 rounded-xl border border-dashed border-[#E8E6E1] dark:border-[#2A2834] text-center space-y-2">
+                    <Fingerprint className="w-8 h-8 text-[#A3A099] mx-auto stroke-1" />
+                    <p className="text-xs text-[#787570] dark:text-[#A3A099]">
+                      No personal biometric passkeys enrolled yet on this device.
+                    </p>
+                    <p className="text-[11px] text-[#A3A099]">
+                      Click "Register Passkey" above to pair your current device fingerprint or face sensor.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-[#E8E6E1] dark:divide-[#26242E] border border-[#E8E6E1] dark:border-[#2A2834] rounded-xl overflow-hidden">
+                    {passkeys.map((cred) => (
+                      <div
+                        key={cred.id}
+                        className="p-4 bg-white dark:bg-[#16151E] flex items-center justify-between gap-4 hover:bg-[#FAF9F5] dark:hover:bg-[#1A1924] transition-colors"
+                      >
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <div className="w-9 h-9 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                            <Fingerprint className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-semibold text-[#141414] dark:text-white truncate">
+                                {cred.deviceName || 'Biometric Passkey'}
+                              </span>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold uppercase">
+                                Active
+                              </span>
+                            </div>
+                            <p className="text-[10px] font-mono text-[#787570] dark:text-[#A3A099] truncate mt-0.5">
+                              ID: {cred.id.substring(0, 18)}... • Enrolled: {new Date(cred.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePasskey(cred.id, cred.deviceName)}
+                          className="p-2 text-[#787570] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors shrink-0"
+                          title="Revoke and delete this passkey"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Zero-Knowledge Security Notice */}
+              <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs text-[#787570] dark:text-[#A3A099] space-y-1">
+                <span className="font-semibold text-[#141414] dark:text-[#F3E8D0] flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-amber-500" />
+                  Hardware-Enforced Zero Knowledge Privacy
+                </span>
+                <p className="text-[11px] leading-relaxed">
+                  Your biometric traits (fingerprints, facial scans) never leave your physical device's Secure Enclave / TPM hardware. ÉLANE only verifies cryptographic FIDO2 proof signatures, ensuring complete immunity against phishing, keyloggers, and data breaches.
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>

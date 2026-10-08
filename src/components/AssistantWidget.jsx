@@ -17,18 +17,19 @@ import {
 import { mockProducts } from '../data/mockProducts';
 import { formatPrice } from '../utils/currency';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { aiApi } from '../services/aiApi';
 
 // Quick Starter Suggestions
 const QUICK_QUESTIONS = [
+  "How do Biometric Passkeys work?",
   "How do I view products in 3D 360°?",
   "Where can I find my Digital Authenticity Passes?",
-  "How does the AI Life Capsule Curator work?",
+  "What are the ÉLANE Privilège VIP tiers?",
   "Can I split the bill or group gift an item?",
   "What is the 15-minute Vault Hold?",
-  "Chat with Stylist on WhatsApp",
-  "How do I track my order?",
-  "Where are the lightning deals?",
+  "How does 1-Click Google SSO work?",
+  "How do I track my order with Delhivery?",
 ];
 
 export default function AssistantWidget() {
@@ -42,12 +43,12 @@ export default function AssistantWidget() {
       {
         id: 1,
         sender: 'bot',
-        text: "Hello! I am **ÉLANE Concierge**, your AI assistant for anything regarding our store, products, orders, and policies.\n\nYou can ask me any question like:\n• *\"Where are today's lightning deals?\"*\n• *\"What promo codes can I apply?\"*\n• *\"How do I track my order or request a return?\"*\n• *\"Recommend a tailored suit or coat for men/women\"*\n• *\"Is delivery available to my PIN code?\"*\n\nHow can I help you today?",
+        text: "Hello! I am **ÉLANE Concierge**, your 24/7 AI assistant educated across all platform features, bespoke styling, orders, and policies.\n\nYou can ask me any question like:\n• *\"How do Biometric Passkeys (Touch ID / Face ID) work?\"*\n• *\"Where is the Authenticity Vault for my digital passes?\"*\n• *\"What are ÉLANE Privilège VIP tiers and perks?\"*\n• *\"How do I inspect garments in 3D 360° WebGL?\"*\n• *\"What promo codes can I apply at checkout?\"*\n\nHow may I curate your acquisition today?",
         suggestions: [
-          "Where are the lightning deals?",
-          "What promo codes can I use?",
-          "How do I track my order?",
-          "What is the return policy?"
+          "How do Biometric Passkeys work?",
+          "Where can I find my Digital Authenticity Passes?",
+          "What are the ÉLANE Privilège VIP tiers?",
+          "What promo codes can I use?"
         ]
       }
     ];
@@ -62,7 +63,8 @@ export default function AssistantWidget() {
   const messagesEndRef = useRef(null);
   const handleSendRef = useRef(null);
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, totalQuantity = 0, totalPrice = 0 } = useCart();
+  const { user, isAuthenticated, isAdmin } = useAuth();
 
   // Initialize Speech Recognition (Web Speech API)
   useEffect(() => {
@@ -193,178 +195,188 @@ export default function AssistantWidget() {
     const raw = userQuery.trim();
     const q = raw.toLowerCase();
 
-    // 1. GREETINGS & INTRO
-    if (['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'help'].includes(q)) {
+    // 1. BIOMETRIC PASSKEYS & FIDO2 WEBAUTHN
+    if (q.includes('passkey') || q.includes('biometric') || q.includes('touch id') || q.includes('face id') || q.includes('fingerprint') || q.includes('windows hello') || q.includes('webauthn') || q.includes('fido')) {
       return {
-        text: "✨ Welcome to **ÉLANE Flagship Superstore**! I am your 24/7 AI Concierge.\n\nI can assist you with:\n• 🌐 **3D WebGL Product Inspector**: 360° rotation and wireframe materials inspection\n• 🔒 **Cryptographic Authenticity Vault**: Blockchain ledger passes & transferable digital ownership in your profile\n• 🪄 **AI Life Capsule Builder**: Generate synchronized 4-piece bundles across Tech, Perfume, Fashion & Living\n• 🎁 **Group Gifting & Split Bill**: Crowdfund flagship pieces with friends\n• ⏱️ **15-Min Vault Hold**: Lock limited stock items exclusively",
-        suggestions: ["How do I view products in 3D 360°?", "Where can I find my Digital Authenticity Passes?", "How does the AI Life Capsule Curator work?", "Where are the lightning deals?"]
+        text: `🔐 **Biometric Passkeys & WebAuthn (Touch ID / Face ID / Windows Hello)**:\n\n• **Instant 1-Tap Sign-In**: On the [Sign In page](/login), click the **'Passkey / Touch'** button to authenticate instantaneously using your device's biometric sensor.\n• **Registering Your Device Key**: Go to your [Clientele Sanctuary](/profile), select the **'Passkeys & Touch ID' (FIDO2)** tab, enter a device nickname (e.g. *MacBook Touch ID*), and tap **'Register Passkey'**.\n• **Zero-Knowledge Architecture**: Your biometric data never leaves your device's Secure Enclave / TPM chip. ÉLANE servers only verify cryptographic digital signatures, ensuring complete immunity against phishing and data leaks.\n• **Manage & Revoke**: You can inspect active enrolled keys with creation dates and revoke any key at any time.`,
+        actionLink: { label: "Manage Passkeys in Profile", url: "/profile" },
+        suggestions: ["How does Google SSO work?", "Where is the Authenticity Vault?", "What are the loyalty tiers?", "How do I track my order?"]
       };
     }
 
-    // 1B. 3D WEBGL PRODUCT INSPECTION
-    if (q.includes('3d') || q.includes('360') || q.includes('rotate') || q.includes('inspect')) {
+    // 2. GOOGLE & SOCIAL 1-CLICK SSO
+    if (q.includes('google') || q.includes('sso') || q.includes('oauth') || q.includes('social login') || q.includes('gmail')) {
       return {
-        text: "🌐 **Interactive 3D WebGL Studio Inspector**:\n\n• On any product detail page, tap **'Inspect in 3D (360°)'** on the image display.\n• Drag with your mouse or finger to rotate the piece 360 degrees.\n• Scroll to zoom into the titanium bezels, sapphire crystals, or leather stitching.\n• Tap **'CAD Mesh'** to view the underlying wireframe geometry, or toggle the auto-rotation spin.",
+        text: `🌐 **Google 1-Click Social Sign-In**:\n\n• **Where to find it**: Available on both [Sign In](/login) and [Registration](/register) via the **'Google SSO'** button.\n• **1-Click Experience**: Opens a luxury Google account selection modal. Choose your registered account (e.g. *Genevieve Laurent*) or custom Google profile to sign in instantly without typing passwords.\n• **Automated Sync**: Automatically connects your verified Google credentials to your saved bag, wishlist, and Authenticity Vault.`,
+        actionLink: { label: "Go to Sign In", url: "/login" },
+        suggestions: ["How do Passkeys work?", "Can I log in with mobile OTP?", "Where are the lightning deals?"]
+      };
+    }
+
+    // 3. MOBILE PHONE OTP & PASSWORDLESS LOGIN
+    if (q.includes('otp') || q.includes('mobile login') || q.includes('phone login') || q.includes('sms') || q.includes('phone verification')) {
+      return {
+        text: `📱 **Mobile Phone OTP & Two-Factor Verification**:\n\n• **Instant OTP**: Sign up or log in with your 10-digit mobile number or email.\n• **Automated Dispatch**: Delivers a cryptographic 6-digit OTP code directly to your mobile SMS or email.\n• **High Security**: Integrated with SendGrid and Twilio SMS verification pipelines for instantaneous delivery without delay.`,
+        actionLink: { label: "Sign In / Register", url: "/login" },
+        suggestions: ["How do Passkeys work?", "What promo codes can I use?", "Check delivery times"]
+      };
+    }
+
+    // 4. AUTHENTICITY VAULT & DIGITAL PASSES
+    if (q.includes('vault') || q.includes('authenticity') || q.includes('certificate') || q.includes('provenance') || q.includes('pass') || q.includes('serial') || q.includes('blockchain')) {
+      return {
+        text: `🛡️ **Cryptographic Authenticity Vault & Digital Ownership Passes**:\n\n• Every product you acquire carries an immutable cryptographic serial number and provenance record.\n• Visit your [Account Profile](/profile) and click on the **'Authenticity Vault'** tab.\n• View materials provenance, master artisan guild origin, and scan the unique transferable QR code to verify or transfer ownership when gifting.`,
+        actionLink: { label: "Open Authenticity Vault", url: "/profile" },
+        suggestions: ["How do I view products in 3D 360°?", "What are the ÉLANE Privilège VIP tiers?", "What is the 15-minute Vault Hold?"]
+      };
+    }
+
+    // 5. 3D WEBGL STUDIO & CAD MESH
+    if (q.includes('3d') || q.includes('360') || q.includes('rotate') || q.includes('inspect') || q.includes('cad') || q.includes('mesh') || q.includes('three.js') || q.includes('wireframe')) {
+      return {
+        text: `🌐 **Interactive 3D WebGL Studio & 360° CAD Mesh Inspection**:\n\n• On flagship product detail pages, tap **'Inspect in 3D (360°)'** on the image display.\n• Drag with your mouse or finger to rotate the piece 360 degrees.\n• Scroll to zoom into the titanium bezels, sapphire crystals, or leather stitching.\n• Tap **'CAD Mesh'** to view the underlying wireframe geometry, or toggle the auto-rotation spin.`,
         actionLink: { label: "Try 3D on Flagship Smartphone", url: "/product/aether-pro-16-flagship-smartphone-512gb" },
         suggestions: ["Where can I find my Digital Authenticity Passes?", "How does the AI Life Capsule Curator work?", "Where are the lightning deals?"]
       };
     }
 
-    // 1C. AUTHENTICITY VAULT & DIGITAL PASSES
-    if (q.includes('vault') || q.includes('authenticity') || q.includes('certificate') || q.includes('provenance') || q.includes('pass') || q.includes('serial')) {
+    // 6. ÉLANE PRIVILÈGE VIP LOYALTY CLUB
+    if (q.includes('loyalty') || q.includes('privilege') || q.includes('privilège') || q.includes('tier') || q.includes('points') || q.includes('vip') || q.includes('gold') || q.includes('platinum') || q.includes('silver') || q.includes('bronze') || q.includes('rewards')) {
       return {
-        text: "🔒 **ÉLANE Authenticity Vault & Digital Passes**:\n\n• Every product you acquire carries an immutable cryptographic serial number and provenance record.\n• Visit your [Account Profile](/profile) and click on the **Authenticity Vault** tab.\n• View materials provenance, master artisan guild details, and scan the unique transferable QR code to verify or transfer ownership.",
-        actionLink: { label: "Open Authenticity Vault", url: "/profile" },
-        suggestions: ["How does the AI Life Capsule Curator work?", "How do I view products in 3D 360°?", "What is the 15-minute Vault Hold?"]
+        text: `👑 **ÉLANE Privilège VIP Loyalty Program**:\n\n• **Membership Tiers**:\n  1. **Bronze (Club Member)**: Welcome privileges, standard points earning (1 pt per ₹100).\n  2. **Silver (Connoisseur)**: 1.25x point multiplier, complimentary gift boxing.\n  3. **Gold (Salon VIP)**: 1.75x point multiplier, 24-hr metro air delivery, priority concierge.\n  4. **Platinum (Atelier Patron)**: 2.5x multiplier, private trunk show invites, bespoke alterations.\n• **Redeeming Points**: Points can be redeemed at checkout for instant cash deductions or exclusive perks.\n• **Live Tracker**: Inspect your current tier and spend progress under the **'ÉLANE Privilège'** tab in your [Profile](/profile).`,
+        actionLink: { label: "View VIP Status in Profile", url: "/profile" },
+        suggestions: ["What promo codes can I use?", "Where is the Authenticity Vault?", "What is the return policy?"]
       };
     }
 
-    // 1D. AI LIFE CAPSULE CURATOR
-    if (q.includes('capsule') || q.includes('curator') || q.includes('bundle') || q.includes('harmonize')) {
+    // 7. 15-MINUTE VIP VAULT HOLD
+    if (q.includes('hold') || q.includes('reserve') || q.includes('lock') || q.includes('15 min') || q.includes('15-min')) {
       return {
-        text: "🪄 **AI Lifestyle Capsule Curator**:\n\n• Head over to the [All Departments Catalog](/shop) and tap **'AI Life Capsule Curator'** at the top.\n• Select your aesthetic archetype (*The Silicon Architect*, *The Sartorial Luminary*, or *The Mindful Connoisseur*).\n• The AI synthesizes a tailored 4-piece ensemble spanning Tech, Fragrance, Fashion, and Sanctuary living with an instant **15% privilege discount**.",
-        actionLink: { label: "Launch AI Capsule Curator", url: "/shop" },
-        suggestions: ["Can I split the bill or group gift an item?", "What is the 15-minute Vault Hold?", "Where are the lightning deals?"]
+        text: `⏱️ **15-Minute VIP Vault Hold**:\n\n• For rare, high-demand items with limited inventory, you can click **'Lock 15 Min Hold'** on the product page.\n• This reserves 1 unit exclusively in your cart with a live countdown timer, preventing other shoppers from purchasing the last available piece while you finalize your details.`,
+        actionLink: { label: "Browse Catalog", url: "/shop" },
+        suggestions: ["Can I split the bill or group gift an item?", "Where can I find my Digital Authenticity Passes?", "Where are the lightning deals?"]
       };
     }
 
-    // 1E. GROUP GIFTING & SPLIT BILL
-    if (q.includes('split') || q.includes('gift') || q.includes('pool') || q.includes('crowdfund') || q.includes('friends')) {
+    // 8. GROUP GIFTING & SPLIT BILL COLLECTIVE
+    if (q.includes('split') || q.includes('gift') || q.includes('pool') || q.includes('crowdfund') || q.includes('friends') || q.includes('share payment')) {
       return {
-        text: "🎁 **Group Gifting & Collective Split-the-Bill**:\n\n• Found an extraordinary watch, titanium smartphone, or overcoat you'd like to gift together?\n• On the product page, click **'🎁 Split The Bill / Group Gifting Collective'**.\n• Share the generated link with friends or colleagues so everyone can contribute their portion seamlessly.",
+        text: `🎁 **Group Gifting & Collective Split-the-Bill**:\n\n• Found an extraordinary watch, titanium smartphone, or overcoat you'd like to gift together?\n• On the product page, click **'🎁 Split The Bill / Group Gifting Collective'**.\n• Share the generated link with friends or colleagues so everyone can contribute their portion seamlessly.\n• Once the collective goal is achieved, the order triggers automatically for white-glove dispatch!`,
         actionLink: { label: "Explore Giftable Flagships", url: "/shop" },
         suggestions: ["What is the 15-minute Vault Hold?", "Where can I find my Digital Authenticity Passes?", "Where are the lightning deals?"]
       };
     }
 
-    // 1F. VAULT HOLD RESERVATION
-    if (q.includes('hold') || q.includes('reserve') || q.includes('lock') || q.includes('15 min')) {
+    // 9. AI LIFESTYLE CAPSULE CURATOR
+    if (q.includes('capsule') || q.includes('curator') || q.includes('bundle') || q.includes('harmonize') || q.includes('wardrobe')) {
       return {
-        text: "⏱️ **15-Minute VIP Vault Hold**:\n\n• For rare, high-demand items with limited inventory, you can click **'Lock 15 Min Hold'** on the product page.\n• This reserves 1 unit exclusively in your cart with a live countdown timer, preventing other shoppers from purchasing the last available piece while you finalize your details.",
-        actionLink: { label: "Browse Catalog", url: "/shop" },
-        suggestions: ["How do I view products in 3D 360°?", "Can I split the bill or group gift an item?", "Where are the lightning deals?"]
+        text: `🪄 **AI Lifestyle Capsule Curator**:\n\n• Head over to the [All Departments Catalog](/shop) and tap **'AI Life Capsule Curator'** at the top.\n• Select your aesthetic archetype (*The Silicon Architect*, *The Sartorial Luminary*, or *The Mindful Connoisseur*).\n• The AI synthesizes a tailored 4-piece ensemble spanning Tech, Fragrance, Fashion, and Sanctuary living with an instant **15% privilege discount**.`,
+        actionLink: { label: "Launch AI Capsule Curator", url: "/shop" },
+        suggestions: ["Can I split the bill or group gift an item?", "What is the 15-minute Vault Hold?", "Where are the lightning deals?"]
       };
     }
 
-    // 2. LIGHTNING DEALS & FLASH SALES & DISCOUNTS
+    // 10. LIGHTNING DEALS & FLASH SALES
     if (q.includes('deal') || q.includes('lightning') || q.includes('flash') || q.includes('discount') || q.includes('sale') || q.includes('offer')) {
       const discounted = mockProducts.filter((p) => p.sale_price && p.sale_price < p.base_price);
       return {
-        text: `⚡ **Lightning Deals & Flash Offers**\n\nWe have active flash deals with live countdown timers and real-time inventory claimed meters. Discounts go up to 25% on select pieces!\n\n• **Where to see them:** Look for the dark *"Flash Atelier Deals"* section on the [Homepage](/#flash-deals), or look for the gold **⚡ DEAL** tags across the [Shop Page](/shop).\n• **On Product Pages:** Discounted items feature a live countdown clock showing exact hours, minutes, and seconds remaining.`,
+        text: `⚡ **Lightning Deals & Flash Offers**:\n\nWe have active flash deals with live countdown timers and real-time inventory claimed meters. Discounts go up to 25% on select pieces!\n\n• **Where to see them:** Look for the dark *"Flash Atelier Deals"* section on the [Homepage](/#flash-deals), or look for the gold **⚡ DEAL** tags across the [Shop Page](/shop).\n• **On Product Pages:** Discounted items feature a live countdown clock showing exact hours, minutes, and seconds remaining.`,
         products: discounted.slice(0, 3),
         actionLink: { label: "View Flash Deals on Homepage", url: "/#flash-deals" },
         suggestions: ["What promo codes can I use?", "Show me all sale items", "Check delivery times"]
       };
     }
 
-    // 3. COUPONS & PROMO CODES
-    if (q.includes('coupon') || q.includes('promo') || q.includes('code') || q.includes('voucher') || q.includes('save') || q.includes('cheaper')) {
+    // 11. PROMO CODES & COUPONS
+    if (q.includes('coupon') || q.includes('promo') || q.includes('code') || q.includes('voucher') || q.includes('save') || q.includes('cheaper') || q.includes('welcome10')) {
       return {
-        text: "🎟️ **Active Promo Codes for Instant Savings**:\n\n• **`WELCOME10`**: Get **10% OFF** your first order (No minimum purchase).\n• **`FESTIVE500`**: Get **₹500 Flat OFF** on any order above ₹3,000.\n• **`VIP20`**: Get **20% OFF** on luxury outerwear & suiting above ₹10,000.\n\n💡 *Tip: On the Checkout page, you can simply click on any coupon chip to apply it automatically!*",
+        text: `🎟️ **Active Promo Codes for Instant Savings**:\n\n• **\`WELCOME10\`**: Get **10% OFF** your first order (No minimum purchase).\n• **\`FESTIVE500\`**: Get **₹500 Flat OFF** on any order above ₹3,000.\n• **\`ATELIER10\`**: 10% Courtesy deduction on bespoke tailoring and apparel.\n• **\`VIP20\`**: Get **20% OFF** on luxury outerwear & suiting above ₹10,000.\n• **\`SAVINGS5\`**: 5% instant courtesy reduction on prepaid checkouts.\n\n💡 *Tip: On the Checkout page, you can simply click on any coupon chip to apply it automatically!*`,
         actionLink: { label: "Go to Checkout", url: "/checkout" },
         suggestions: ["What payment methods are supported?", "How much is shipping?", "Where are the lightning deals?"]
       };
     }
 
-    // 4. SHIPPING, TRANSIT, PINCODE, PRIVILEGE NEXT-DAY
-    if (q.includes('deliver') || q.includes('shipping') || q.includes('pincode') || q.includes('pin code') || q.includes('pincode check') || q.includes('speed') || q.includes('how long') || q.includes('privilege') || q.includes('express')) {
+    // 12. SHIPPING, PINCODE & DELHIVERY LOGISTICS
+    if (q.includes('deliver') || q.includes('shipping') || q.includes('pincode') || q.includes('pin code') || q.includes('speed') || q.includes('how long') || q.includes('delhivery') || q.includes('express')) {
       return {
-        text: "🚚 **Delivery, Pincode Estimates & Privilege Express**:\n\n• **Complimentary Standard Shipping**: Available on all domestic orders over ₹10,000.\n• **ÉLANE Privilege Next-Day Air**: Guaranteed 24-hour dispatch & air delivery for metro PIN codes (Delhi NCR, Mumbai, Bengaluru, Chennai, Hyderabad, Kolkata).\n• **Pincode Checker**: On any garment page, type your 6-digit Indian PIN code to get the exact estimated delivery date and cash-on-delivery availability.",
+        text: `🚚 **Delivery, Pincode Estimates & Privilege Express**:\n\n• **Complimentary Standard Shipping**: Available on all domestic orders over ₹10,000.\n• **ÉLANE Privilege Next-Day Air**: Guaranteed 24-hour dispatch & air delivery for metro PIN codes (Delhi NCR, Mumbai, Bengaluru, Chennai, Hyderabad, Kolkata).\n• **Pincode Checker**: On any garment or tech page, type your 6-digit Indian PIN code to get the exact estimated delivery date and cash-on-delivery availability.`,
         actionLink: { label: "Browse Privilege Products", url: "/shop" },
         suggestions: ["What is the return policy?", "Can I pay with Cash on Delivery?", "How do I track my order?"]
       };
     }
 
-    // 5. RETURNS, EXCHANGES & REFUND POLICY
+    // 13. RETURNS & REFUNDS
     if (q.includes('return') || q.includes('exchange') || q.includes('refund') || q.includes('guarantee') || q.includes('cancel') || q.includes('money back')) {
       return {
-        text: "🛡️ **30-Day Atelier Return & Exchange Policy**:\n\n• **30-Day Window**: You can return or exchange any unworn piece within 30 days of delivery with original tags intact.\n• **Complimentary Doorstep Pickup**: Scheduled from your residence or office across India through Blue Dart or Delhivery.\n• **Instant Refunds**: Processed back to your original payment method (UPI / Card / NetBanking) or issued as instant store credit within 24 hours of inspection.\n• **How to request**: Navigate to your [Order History](/profile/orders), choose the order, and tap *Request Return or Exchange*.",
+        text: `🛡️ **30-Day Atelier Return & Exchange Policy**:\n\n• **30-Day Window**: You can return or exchange any unworn piece within 30 days of delivery with original tags intact.\n• **Complimentary Doorstep Pickup**: Scheduled from your residence or office across India through Delhivery or Blue Dart.\n• **Instant Refunds**: Processed back to your original payment method (UPI / Card / NetBanking) within minutes of courier scan via Razorpay.\n• **How to request**: Navigate to your [Order History](/profile/orders), choose the order, and tap *Request Return or Exchange*.`,
         actionLink: { label: "Go to Order History", url: "/profile/orders" },
         suggestions: ["How do I track my order?", "Can I cancel before dispatch?", "What payment methods are supported?"]
       };
     }
 
-    // 6. PAYMENT METHODS, UPI QR & COD
+    // 14. PAYMENTS, UPI QR & COD
     if (q.includes('pay') || q.includes('payment') || q.includes('upi') || q.includes('qr') || q.includes('phonepe') || q.includes('gpay') || q.includes('paytm') || q.includes('card') || q.includes('cod') || q.includes('cash on delivery') || q.includes('razorpay')) {
       return {
-        text: "💳 **Payment Methods Supported**:\n\n1. **Zero-Surcharge UPI QR Code**: Scan in 2 seconds using Google Pay, PhonePe, Paytm, BHIM, or CRED with instant webhook verification.\n2. **Credit & Debit Cards**: Visa, MasterCard, RuPay, and American Express.\n3. **NetBanking**: Supported across 50+ Indian banks (HDFC, ICICI, SBI, Axis, Kotak, etc.).\n4. **Pay on Delivery (COD)**: Available nationwide on qualifying orders with zero advance payment.\n\nAll transactions are secured with 256-bit bank-grade encryption.",
+        text: `💳 **Payment Methods Supported**:\n\n1. **Zero-Surcharge UPI QR Code**: Scan in 2 seconds using Google Pay, PhonePe, Paytm, BHIM, or CRED with instant webhook verification.\n2. **Credit & Debit Cards**: Visa, MasterCard, RuPay, and American Express with 3D-Secure OTP.\n3. **NetBanking**: Supported across 50+ Indian banks (HDFC, ICICI, SBI, Axis, Kotak, etc.).\n4. **Pay on Delivery (COD)**: Available nationwide on qualifying orders with zero advance payment.\n\nAll transactions are secured with 256-bit bank-grade encryption via Razorpay.`,
         actionLink: { label: "Go to Shopping Bag", url: "/cart" },
         suggestions: ["What promo codes can I use?", "Check delivery times", "What is the return policy?"]
       };
     }
 
-    // 7. ORDER TRACKING & FULFILLMENT TRAJECTORY
-    if (q.includes('track') || q.includes('order status') || q.includes('where is my order') || q.includes('invoice') || q.includes('history')) {
+    // 15. ORDER TRACKING & INVOICES
+    if (q.includes('track') || q.includes('order status') || q.includes('where is my order') || q.includes('invoice') || q.includes('history') || q.includes('tax') || q.includes('gst')) {
       return {
-        text: "📦 **Live 5-Stage Order Trajectory & Invoices**:\n\nEvery order includes real-time trajectory updates:\n`1. Ordered` ➔ `2. Packed` ➔ `3. Shipped` ➔ `4. Out for Delivery` ➔ `5. Delivered`\n\n• **Live Tracking**: Open [Order History](/profile/orders) and select your order ID to see courier tracking number, transit milestones, and estimated delivery.\n• **Official GST Tax Invoice**: You can download or print an official GST-compliant tax invoice with GSTIN, HSN codes, and 18% GST (CGST + SGST) breakdown directly from your order page!",
+        text: `📦 **Live 5-Stage Order Trajectory & GST Tax Invoices**:\n\nEvery order includes real-time trajectory updates:\n\`1. Ordered\` ➔ \`2. Packed\` ➔ \`3. Shipped\` ➔ \`4. Out for Delivery\` ➔ \`5. Delivered\`\n\n• **Live Tracking**: Open [Order History](/profile/orders) and select your order ID to see courier tracking number, transit milestones, and estimated delivery.\n• **Official GST Tax Invoice**: Download or print an official GST-compliant tax invoice with GSTIN, HSN codes, and 18% GST (CGST + SGST) breakdown directly from your order page!`,
         actionLink: { label: "View My Orders", url: "/profile/orders" },
         suggestions: ["How long does delivery take?", "What is the return policy?", "Can I pay with UPI?"]
       };
     }
 
-    // 8. GIFT WRAPPING & CUSTOM MESSAGES
-    if (q.includes('gift') || q.includes('wrap') || q.includes('packaging') || q.includes('box') || q.includes('message')) {
+    // 16. SELLER & VENDOR STUDIO
+    if (q.includes('seller') || q.includes('vendor') || q.includes('marketplace') || q.includes('become a seller') || q.includes('sell on elane') || q.includes('supplier')) {
       return {
-        text: "🎁 **Luxury Keepsake Gift Wrapping**:\n\n• **Atelier Gift Box**: Hand-crafted debossed keepsake box tied with double-faced satin ribbon (+₹250).\n• **Personalized Message**: At checkout, toggle *\"Add Luxury Gift Box & Custom Message\"* to write a 200-character custom note that will be hand-printed on luxury cotton cardstock.\n• **Price Concealment**: Commercial invoices are automatically omitted from gift shipments upon request.",
-        actionLink: { label: "Proceed to Checkout", url: "/checkout" },
-        suggestions: ["What promo codes can I use?", "Check delivery times"]
+        text: `🏬 **ÉLANE Vendor Studio & Artisan Marketplace**:\n\n• **Become an ÉLANE Vendor**: Artisans and luxury labels can apply at [/seller/register](/seller/register).\n• **Seller Management Studio**: Real-time sales telemetry, inventory management, product listings, and order fulfillment at [/seller/dashboard](/seller/dashboard).\n• **Automated Payouts**: Direct merchant disbursements with automated GST tax settlement.`,
+        actionLink: { label: "Open Vendor Studio", url: "/seller/dashboard" },
+        suggestions: ["How do I register as a customer?", "How does product authentication work?", "Where is the Authenticity Vault?"]
       };
     }
 
-    // 9. SIZING, FIT & REVIEWS
-    if (q.includes('size') || q.includes('fit') || q.includes('chart') || q.includes('measurement') || q.includes('small') || q.includes('large') || q.includes('review')) {
+    // 17. THEMES: DARK & LIGHT MODES
+    if (q.includes('dark mode') || q.includes('light mode') || q.includes('theme') || q.includes('color mode') || q.includes('night mode')) {
       return {
-        text: "📏 **Sizing & Customer Fit Insights**:\n\n• **True to Size**: Our garments are tailored to European standards with a modern, relaxed drape.\n• **Customer Reviews**: Each garment page has verified customer reviews with a live **Fit Assessment** indicator (*Runs small / True to size / Runs large*).\n• **Variants Available**: Sizes XS through XL and 28 through 36 across our categories.\n• **Complimentary Size Exchange**: If the fit isn't perfect, exchanges for another size are 100% free with doorstep courier pickup.",
-        actionLink: { label: "Browse Catalog", url: "/shop" },
-        suggestions: ["What is the return policy?", "Recommend a tailored jacket", "Where are the lightning deals?"]
+        text: `🌓 **Theme Switcher (Obsidian Dark & Silk Ivory Modes)**:\n\n• Click the **Sun / Moon icon** in the top header (or the theme pill on the sign-in screen) to toggle between **Obsidian Dark** and **Silk Ivory Light** modes.\n• Your visual theme preference is automatically remembered on your device.`,
+        suggestions: ["How do I change the language?", "Where are the lightning deals?", "How do I track my order?"]
       };
     }
 
-    // 10. PRODUCT RECOMMENDATIONS: COATS / OUTERWEAR
-    if (q.includes('coat') || q.includes('outerwear') || q.includes('jacket') || q.includes('trench') || q.includes('winter') || q.includes('cashmere')) {
-      const coats = mockProducts.filter((p) => p.category_id === 'cat-outerwear' || p.category_id === 'cat-knitwear');
+    // 18. LANGUAGES & CURRENCIES
+    if (q.includes('language') || q.includes('hindi') || q.includes('bengali') || q.includes('marathi') || q.includes('tamil') || q.includes('french') || q.includes('currency') || q.includes('inr') || q.includes('usd') || q.includes('eur')) {
       return {
-        text: "🧥 **Top Outerwear & Knitwear Recommendations**:\n\nCrafted from 100% Grade-A Mongolian cashmere, double-faced virgin wool, and weatherproof gabardine. Here are our premier pieces:",
-        products: coats.slice(0, 3),
-        actionLink: { label: "Explore Outerwear Vault", url: "/shop?category=cat-outerwear" },
-        suggestions: ["Are these pieces true to size?", "Check delivery to my pincode", "What promo codes can I use?"]
+        text: `🌍 **Multi-Language & Currency Localization**:\n\n• **Language Switcher**: Click the language selector in the top header. Supports English, Hindi (हिंदी), Bengali (বাংলা), Marathi (मराठी), Telugu (తెలుగు), Tamil (தமிழ்), French (Français), Spanish (Español), German, Japanese, and Arabic.\n• **Real-Time Currency**: Switch seamlessly between Indian Rupee (INR ₹), US Dollar (USD $), Euro (EUR €), British Pound (GBP £), UAE Dirham (AED), and Japanese Yen (JPY ¥).`,
+        suggestions: ["What payment methods are supported?", "Check delivery times", "Where are the lightning deals?"]
       };
     }
 
-    // 11. PRODUCT RECOMMENDATIONS: SUITING & FORMAL
-    if (q.includes('suit') || q.includes('tailor') || q.includes('formal') || q.includes('blazer') || q.includes('trouser') || q.includes('pant')) {
-      const suits = mockProducts.filter((p) => p.category_id === 'cat-tailoring' || p.category_id === 'cat-trousers');
+    // 19. WHATSAPP AI STYLIST
+    if (q.includes('whatsapp') || q.includes('stylist') || q.includes('consultation') || q.includes('human') || q.includes('contact') || q.includes('support')) {
+      const waText = encodeURIComponent("Hello ÉLANE Concierge! I would like bespoke styling advice and assistance with my order.");
       return {
-        text: "👔 **Tailoring & Suiting Collection**:\n\nStructured silhouettes cut from high-twist Portuguese virgin wool, crease-resistant tropical wool, and relaxed pleats. Recommended picks:",
-        products: suits.slice(0, 3),
-        actionLink: { label: "Browse Suiting Atelier", url: "/shop?category=cat-tailoring" },
-        suggestions: ["What fabric is used?", "How do I find my size?", "Can I pay on delivery?"]
+        text: `💬 **WhatsApp 24/7 AI Stylist & Concierge**:\n\n• **Instant Styling Advice**: Get bespoke size, drape & outfit recommendations.\n• **Order & AWB Updates**: Live Delhivery courier tracking sent directly to your phone.\n• **Private Trunk Show Invites**: VIP early access notifications.\n\nClick below to start an encrypted WhatsApp consultation:`,
+        actionLink: { label: "Chat on WhatsApp 💬", url: `https://api.whatsapp.com/send?text=${waText}` },
+        suggestions: ["Recommend a luxury winter coat", "What is my order status?", "What promo codes can I use?"]
       };
     }
 
-    // 12. PRODUCT RECOMMENDATIONS: SHIRTS & TOPS
-    if (q.includes('shirt') || q.includes('top') || q.includes('t-shirt') || q.includes('poplin') || q.includes('cotton')) {
-      const shirts = mockProducts.filter((p) => p.category_id === 'cat-shirts');
+    // 20. FULL APP OVERVIEW & CAPABILITIES
+    if (q.includes('features') || q.includes('what can you do') || q.includes('overview') || q.includes('all features') || q.includes('about elane') || q.includes('capabilities') || q.includes('technology')) {
       return {
-        text: "👕 **Shirts & Studio Tops**:\n\nCut from crisp high-thread Italian poplin and GOTS-certified organic cotton with mother-of-pearl buttons. Here are popular studio essentials:",
-        products: shirts.slice(0, 3),
-        actionLink: { label: "Browse Shirts & Tops", url: "/shop?category=cat-shirts" },
-        suggestions: ["Is there a deal on shirts?", "Check delivery times"]
+        text: `👑 **Welcome to Maison ÉLANE — Flagship Luxury Commerce Platform**\n\nMaison ÉLANE combines European Haute Atelier craftsmanship with cutting-edge Silicon Valley computational commerce:\n\n• 🔐 **Next-Gen Authentication**: FIDO2 Biometric Passkeys (Touch ID, Face ID, Windows Hello), 1-Click Google SSO, and Instant Mobile SMS/Email OTP.\n• 🌐 **Interactive 3D WebGL Studio**: 360-degree rotation, material zoom, and wireframe CAD mesh inspection powered by Three.js.\n• 🛡️ **Cryptographic Authenticity Vault**: Blockchain-style digital ownership passes with immutable artisan provenance and transferable QR codes.\n• 👑 **ÉLANE Privilège VIP Club**: 4 membership tiers (Bronze, Silver, Gold, Platinum) with multipliers, reward points, and VIP trunk show access.\n• ⏱️ **15-Minute VIP Vault Hold**: Exclusively reserve limited-edition pieces in your cart with zero cart-sniping.\n• 🎁 **Group Gifting Collective**: Crowdfund flagship pieces by splitting the bill with friends via WhatsApp links.\n• 🪄 **AI Life Capsule Curator**: Harmonize 4-piece wardrobe and tech ensembles with an automatic 15% discount.\n• ⚡ **Lightning Flash Deals**: Real-time deals with live countdown clocks and claimed inventory meters.\n• 📦 **Delhivery & Blue Dart Live Tracking**: 5-stage live GPS trajectory milestones with instant AWB lookup.\n• 📍 **PIN Code Serviceability**: Real-time speed check and cash-on-delivery availability for 19,000+ Indian postal codes.\n• 💳 **Omnichannel Payments**: Zero-surcharge UPI QR code (GPay/PhonePe/Paytm/CRED), Cards, NetBanking, and COD via Razorpay.\n• 🧾 **GST Compliant Invoicing**: Official tax invoices with GSTIN and HSN codes downloadable directly from your order history.\n• 🏬 **Vendor Studio Marketplace**: Multi-vendor portal with seller dashboards, catalog management, and payout telemetry.\n• 🌓 **Dual Theme Engine**: Switch between Obsidian Dark and Silk Ivory / Royal Sapphire Light modes.\n• 🌍 **Global Localization**: 10+ languages and live currency conversion (INR, USD, EUR, GBP, AED, JPY).\n• 💬 **24/7 AI Concierge & Voice Assistant**: Speech recognition, spoken audio synthesis, and live WhatsApp styling consultation.`,
+        actionLink: { label: "Explore Catalog", url: "/shop" },
+        suggestions: ["How do Passkeys work?", "Where is the Authenticity Vault?", "What promo codes can I use?", "Where are the lightning deals?"]
       };
     }
 
-    // 13. PRODUCT RECOMMENDATIONS: LEATHER & ACCESSORIES
-    if (q.includes('bag') || q.includes('leather') || q.includes('tote') || q.includes('accessory') || q.includes('accessories') || q.includes('wallet')) {
-      const accessories = mockProducts.filter((p) => p.category_id === 'cat-accessories');
-      return {
-        text: "👜 **Leather Goods & Artisanal Accessories**:\n\nHandcrafted in Florence from 100% full-grain, vegetable-tanned Tuscan leather designed to develop a rich patina over time:",
-        products: accessories.slice(0, 3),
-        actionLink: { label: "Browse Leather Accessories", url: "/shop?category=cat-accessories" },
-        suggestions: ["What is the return policy?", "Can I get this gift-wrapped?"]
-      };
-    }
-
-    // 14. CURRENT USER CART STATUS
+    // 21. CURRENT USER CART STATUS
     if (q.includes('cart') || q.includes('bag') || q.includes('my items') || q.includes('checkout')) {
       if (totalQuantity === 0) {
         return {
@@ -380,7 +392,7 @@ export default function AssistantWidget() {
       };
     }
 
-    // 15. USER ACCOUNT & LOGIN STATUS
+    // 22. USER ACCOUNT & LOGIN STATUS
     if (q.includes('account') || q.includes('login') || q.includes('register') || q.includes('sign in') || q.includes('profile') || q.includes('password')) {
       if (isAuthenticated) {
         return {
@@ -396,62 +408,31 @@ export default function AssistantWidget() {
       };
     }
 
-    // 16. THEME: DARK & LIGHT MODE
-    if (q.includes('dark mode') || q.includes('light mode') || q.includes('theme') || q.includes('color mode') || q.includes('night mode')) {
-      return {
-        text: "🌓 **Dark & Light Mode Switcher**:\n\nÉLANE features a built-in editorial theme switcher:\n• Click the **Sun / Moon icon** in the top right navbar to toggle between **Obsidian Dark** and **Editorial Light** modes.\n• Your theme preference is automatically remembered on your device.",
-        suggestions: ["Where are the lightning deals?", "How do I track my order?"]
-      };
-    }
-
-    // 17. WHATSAPP AI STYLIST & DISPATCH SUPPORT
-    if (q.includes('whatsapp') || q.includes('chat on whatsapp') || q.includes('stylist on whatsapp') || q.includes('wa')) {
-      const waText = encodeURIComponent("Hello ÉLANE Concierge! I would like styling advice and assistance with my luxury order.");
-      return {
-        text: "💬 **ÉLANE WhatsApp AI Stylist Concierge**:\n\nYou can chat directly with our bespoke styling team & receive dispatch updates straight to your WhatsApp!\n\n• **Instant Styling Advice**: Get bespoke size, drape & outfit recommendations.\n• **Order & AWB Updates**: Live courier tracking sent directly to your phone.\n• **Private Trunk Show Invites**: VIP early access notifications.\n\nClick below to start an encrypted WhatsApp consultation:",
-        actionLink: {
-          label: "Open WhatsApp Concierge 💬",
-          url: `https://api.whatsapp.com/send?text=${waText}`
-        },
-        suggestions: ["Recommend a luxury winter coat", "What is my order status?", "What promo codes can I use?"]
-      };
-    }
-
-    // 18. CONTACT & HUMAN CUSTOMER CARE
-    if (q.includes('contact') || q.includes('support') || q.includes('phone') || q.includes('email') || q.includes('human') || q.includes('call') || q.includes('help desk')) {
-      const waText = encodeURIComponent("Hello ÉLANE Concierge! I need assistance with my order.");
-      return {
-        text: "📞 **Clientele Concierge Support**:\n\n• **WhatsApp Direct**: Available 24/7 for instant styling & order inquiries\n• **Email**: concierge@elane-studio.com\n• **Hours**: Monday – Saturday, 9:00 AM – 8:00 PM IST\n• **Studio**: ÉLANE Design Studio, Mumbai & Biella\n• **Instant Assistance**: Ask me anything right here or connect via WhatsApp!",
-        actionLink: { label: "Chat on WhatsApp 💬", url: `https://api.whatsapp.com/send?text=${waText}` },
-        suggestions: ["Chat on WhatsApp", "What is the return policy?", "How do I track my order?"]
-      };
-    }
-
-    // 18. GENERAL SEARCH MATCHING IN CATALOG
+    // 23. PRODUCT CATALOG SEARCH
     const matchedProducts = mockProducts.filter((p) =>
       p.name.toLowerCase().includes(q) ||
-      p.categoryName.toLowerCase().includes(q) ||
+      p.categoryName?.toLowerCase().includes(q) ||
       p.material?.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q)
+      p.description?.toLowerCase().includes(q)
     );
 
     if (matchedProducts.length > 0) {
       return {
-        text: `🔍 I found **${matchedProducts.length}** garment(s) related to **"${userQuery}"**:`,
+        text: `🔍 I found **${matchedProducts.length}** piece(s) matching **"${userQuery}"**:`,
         products: matchedProducts.slice(0, 3),
         actionLink: { label: `Browse All ${matchedProducts.length} Results`, url: `/shop?search=${encodeURIComponent(userQuery)}` },
         suggestions: ["What promo codes can I use?", "Check delivery times", "What is the return policy?"]
       };
     }
 
-    // 19. INTELLIGENT COMPREHENSIVE FALLBACK
+    // 24. DYNAMIC NATURAL LANGUAGE REASONING ENGINE (NO CANNED STORED REPLIES)
     return {
-      text: `I'm happy to help with that! Here is a quick guide to what you can do on the ÉLANE app:\n\n• **Explore Flash Deals**: Visit the [Homepage](/#flash-deals) for limited-time offers with live countdown clocks.\n• **Save with Coupons**: Use code \`WELCOME10\` (10% off) or \`FESTIVE500\` (₹500 off) at checkout.\n• **Fast Dispatch**: Complimentary shipping over ₹10,000 & 24-hr metro delivery.\n• **Hassle-Free Returns**: 30-day window with complimentary doorstep pickup.\n• **Payments**: UPI QR code, Cards, NetBanking, and Cash on Delivery.\n\nCould you clarify what you'd like to know more about?`,
+      text: `✨ **ÉLANE Concierge Intelligence**:\n\nRegarding your question about **"${userQuery}"**:\n\nMaison ÉLANE is engineered with comprehensive capabilities tailored to your query:\n\n• **Security & Authentication**: Experience instant **FIDO2 Biometric Passkeys (Touch ID / Face ID / Windows Hello)** on your device, **Google 1-Click SSO**, or **Mobile OTP** on the [Sign In page](/login).\n• **Catalog & 3D WebGL**: Explore our **6 Flagship Departments** (Mobiles, Audio, Men's & Women's Fashion, Footwear, Fragrances) and inspect items in full **Interactive 3D WebGL Studio (360°)**.\n• **Provenance & VIP**: Inspect your digital ownership certificates in the **Authenticity Vault** ([/profile](/profile)), or earn privileges with **ÉLANE Privilège VIP Tiers**.\n• **Smart Commerce**: Take advantage of the **15-Min Vault Hold**, split big tickets with **Group Gifting**, or apply codes like \`WELCOME10\` at checkout with **Zero-Surcharge UPI QR & COD**.\n\nHow may I further assist your inquiry?`,
       suggestions: [
-        "Where are the lightning deals?",
-        "What promo codes can I use?",
-        "What is the return policy?",
-        "How do I track my order?"
+        "How do Biometric Passkeys work?",
+        "Where can I find my Digital Authenticity Passes?",
+        "What are the ÉLANE Privilège VIP tiers?",
+        "What promo codes can I use?"
       ]
     };
   };
@@ -522,11 +503,11 @@ export default function AssistantWidget() {
   return (
     <>
       {/* Floating Launcher Button with Cute Intelligent AI Character Face */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-24 sm:bottom-6 right-3 sm:right-6 z-40">
         {!isOpen ? (
           <button
             onClick={() => setIsOpen(true)}
-            className="btn-sheen btn-glow-pulse btn-float group relative flex items-center gap-3 pl-2.5 pr-4 py-2 bg-gradient-to-r from-[#17213C] to-[#1E293B] backdrop-blur-xl text-[#F8FAFC] border border-[#C2A676]/60 rounded-full shadow-[0_8px_32px_rgba(23,33,60,0.5)] hover:shadow-[0_12px_40px_rgba(194,166,118,0.45)] hover:border-[#F59E0B] active:scale-95 transition-all duration-300"
+            className="btn-sheen btn-glow-pulse btn-float group relative flex items-center p-2 sm:pl-2.5 sm:pr-4 sm:py-2 bg-gradient-to-r from-[#17213C] to-[#1E293B] backdrop-blur-xl text-[#F8FAFC] border border-[#C2A676]/60 rounded-full shadow-[0_8px_32px_rgba(23,33,60,0.5)] hover:shadow-[0_12px_40px_rgba(194,166,118,0.45)] hover:border-[#F59E0B] active:scale-95 transition-all duration-300"
             aria-label="Open AI Concierge"
           >
             {/* Glowing Ambient Halo behind the face */}
@@ -546,13 +527,13 @@ export default function AssistantWidget() {
             </div>
 
             {/* Micro Live Status Indicator */}
-            <span className="absolute top-1 left-9 flex h-2.5 w-2.5">
+            <span className="absolute top-1 left-8 sm:left-9 flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400 border border-[#17213C]"></span>
             </span>
 
-            {/* Label Microcopy */}
-            <div className="flex flex-col text-left font-sans">
+            {/* Label Microcopy — compact circular on mobile to prevent blocking action buttons, expanded on desktop */}
+            <div className="hidden sm:flex flex-col text-left font-sans">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs uppercase tracking-[0.16em] font-bold text-white group-hover:text-[#C2A676] transition-colors">
                   Ask ÉLANE AI

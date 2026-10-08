@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { X, Sparkles, Sliders, Check, AlertCircle, Info, RefreshCw, Ruler, ShieldCheck } from 'lucide-react';
 
 export default function VirtualFittingModal({ isOpen, onClose, product, selectedSize, onSelectSize }) {
-  if (!isOpen || !product) return null;
-
   // Body proportions state (cm)
   const [gender, setGender] = useState('female');
   const [height, setHeight] = useState(172); // 150 - 195 cm
@@ -14,6 +12,8 @@ export default function VirtualFittingModal({ isOpen, onClose, product, selected
 
   // Current previewed size in the fitting room
   const [previewSize, setPreviewSize] = useState(selectedSize || 'M');
+
+  if (!isOpen || !product) return null;
 
   // Compute recommended size based on body parameters
   const calculateRecommendedSize = () => {

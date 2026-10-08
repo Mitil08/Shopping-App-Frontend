@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import LuxuryEditorialShowcase from '../components/LuxuryEditorialShowcase';
+import FlipkartStyleMobileHome from '../components/FlipkartStyleMobileHome';
 import { mockProducts } from '../data/mockProducts';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -316,10 +317,15 @@ export default function HomePage() {
 
   return (
     <div className="relative flex flex-col overflow-hidden bg-[#FAF8F5] text-[#192238]">
+      {/* Flipkart-Style Mobile Shopping Experience (Mobile Viewports) */}
+      <div className="block lg:hidden">
+        <FlipkartStyleMobileHome onOpenSearch={() => {}} />
+      </div>
 
-
-      {/* 1. Full-Width Editorial Hero Section with Curated Luxury Atmosphere */}
-      <section className="relative min-h-[90vh] lg:min-h-[96vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0F172A] via-[#1E1B4B] to-[#0F172A]">
+      {/* Flagship Editorial Experience (Desktop Viewports) */}
+      <div className="hidden lg:flex lg:flex-col">
+        {/* 1. Full-Width Editorial Hero Section with Curated Luxury Atmosphere */}
+        <section className="relative min-h-[90vh] lg:min-h-[96vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0F172A] via-[#1E1B4B] to-[#0F172A]">
         {/* Curated Luxury Editorial Showcase (App-Relative, Performance-Optimized, No 3D Canvas) */}
         <LuxuryEditorialShowcase />
 
@@ -1253,6 +1259,7 @@ export default function HomePage() {
           )}
         </div>
       </section>
+      </div>
     </div>
   );
 }

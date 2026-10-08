@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo, useCall
 import { cartApi } from '../services/cartApi';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
+import { triggerHaptic } from '../utils/haptics';
 
 const CartContext = createContext(null);
 
@@ -59,10 +60,15 @@ export const CartProvider = ({ children }) => {
     handleAuthSync();
   }, [isAuthenticated, user?.id]);
 
-  // Persist guest cart to localStorage
+  // Persist cart to localStorage for guest and offline resiliency
   useEffect(() => {
-    if (!isAuthenticated) {
-      localStorage.setItem('elane_guest_cart', JSON.stringify(items));
+    try {
+      localStorage.setItem('elane_cached_cart', JSON.stringify(items));
+      if (!isAuthenticated) {
+        localStorage.setItem('elane_guest_cart', JSON.stringify(items));
+      }
+    } catch (e) {
+      console.warn('Cart storage persist warning:', e);
     }
   }, [items, isAuthenticated]);
 
@@ -113,6 +119,7 @@ export const CartProvider = ({ children }) => {
         }
       }
 
+      triggerHaptic('medium');
       success(`Added "${product.name}" to your bag`);
       if (openDrawerOnAdd) {
         setIsDrawerOpen(true);

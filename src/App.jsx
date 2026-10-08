@@ -9,11 +9,13 @@ import { ThemeProvider } from './context/ThemeContext';
 import { LoyaltyProvider } from './context/LoyaltyContext';
 import { CompareProvider } from './context/CompareContext';
 import { CurrencyProvider } from './context/CurrencyContext';
+import { OfflineProvider } from './context/OfflineContext';
 
 import RootLayout from './layouts/RootLayout';
 import AdminLayout from './layouts/AdminLayout';
 import SellerLayout from './layouts/SellerLayout';
 import CapacitorBridge from './components/CapacitorBridge';
+import AuthGate from './components/AuthGate';
 
 // Luxury Code-Splitting with React.lazy for high performance
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -70,20 +72,35 @@ function LuxuryPageLoader() {
 export default function App() {
   return (
     <ThemeProvider>
-      <LanguageProvider>
-        <CurrencyProvider>
-          <ToastProvider>
-            <AuthProvider>
-              <CartProvider>
-                <WishlistProvider>
+      <OfflineProvider>
+        <LanguageProvider>
+          <CurrencyProvider>
+            <ToastProvider>
+              <AuthProvider>
+                <CartProvider>
+                  <WishlistProvider>
                   <LoyaltyProvider>
                     <CompareProvider>
                       <BrowserRouter>
                         <CapacitorBridge />
                         <Suspense fallback={<LuxuryPageLoader />}>
                           <Routes>
-                            {/* Public & Customer Routes */}
-                            <Route path="/" element={<RootLayout />}>
+                            {/* Unauthenticated Authentication Routes (Open to all) */}
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/register" element={<RegisterPage />} />
+                            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                            <Route path="/seller/register" element={<SellerRegisterPage />} />
+                            <Route path="/become-seller" element={<SellerRegisterPage />} />
+
+                            {/* Public & Customer Shopping Routes — Gated: User must log in first */}
+                            <Route
+                              path="/"
+                              element={
+                                <AuthGate>
+                                  <RootLayout />
+                                </AuthGate>
+                              }
+                            >
                               <Route index element={<HomePage />} />
                               <Route path="shop" element={<ShopPage />} />
                               <Route path="product/:slug" element={<ProductDetailPage />} />
@@ -92,11 +109,6 @@ export default function App() {
                               <Route path="cart" element={<CartPage />} />
                               <Route path="checkout" element={<CheckoutPage />} />
                               <Route path="order-success/:orderId" element={<OrderSuccessPage />} />
-                              <Route path="login" element={<LoginPage />} />
-                              <Route path="register" element={<RegisterPage />} />
-                              <Route path="seller/register" element={<SellerRegisterPage />} />
-                              <Route path="become-seller" element={<SellerRegisterPage />} />
-                              <Route path="forgot-password" element={<ForgotPasswordPage />} />
                               <Route path="wishlist" element={<WishlistPage />} />
                               <Route path="profile" element={<ProfilePage />} />
                               <Route path="profile/orders" element={<OrderHistoryPage />} />
@@ -106,8 +118,15 @@ export default function App() {
                               <Route path="*" element={<NotFoundPage />} />
                             </Route>
 
-                            {/* Seller / Merchant Partner Studio */}
-                            <Route path="/seller" element={<SellerLayout />}>
+                            {/* Seller / Merchant Partner Studio — Gated behind AuthGate */}
+                            <Route
+                              path="/seller"
+                              element={
+                                <AuthGate>
+                                  <SellerLayout />
+                                </AuthGate>
+                              }
+                            >
                               <Route index element={<SellerDashboardPage />} />
                               <Route path="dashboard" element={<SellerDashboardPage />} />
                               <Route path="products" element={<SellerProductsPage />} />
@@ -115,8 +134,15 @@ export default function App() {
                               <Route path="orders" element={<SellerOrdersPage />} />
                             </Route>
 
-                            {/* Administrative Back-Office Routes */}
-                            <Route path="/admin" element={<AdminLayout />}>
+                            {/* Administrative Back-Office Routes — Gated behind AuthGate */}
+                            <Route
+                              path="/admin"
+                              element={
+                                <AuthGate>
+                                  <AdminLayout />
+                                </AuthGate>
+                              }
+                            >
                               <Route index element={<AdminDashboardPage />} />
                               <Route path="products" element={<AdminProductsPage />} />
                               <Route path="products/new" element={<AdminProductEditPage />} />
@@ -136,6 +162,7 @@ export default function App() {
           </ToastProvider>
         </CurrencyProvider>
       </LanguageProvider>
+      </OfflineProvider>
     </ThemeProvider>
   );
 }

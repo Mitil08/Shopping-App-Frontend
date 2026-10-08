@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useCart } from './CartContext';
 import { useToast } from './ToastContext';
 import { automationApi } from '../services/automationApi';
+import { triggerHaptic } from '../utils/haptics';
 
 const WishlistContext = createContext(null);
 
@@ -40,9 +41,11 @@ export const WishlistProvider = ({ children }) => {
       setWishlist((prev) => {
         const exists = prev.some((item) => item.id === product.id);
         if (exists) {
+          triggerHaptic('light');
           info(`Removed "${product.name}" from your wishlist`);
           return prev.filter((item) => item.id !== product.id);
         } else {
+          triggerHaptic('medium');
           success(`Saved "${product.name}" to your wishlist`);
           return [...prev, product];
         }

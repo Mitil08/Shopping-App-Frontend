@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, User, Menu, X, ChevronDown, ShieldCheck, LogOut, Package, Globe, Sun, Moon, Camera, Layers, Crown } from 'lucide-react';
+import { Search, ShoppingBag, Heart, User, Menu, X, ChevronDown, ShieldCheck, LogOut, Package, Globe, Sun, Moon, Camera, Layers, Crown, Bell } from 'lucide-react';
 import VisualSearchModal from './VisualSearchModal';
+import PushNotificationCenterModal from './PushNotificationCenterModal';
+import { pushNotificationService } from '../services/pushNotificationService';
+import { triggerHaptic } from '../utils/haptics';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -23,9 +26,19 @@ export default function Navbar({ onOpenSearch }) {
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [currencyMenuOpen, setCurrencyMenuOpen] = useState(false);
   const [visualSearchOpen, setVisualSearchOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    setUnreadCount(pushNotificationService.getUnreadCount());
+    const unsub = pushNotificationService.subscribe(() => {
+      setUnreadCount(pushNotificationService.getUnreadCount());
+    });
+    return () => unsub();
+  }, []);
 
   // Close menus on route change
   useEffect(() => {
@@ -47,7 +60,7 @@ export default function Navbar({ onOpenSearch }) {
   const handleLogout = async () => {
     await logout();
     setUserDropdownOpen(false);
-    navigate('/');
+    navigate('/login');
   };
 
   const navLinks = [
@@ -287,6 +300,24 @@ export default function Navbar({ onOpenSearch }) {
                   </span>
                 )}
               </Link>
+
+              {/* Atelier Dispatches / Notifications Bell */}
+              <button
+                onClick={() => {
+                  triggerHaptic('light');
+                  setNotificationOpen(true);
+                }}
+                className="p-1.5 sm:p-2 text-[#192238] dark:text-[#F8FAFC] hover:text-amber-500 transition-colors relative rounded-full hover:bg-amber-500/10 active:scale-90 group"
+                aria-label="Atelier Dispatches"
+                title="Atelier Notifications & Dispatches"
+              >
+                <Bell className="w-[18px] h-[18px] stroke-[1.75] group-hover:scale-110 transition-transform" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-0.5 right-0.5 bg-amber-500 text-stone-900 text-[8px] sm:text-[8.5px] w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full flex items-center justify-center font-bold shadow-xs animate-pulse">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
 
               {/* Silhouette Comparison Studio Button (Desktop & Tablet md+) */}
               <button
@@ -582,6 +613,12 @@ export default function Navbar({ onOpenSearch }) {
       <VisualSearchModal
         isOpen={visualSearchOpen}
         onClose={() => setVisualSearchOpen(false)}
+      />
+
+      {/* Push Notification & Atelier Dispatch Center Modal */}
+      <PushNotificationCenterModal
+        isOpen={notificationOpen}
+        onClose={() => setNotificationOpen(false)}
       />
     </>
   );

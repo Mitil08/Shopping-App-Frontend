@@ -8,11 +8,13 @@ import AssistantWidget from '../components/AssistantWidget';
 import CompareFloatingBar from '../components/CompareFloatingBar';
 import CompareStudioModal from '../components/CompareStudioModal';
 import RoyalSplashOpening from '../components/RoyalSplashOpening';
+import MobileBottomNav from '../components/MobileBottomNav';
 
 export default function RootLayout() {
   const [searchOpen, setSearchOpen] = useState(false);
-  const [showOpeningSplash, setShowOpeningSplash] = useState(true);
   const location = useLocation();
+  const isPreview = new URLSearchParams(location.search).get('preview') === 'true';
+  const [showOpeningSplash, setShowOpeningSplash] = useState(!isPreview);
 
   // Listen for manual re-trigger event from anywhere in the app
   useEffect(() => {
@@ -37,18 +39,23 @@ export default function RootLayout() {
         <RoyalSplashOpening onComplete={handleSplashComplete} />
       )}
 
-      <Navbar onOpenSearch={() => setSearchOpen(true)} />
+      <div className={location.pathname === '/' ? 'hidden lg:block' : 'block'}>
+        <Navbar onOpenSearch={() => setSearchOpen(true)} />
+      </div>
       <CartDrawer />
       <SearchBar isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
       <AssistantWidget />
       <CompareFloatingBar />
       <CompareStudioModal />
 
-      <main className="flex-1 relative z-20">
+      <main className="flex-1 relative z-20 pb-16 lg:pb-0">
         <Outlet />
       </main>
 
-      <Footer />
+      <div className={location.pathname === '/' ? 'hidden lg:block' : 'block'}>
+        <Footer />
+      </div>
+      <MobileBottomNav />
     </div>
   );
 }
