@@ -19,6 +19,12 @@ export default function GoogleOAuthModal({ isOpen, onClose, onSuccess }) {
   // Pre-configured Google Accounts for seamless 1-click testing
   const savedGoogleAccounts = [
     {
+      name: 'Mitil Chakraborty',
+      email: 'mitilchakraborty08@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
+      badge: 'Active Google Account'
+    },
+    {
       name: 'Lady Genevieve Laurent',
       email: 'genevieve.laurent@gmail.com',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
